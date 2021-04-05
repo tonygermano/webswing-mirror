@@ -347,7 +347,7 @@ public class ServerUtil {
 	
 	public static void clearAdminConsoleCookie(HttpServletResponse resp) {
 		ServerUtil.setTokenCookie(resp, Constants.WEBSWING_SESSION_ADMIN_CONSOLE_REFRESH_TOKEN, "expired", true);
-		ServerUtil.setTokenCookie(resp, Constants.WEBSWING_SESSION_ADMIN_CONSOLE_THREAD_DUMP_TOKEN, "expired", true);
+		ServerUtil.setTokenCookie(resp, Constants.WEBSWING_SESSION_ADMIN_CONSOLE_DOWNLOAD_TOKEN, "expired", true);
 	}
 
 }

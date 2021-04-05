@@ -613,15 +613,19 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher {
 		}
 	}
 
-	protected void fillFocusEvent(AppFrameMsgOut json) {
-		if (focusEvent != null) {
-			json.setFocusEvent(focusEvent);
-			focusEvent = null;
-		}
-	}
-	
 	public void notifyFocusEvent(FocusEventMsgOut msg) {
-		focusEvent = msg;
+		if (msg == null) {
+			return;
+		}
+		
+		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
+		AppFrameMsgOut f = new AppFrameMsgOut();
+		f.setFocusEvent(msg);
+		
+		AppLogger.debug("WebPaintDispatcher:sendNotifyFocusEvent", f);
+		
+		sendObject(msgOut, f);
+		
 		notifyAccessibilityInfoUpdate();
 	}
 	
@@ -921,13 +925,13 @@ public abstract class AbstractPaintDispatcher implements PaintDispatcher {
 		
 		sendObject(msgOut, null);
 	}
-	
+
 	@Override
 	public void notifySessionDataChanged() {
 		AppToServerFrameMsgOut msgOut = new AppToServerFrameMsgOut();
-		
-		SessionDataMsgOut msg = new SessionDataMsgOut(Util.isApplet(), Util.isSessionLoggingEnabled(), Util.getWebToolkit().isRecording(), 
-				Util.getWebToolkit().getRecordingFileName(), Util.getWebToolkit().isStatisticsLoggingEnabled());
+
+		SessionDataMsgOut msg = new SessionDataMsgOut(Util.isApplet(), Util.isSessionLoggingEnabled(), Util.getWebToolkit().getRecordingStatus(),
+				Util.getWebToolkit().getRecordingFileName(), Util.getWebToolkit().getMirroringStatus(), Util.getWebToolkit().isStatisticsLoggingEnabled());
 		msgOut.setSessionData(msg);
 		
 		sendObject(msgOut, null);

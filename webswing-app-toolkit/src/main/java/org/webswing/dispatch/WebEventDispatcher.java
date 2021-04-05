@@ -112,8 +112,17 @@ public class WebEventDispatcher extends AbstractEventDispatcher {
 		case disableStatisticsLogging:
 			Util.getWebToolkit().setStatisticsLoggingEnabled(false);
 			break;
-		case toggleRecording:
-			Util.getWebToolkit().toggleRecording();
+		case startRecording:
+			Util.getWebToolkit().startRecording();
+			break;
+		case stopRecording:
+			Util.getWebToolkit().stopRecording();
+			break;
+		case startMirroring:
+			Util.getWebToolkit().startMirroring();
+			break;
+		case stopMirroring:
+			Util.getWebToolkit().stopMirroring();
 			break;
 		}
 	}

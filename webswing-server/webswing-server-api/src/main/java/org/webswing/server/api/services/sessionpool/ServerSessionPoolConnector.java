@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.webswing.model.adminconsole.in.RecordingRequestMsgIn;
 import org.webswing.model.adminconsole.out.MetricMsgOut;
 import org.webswing.model.adminconsole.out.SessionPoolInfoMsgOut;
 import org.webswing.model.adminconsole.out.StatEntryMsgOut;
@@ -24,6 +25,7 @@ import org.webswing.model.adminconsole.out.ThreadDumpMsgOut;
 import org.webswing.model.app.in.ServerToAppFrameMsgIn;
 import org.webswing.model.app.in.ThreadDumpRequestMsgIn;
 import org.webswing.model.common.in.ConnectionHandshakeMsgIn;
+import org.webswing.model.adminconsole.in.ManageSessionPoolMsgIn;
 import org.webswing.model.common.in.ParamMsgIn;
 import org.webswing.model.common.in.SimpleEventMsgIn;
 import org.webswing.model.common.in.SimpleEventMsgIn.SimpleEventType;
@@ -222,8 +224,12 @@ public abstract class ServerSessionPoolConnector {
 			// if a mirror handshake ends up here it is an error
 			throw new WsException("Direct mirror connection is not allowed!");
 		} else {
-			String ownerId = ServerApiUtil.resolveOwnerIdForSessionMode(r, handshake, sessionMode);
-			instance = instanceHolders.get(path).findInstanceByOwnerId(ownerId);
+			if (handshake.getInstanceId() != null) {
+				instance = instanceHolders.get(path).findInstanceByInstanceId(handshake.getInstanceId());
+			} else {
+				String ownerId = ServerApiUtil.resolveOwnerIdForSessionMode(r, handshake, sessionMode);
+				instance = instanceHolders.get(path).findInstanceByOwnerId(ownerId);
+			}
 		}
 
 		if (instance == null) {
@@ -261,7 +267,9 @@ public abstract class ServerSessionPoolConnector {
 		startupParams.setPathMapping(path);
 		startupParams.setAppName(instance.getAppName());
 		startupParams.setDebugPort(r.getUserInfo().getDebugPort());
-		startupParams.setRecording(r.isRecording());
+		startupParams.setRecordingFlagged(r.isRecordingFlagged());
+		startupParams.setAskForRecordingNeeded(instance.getConfig().isRecordingConsentRequired());
+		startupParams.setAskForMirroringNeeded(instance.getConfig().isMirroringConsentRequired());
 		startupParams.setScreenWidth(handshake.getDesktopWidth());
 		startupParams.setScreenHeight(handshake.getDesktopHeight());
 		startupParams.setParams(convertHandshakeParams(handshake.getParams()));
@@ -355,15 +363,22 @@ public abstract class ServerSessionPoolConnector {
 		
 		requestThreadDumpForInstance(instance);
 	}
-	
-	public final void toggleRecordingForConnectedInstance(String path, String instanceId) throws WsException {
+
+	public final void requestRecordingForConnectedInstance(RecordingRequestMsgIn.RecordingRequestType recordingRequestType, String path, String instanceId) throws WsException {
 		ConnectedSwingInstance instance = getConnectedInstanceByInstanceId(path, instanceId);
-		
+
 		if (instance == null) {
 			return;
 		}
-		
-		instance.toggleRecording();
+
+		switch (recordingRequestType) {
+			case startRecording:
+				instance.startRecording();
+				break;
+			case stopRecording:
+				instance.stopRecording();
+				break;
+		}
 	}
 	
 	public final void toggleStatisticsLoggingForConnectedInstance(String path, String instanceId, Boolean enabled) throws WsException {
@@ -603,4 +618,7 @@ public abstract class ServerSessionPoolConnector {
 
 	public abstract Map<String, String> searchVariables(String path, String user, String search) throws Exception;
 
+	public abstract void handleManageSessionPool(ManageSessionPoolMsgIn manageSessionPool);
+
+	public abstract boolean isDrainMode();
 }

@@ -14,7 +14,9 @@ public class ProcessStartupParams {
 	private String pathMapping;
 	private String appName;
 	private int debugPort;
-	private boolean recording;
+	private boolean recordingFlagged;
+	private boolean askForRecordingNeeded;
+	private boolean askForMirroringNeeded;
 	private SwingConfig appConfig;
 	private VariableSubstitutor subs;
 	private Function<String, File> fileResolver;
@@ -179,12 +181,28 @@ public class ProcessStartupParams {
 		this.appConnectionSecret = appConnectionSecret;
 	}
 
-	public boolean isRecording() {
-		return recording;
+	public boolean isRecordingFlagged() {
+		return recordingFlagged;
 	}
 
-	public void setRecording(boolean recording) {
-		this.recording = recording;
+	public void setRecordingFlagged(boolean recordingFlagged) {
+		this.recordingFlagged = recordingFlagged;
+	}
+
+	public boolean isAskForRecordingNeeded() {
+		return askForRecordingNeeded;
+	}
+
+	public void setAskForRecordingNeeded(boolean askForRecordingNeeded) {
+		this.askForRecordingNeeded = askForRecordingNeeded;
+	}
+
+	public boolean isAskForMirroringNeeded() {
+		return askForMirroringNeeded;
+	}
+
+	public void setAskForMirroringNeeded(boolean askForMirroringNeeded) {
+		this.askForMirroringNeeded = askForMirroringNeeded;
 	}
 
 	public String getDataStoreConfig() {

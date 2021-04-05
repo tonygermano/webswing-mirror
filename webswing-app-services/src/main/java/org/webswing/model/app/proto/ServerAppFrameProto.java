@@ -9478,34 +9478,43 @@ public final class ServerAppFrameProto {
     boolean getSessionLoggingEnabled();
 
     /**
-     * <code>optional bool recording = 3;</code>
+     * <code>optional .commonProto.RecordingStatusEnumProto recordingStatus = 3;</code>
      */
-    boolean hasRecording();
+    boolean hasRecordingStatus();
     /**
-     * <code>optional bool recording = 3;</code>
+     * <code>optional .commonProto.RecordingStatusEnumProto recordingStatus = 3;</code>
      */
-    boolean getRecording();
+    org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto getRecordingStatus();
 
     /**
-     * <code>optional string recordingFile = 4;</code>
+     * <code>optional .commonProto.MirroringStatusEnumProto mirroringStatus = 4;</code>
+     */
+    boolean hasMirroringStatus();
+    /**
+     * <code>optional .commonProto.MirroringStatusEnumProto mirroringStatus = 4;</code>
+     */
+    org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto getMirroringStatus();
+
+    /**
+     * <code>optional string recordingFile = 5;</code>
      */
     boolean hasRecordingFile();
     /**
-     * <code>optional string recordingFile = 4;</code>
+     * <code>optional string recordingFile = 5;</code>
      */
     java.lang.String getRecordingFile();
     /**
-     * <code>optional string recordingFile = 4;</code>
+     * <code>optional string recordingFile = 5;</code>
      */
     com.google.protobuf.ByteString
         getRecordingFileBytes();
 
     /**
-     * <code>optional bool statisticsLoggingEnabled = 5;</code>
+     * <code>optional bool statisticsLoggingEnabled = 6;</code>
      */
     boolean hasStatisticsLoggingEnabled();
     /**
-     * <code>optional bool statisticsLoggingEnabled = 5;</code>
+     * <code>optional bool statisticsLoggingEnabled = 6;</code>
      */
     boolean getStatisticsLoggingEnabled();
   }
@@ -9524,7 +9533,8 @@ public final class ServerAppFrameProto {
     private SessionDataMsgOutProto() {
       applet_ = false;
       sessionLoggingEnabled_ = false;
-      recording_ = false;
+      recordingStatus_ = 1;
+      mirroringStatus_ = 1;
       recordingFile_ = "";
       statisticsLoggingEnabled_ = false;
     }
@@ -9564,18 +9574,37 @@ public final class ServerAppFrameProto {
               break;
             }
             case 24: {
-              bitField0_ |= 0x00000004;
-              recording_ = input.readBool();
+              int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
+              org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto value = org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(3, rawValue);
+              } else {
+                bitField0_ |= 0x00000004;
+                recordingStatus_ = rawValue;
+              }
               break;
             }
-            case 34: {
+            case 32: {
+              int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
+              org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto value = org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(4, rawValue);
+              } else {
+                bitField0_ |= 0x00000008;
+                mirroringStatus_ = rawValue;
+              }
+              break;
+            }
+            case 42: {
               com.google.protobuf.ByteString bs = input.readBytes();
-              bitField0_ |= 0x00000008;
+              bitField0_ |= 0x00000010;
               recordingFile_ = bs;
               break;
             }
-            case 40: {
-              bitField0_ |= 0x00000010;
+            case 48: {
+              bitField0_ |= 0x00000020;
               statisticsLoggingEnabled_ = input.readBool();
               break;
             }
@@ -9642,31 +9671,50 @@ public final class ServerAppFrameProto {
       return sessionLoggingEnabled_;
     }
 
-    public static final int RECORDING_FIELD_NUMBER = 3;
-    private boolean recording_;
+    public static final int RECORDINGSTATUS_FIELD_NUMBER = 3;
+    private int recordingStatus_;
     /**
-     * <code>optional bool recording = 3;</code>
+     * <code>optional .commonProto.RecordingStatusEnumProto recordingStatus = 3;</code>
      */
-    public boolean hasRecording() {
+    public boolean hasRecordingStatus() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional bool recording = 3;</code>
+     * <code>optional .commonProto.RecordingStatusEnumProto recordingStatus = 3;</code>
      */
-    public boolean getRecording() {
-      return recording_;
+    public org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto getRecordingStatus() {
+      @SuppressWarnings("deprecation")
+      org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto result = org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto.valueOf(recordingStatus_);
+      return result == null ? org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto.NOT_RECORDING : result;
     }
 
-    public static final int RECORDINGFILE_FIELD_NUMBER = 4;
-    private volatile java.lang.Object recordingFile_;
+    public static final int MIRRORINGSTATUS_FIELD_NUMBER = 4;
+    private int mirroringStatus_;
     /**
-     * <code>optional string recordingFile = 4;</code>
+     * <code>optional .commonProto.MirroringStatusEnumProto mirroringStatus = 4;</code>
      */
-    public boolean hasRecordingFile() {
+    public boolean hasMirroringStatus() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional string recordingFile = 4;</code>
+     * <code>optional .commonProto.MirroringStatusEnumProto mirroringStatus = 4;</code>
+     */
+    public org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto getMirroringStatus() {
+      @SuppressWarnings("deprecation")
+      org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto result = org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto.valueOf(mirroringStatus_);
+      return result == null ? org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto.NOT_MIRRORING : result;
+    }
+
+    public static final int RECORDINGFILE_FIELD_NUMBER = 5;
+    private volatile java.lang.Object recordingFile_;
+    /**
+     * <code>optional string recordingFile = 5;</code>
+     */
+    public boolean hasRecordingFile() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional string recordingFile = 5;</code>
      */
     public java.lang.String getRecordingFile() {
       java.lang.Object ref = recordingFile_;
@@ -9683,7 +9731,7 @@ public final class ServerAppFrameProto {
       }
     }
     /**
-     * <code>optional string recordingFile = 4;</code>
+     * <code>optional string recordingFile = 5;</code>
      */
     public com.google.protobuf.ByteString
         getRecordingFileBytes() {
@@ -9699,16 +9747,16 @@ public final class ServerAppFrameProto {
       }
     }
 
-    public static final int STATISTICSLOGGINGENABLED_FIELD_NUMBER = 5;
+    public static final int STATISTICSLOGGINGENABLED_FIELD_NUMBER = 6;
     private boolean statisticsLoggingEnabled_;
     /**
-     * <code>optional bool statisticsLoggingEnabled = 5;</code>
+     * <code>optional bool statisticsLoggingEnabled = 6;</code>
      */
     public boolean hasStatisticsLoggingEnabled() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
+      return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional bool statisticsLoggingEnabled = 5;</code>
+     * <code>optional bool statisticsLoggingEnabled = 6;</code>
      */
     public boolean getStatisticsLoggingEnabled() {
       return statisticsLoggingEnabled_;
@@ -9735,13 +9783,16 @@ public final class ServerAppFrameProto {
         output.writeBool(2, sessionLoggingEnabled_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBool(3, recording_);
+        output.writeEnum(3, recordingStatus_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, recordingFile_);
+        output.writeEnum(4, mirroringStatus_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeBool(5, statisticsLoggingEnabled_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, recordingFile_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeBool(6, statisticsLoggingEnabled_);
       }
       unknownFields.writeTo(output);
     }
@@ -9762,14 +9813,18 @@ public final class ServerAppFrameProto {
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(3, recording_);
+          .computeEnumSize(3, recordingStatus_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, recordingFile_);
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(4, mirroringStatus_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, recordingFile_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(5, statisticsLoggingEnabled_);
+          .computeBoolSize(6, statisticsLoggingEnabled_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -9797,10 +9852,13 @@ public final class ServerAppFrameProto {
         result = result && (getSessionLoggingEnabled()
             == other.getSessionLoggingEnabled());
       }
-      result = result && (hasRecording() == other.hasRecording());
-      if (hasRecording()) {
-        result = result && (getRecording()
-            == other.getRecording());
+      result = result && (hasRecordingStatus() == other.hasRecordingStatus());
+      if (hasRecordingStatus()) {
+        result = result && recordingStatus_ == other.recordingStatus_;
+      }
+      result = result && (hasMirroringStatus() == other.hasMirroringStatus());
+      if (hasMirroringStatus()) {
+        result = result && mirroringStatus_ == other.mirroringStatus_;
       }
       result = result && (hasRecordingFile() == other.hasRecordingFile());
       if (hasRecordingFile()) {
@@ -9833,10 +9891,13 @@ public final class ServerAppFrameProto {
         hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
             getSessionLoggingEnabled());
       }
-      if (hasRecording()) {
-        hash = (37 * hash) + RECORDING_FIELD_NUMBER;
-        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-            getRecording());
+      if (hasRecordingStatus()) {
+        hash = (37 * hash) + RECORDINGSTATUS_FIELD_NUMBER;
+        hash = (53 * hash) + recordingStatus_;
+      }
+      if (hasMirroringStatus()) {
+        hash = (37 * hash) + MIRRORINGSTATUS_FIELD_NUMBER;
+        hash = (53 * hash) + mirroringStatus_;
       }
       if (hasRecordingFile()) {
         hash = (37 * hash) + RECORDINGFILE_FIELD_NUMBER;
@@ -9984,12 +10045,14 @@ public final class ServerAppFrameProto {
         bitField0_ = (bitField0_ & ~0x00000001);
         sessionLoggingEnabled_ = false;
         bitField0_ = (bitField0_ & ~0x00000002);
-        recording_ = false;
+        recordingStatus_ = 1;
         bitField0_ = (bitField0_ & ~0x00000004);
-        recordingFile_ = "";
+        mirroringStatus_ = 1;
         bitField0_ = (bitField0_ & ~0x00000008);
-        statisticsLoggingEnabled_ = false;
+        recordingFile_ = "";
         bitField0_ = (bitField0_ & ~0x00000010);
+        statisticsLoggingEnabled_ = false;
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
 
@@ -10029,13 +10092,17 @@ public final class ServerAppFrameProto {
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.recording_ = recording_;
+        result.recordingStatus_ = recordingStatus_;
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
         }
-        result.recordingFile_ = recordingFile_;
+        result.mirroringStatus_ = mirroringStatus_;
         if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
           to_bitField0_ |= 0x00000010;
+        }
+        result.recordingFile_ = recordingFile_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
         }
         result.statisticsLoggingEnabled_ = statisticsLoggingEnabled_;
         result.bitField0_ = to_bitField0_;
@@ -10093,11 +10160,14 @@ public final class ServerAppFrameProto {
         if (other.hasSessionLoggingEnabled()) {
           setSessionLoggingEnabled(other.getSessionLoggingEnabled());
         }
-        if (other.hasRecording()) {
-          setRecording(other.getRecording());
+        if (other.hasRecordingStatus()) {
+          setRecordingStatus(other.getRecordingStatus());
+        }
+        if (other.hasMirroringStatus()) {
+          setMirroringStatus(other.getMirroringStatus());
         }
         if (other.hasRecordingFile()) {
-          bitField0_ |= 0x00000008;
+          bitField0_ |= 0x00000010;
           recordingFile_ = other.recordingFile_;
           onChanged();
         }
@@ -10198,47 +10268,89 @@ public final class ServerAppFrameProto {
         return this;
       }
 
-      private boolean recording_ ;
+      private int recordingStatus_ = 1;
       /**
-       * <code>optional bool recording = 3;</code>
+       * <code>optional .commonProto.RecordingStatusEnumProto recordingStatus = 3;</code>
        */
-      public boolean hasRecording() {
+      public boolean hasRecordingStatus() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional bool recording = 3;</code>
+       * <code>optional .commonProto.RecordingStatusEnumProto recordingStatus = 3;</code>
        */
-      public boolean getRecording() {
-        return recording_;
+      public org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto getRecordingStatus() {
+        @SuppressWarnings("deprecation")
+        org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto result = org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto.valueOf(recordingStatus_);
+        return result == null ? org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto.NOT_RECORDING : result;
       }
       /**
-       * <code>optional bool recording = 3;</code>
+       * <code>optional .commonProto.RecordingStatusEnumProto recordingStatus = 3;</code>
        */
-      public Builder setRecording(boolean value) {
+      public Builder setRecordingStatus(org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
         bitField0_ |= 0x00000004;
-        recording_ = value;
+        recordingStatus_ = value.getNumber();
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool recording = 3;</code>
+       * <code>optional .commonProto.RecordingStatusEnumProto recordingStatus = 3;</code>
        */
-      public Builder clearRecording() {
+      public Builder clearRecordingStatus() {
         bitField0_ = (bitField0_ & ~0x00000004);
-        recording_ = false;
+        recordingStatus_ = 1;
+        onChanged();
+        return this;
+      }
+
+      private int mirroringStatus_ = 1;
+      /**
+       * <code>optional .commonProto.MirroringStatusEnumProto mirroringStatus = 4;</code>
+       */
+      public boolean hasMirroringStatus() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional .commonProto.MirroringStatusEnumProto mirroringStatus = 4;</code>
+       */
+      public org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto getMirroringStatus() {
+        @SuppressWarnings("deprecation")
+        org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto result = org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto.valueOf(mirroringStatus_);
+        return result == null ? org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto.NOT_MIRRORING : result;
+      }
+      /**
+       * <code>optional .commonProto.MirroringStatusEnumProto mirroringStatus = 4;</code>
+       */
+      public Builder setMirroringStatus(org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000008;
+        mirroringStatus_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .commonProto.MirroringStatusEnumProto mirroringStatus = 4;</code>
+       */
+      public Builder clearMirroringStatus() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        mirroringStatus_ = 1;
         onChanged();
         return this;
       }
 
       private java.lang.Object recordingFile_ = "";
       /**
-       * <code>optional string recordingFile = 4;</code>
+       * <code>optional string recordingFile = 5;</code>
        */
       public boolean hasRecordingFile() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>optional string recordingFile = 4;</code>
+       * <code>optional string recordingFile = 5;</code>
        */
       public java.lang.String getRecordingFile() {
         java.lang.Object ref = recordingFile_;
@@ -10255,7 +10367,7 @@ public final class ServerAppFrameProto {
         }
       }
       /**
-       * <code>optional string recordingFile = 4;</code>
+       * <code>optional string recordingFile = 5;</code>
        */
       public com.google.protobuf.ByteString
           getRecordingFileBytes() {
@@ -10271,36 +10383,36 @@ public final class ServerAppFrameProto {
         }
       }
       /**
-       * <code>optional string recordingFile = 4;</code>
+       * <code>optional string recordingFile = 5;</code>
        */
       public Builder setRecordingFile(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000008;
+  bitField0_ |= 0x00000010;
         recordingFile_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string recordingFile = 4;</code>
+       * <code>optional string recordingFile = 5;</code>
        */
       public Builder clearRecordingFile() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         recordingFile_ = getDefaultInstance().getRecordingFile();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string recordingFile = 4;</code>
+       * <code>optional string recordingFile = 5;</code>
        */
       public Builder setRecordingFileBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000008;
+  bitField0_ |= 0x00000010;
         recordingFile_ = value;
         onChanged();
         return this;
@@ -10308,31 +10420,31 @@ public final class ServerAppFrameProto {
 
       private boolean statisticsLoggingEnabled_ ;
       /**
-       * <code>optional bool statisticsLoggingEnabled = 5;</code>
+       * <code>optional bool statisticsLoggingEnabled = 6;</code>
        */
       public boolean hasStatisticsLoggingEnabled() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
+        return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional bool statisticsLoggingEnabled = 5;</code>
+       * <code>optional bool statisticsLoggingEnabled = 6;</code>
        */
       public boolean getStatisticsLoggingEnabled() {
         return statisticsLoggingEnabled_;
       }
       /**
-       * <code>optional bool statisticsLoggingEnabled = 5;</code>
+       * <code>optional bool statisticsLoggingEnabled = 6;</code>
        */
       public Builder setStatisticsLoggingEnabled(boolean value) {
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         statisticsLoggingEnabled_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool statisticsLoggingEnabled = 5;</code>
+       * <code>optional bool statisticsLoggingEnabled = 6;</code>
        */
       public Builder clearStatisticsLoggingEnabled() {
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000020);
         statisticsLoggingEnabled_ = false;
         onChanged();
         return this;
@@ -10490,12 +10602,14 @@ public final class ServerAppFrameProto {
       "MethodProto\022\013\n\007HasRole\020\000\022\017\n\013IsPermitted\020" +
       "\001\"g\n\023JvmStatsMsgOutProto\022\020\n\010heapSize\030\001 \001" +
       "(\001\022\024\n\014heapSizeUsed\030\002 \001(\001\022\020\n\010cpuUsage\030\003 \001" +
-      "(\001\022\026\n\016edtPingSeconds\030\004 \001(\021\"\223\001\n\026SessionDa" +
+      "(\001\022\026\n\016edtPingSeconds\030\004 \001(\021\"\200\002\n\026SessionDa" +
       "taMsgOutProto\022\016\n\006applet\030\001 \001(\010\022\035\n\025session" +
-      "LoggingEnabled\030\002 \001(\010\022\021\n\trecording\030\003 \001(\010\022" +
-      "\025\n\rrecordingFile\030\004 \001(\t\022 \n\030statisticsLogg" +
-      "ingEnabled\030\005 \001(\010B\036\n\034org.webswing.model.a" +
-      "pp.proto"
+      "LoggingEnabled\030\002 \001(\010\022>\n\017recordingStatus\030" +
+      "\003 \001(\0162%.commonProto.RecordingStatusEnumP" +
+      "roto\022>\n\017mirroringStatus\030\004 \001(\0162%.commonPr" +
+      "oto.MirroringStatusEnumProto\022\025\n\rrecordin" +
+      "gFile\030\005 \001(\t\022 \n\030statisticsLoggingEnabled\030" +
+      "\006 \001(\010B\036\n\034org.webswing.model.app.proto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -10575,7 +10689,7 @@ public final class ServerAppFrameProto {
     internal_static_SessionDataMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SessionDataMsgOutProto_descriptor,
-        new java.lang.String[] { "Applet", "SessionLoggingEnabled", "Recording", "RecordingFile", "StatisticsLoggingEnabled", });
+        new java.lang.String[] { "Applet", "SessionLoggingEnabled", "RecordingStatus", "MirroringStatus", "RecordingFile", "StatisticsLoggingEnabled", });
     org.webswing.model.common.proto.CommonProto.getDescriptor();
   }
 

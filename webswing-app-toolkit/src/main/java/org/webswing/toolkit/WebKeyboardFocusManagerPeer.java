@@ -26,6 +26,15 @@ public class WebKeyboardFocusManagerPeer implements KeyboardFocusManagerPeer {
 	private static CaretListener caretListener = new CaretListener() {
 		@Override
 		public void caretUpdate(CaretEvent e) {
+			Object c = e.getSource();
+			Component o = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+
+			if (o != c) {
+				// do not send caret update focus event if the current focus owner is not the source of this event
+				// without this check a focus event for previous owner is sent when moving focus from  one field to another
+				return;
+			}
+			
 			Util.getWebToolkit().getPaintDispatcher().notifyFocusEvent(getFocusEvent());
 		}
 	};

@@ -17,6 +17,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
 
 public abstract class AbstractWebSocketConnection implements WebSocketConnection {
 	private static final Logger log = LoggerFactory.getLogger(AbstractWebSocketConnection.class);
@@ -29,6 +30,8 @@ public abstract class AbstractWebSocketConnection implements WebSocketConnection
 	private ByteArrayOutputStream partialMsg = new ByteArrayOutputStream();
 
 	protected Session session;
+	
+	private Object sendLock = new Object();
 
 	protected void onOpen(Session session, EndpointConfig config) {
 		this.session = session;
@@ -40,7 +43,9 @@ public abstract class AbstractWebSocketConnection implements WebSocketConnection
 			public void run() {
 				if (session != null && session.isOpen()) {
 					try {
-						session.getAsyncRemote().sendPing(ByteBuffer.wrap(Constants.WEBSOCKET_PING_PONG_CONTENT.getBytes(StandardCharsets.UTF_8)));
+						synchronized (sendLock) {
+							session.getAsyncRemote().sendPing(ByteBuffer.wrap(Constants.WEBSOCKET_PING_PONG_CONTENT.getBytes(StandardCharsets.UTF_8)));
+						}
 					} catch (IllegalArgumentException | IOException e) {
 						this.cancel();
 					}
@@ -79,9 +84,11 @@ public abstract class AbstractWebSocketConnection implements WebSocketConnection
 
 	protected void sendMessage(byte[] encoded) throws IOException {
 		try {
-			session.getAsyncRemote().sendBinary(ByteBuffer.wrap(encoded));
-		} catch (IllegalStateException ex){
-			throw new IOException(ex.getMessage(),ex);
+			synchronized (sendLock) {
+				session.getAsyncRemote().sendBinary(ByteBuffer.wrap(encoded)).get();
+			}
+		} catch (IllegalStateException | InterruptedException | ExecutionException ex){
+			throw new IOException(ex.getMessage(), ex);
 		}
 	}
 

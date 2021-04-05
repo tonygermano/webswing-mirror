@@ -23,7 +23,8 @@ export const webswingInstanceInjectable = {
     startPing: 'ping.start' as const,
     showPlaybackControls: 'playback.showControls' as const,
     externalApi: 'external.api' as const,
-    canvasConfig: 'canvas.canvasConfig' as const
+    canvasConfig: 'canvas.canvasConfig' as const,
+    clearInstanceId: 'socket.clearInstanceId' as const
 }
 
 export interface IWebswingInstanceService {
@@ -179,6 +180,7 @@ export class WebswingInstanceModule extends ModuleDef<typeof webswingInstanceInj
     public newSession() {
         this.api.disconnect();
         this.api.disposeIdentity();
+        this.api.clearInstanceId();
         this.api.start();
     }
 

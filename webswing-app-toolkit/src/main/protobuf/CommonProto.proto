@@ -9,6 +9,20 @@ message ParamMsgInProto {
 	optional string value = 2;
 }
 
+enum RecordingStatusEnumProto {
+    NOT_RECORDING = 1;
+    WAITING_FOR_RECORDING_APPROVAL = 2;
+    DENIED_RECORDING_BY_USER = 3;
+    RECORDING = 4;
+}
+
+enum MirroringStatusEnumProto {
+    NOT_MIRRORING = 1;
+    WAITING_FOR_MIRRORING_APPROVAL = 2;
+    DENIED_MIRRORING_BY_USER = 3;
+    MIRRORING = 4;
+}
+
 message SimpleEventMsgInProto {
     optional SimpleEventTypeProto type = 1;
 
@@ -25,7 +39,10 @@ message SimpleEventMsgInProto {
         requestWindowSwitchList = 9;
         enableStatisticsLogging = 10;
         disableStatisticsLogging = 11;
-        toggleRecording = 12;
+        startRecording = 12;
+        stopRecording = 13;
+        startMirroring = 14;
+        stopMirroring = 15;
     }
 }
 

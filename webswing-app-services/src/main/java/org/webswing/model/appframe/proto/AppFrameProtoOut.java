@@ -63,6 +63,10 @@ public final class AppFrameProtoOut {
      * <code>applicationBusy = 10;</code>
      */
     applicationBusy(10),
+    /**
+     * <code>reconnectInstanceNotFound = 11;</code>
+     */
+    reconnectInstanceNotFound(11),
     ;
 
     /**
@@ -109,6 +113,10 @@ public final class AppFrameProtoOut {
      * <code>applicationBusy = 10;</code>
      */
     public static final int applicationBusy_VALUE = 10;
+    /**
+     * <code>reconnectInstanceNotFound = 11;</code>
+     */
+    public static final int reconnectInstanceNotFound_VALUE = 11;
 
 
     public final int getNumber() {
@@ -136,6 +144,7 @@ public final class AppFrameProtoOut {
         case 8: return sessionTimeoutWarning;
         case 9: return sessionTimedOutNotification;
         case 10: return applicationBusy;
+        case 11: return reconnectInstanceNotFound;
         default: return null;
       }
     }
@@ -35640,7 +35649,7 @@ public final class AppFrameProtoOut {
       "e\020\003\"t\n\034CursorChangeEventMsgOutProto\022\016\n\006c" +
       "ursor\030\001 \001(\t\022\016\n\006b64img\030\002 \001(\014\022\017\n\007curFile\030\003" +
       " \001(\t\022\t\n\001x\030\004 \001(\021\022\t\n\001y\030\005 \001(\021\022\r\n\005winId\030\006 \001(" +
-      "\t*\315\002\n\026SimpleEventMsgOutProto\022\035\n\031applicat" +
+      "\t*\354\002\n\026SimpleEventMsgOutProto\022\035\n\031applicat" +
       "ionAlreadyRunning\020\000\022\030\n\024shutDownNotificat" +
       "ion\020\001\022\036\n\032tooManyClientsNotification\020\002\022\026\n" +
       "\022continueOldSession\020\003\022\026\n\022configurationEr" +
@@ -35648,8 +35657,9 @@ public final class AppFrameProtoOut {
       "unauthorizedAccess\020\006\022\"\n\036shutDownAutoLogo" +
       "utNotification\020\007\022\031\n\025sessionTimeoutWarnin" +
       "g\020\010\022\037\n\033sessionTimedOutNotification\020\t\022\023\n\017" +
-      "applicationBusy\020\nB#\n!org.webswing.model." +
-      "appframe.proto"
+      "applicationBusy\020\n\022\035\n\031reconnectInstanceNo" +
+      "tFound\020\013B#\n!org.webswing.model.appframe." +
+      "proto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

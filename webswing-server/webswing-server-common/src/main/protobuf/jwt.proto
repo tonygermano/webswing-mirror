@@ -50,6 +50,7 @@ enum WebswingActionProto {
 	websocket_startMirrorView = 27;
 	file_download = 28;
 	file_upload = 29;
+	rest_controlSessionPool = 30;
 }
 
 message MapProtoProto {

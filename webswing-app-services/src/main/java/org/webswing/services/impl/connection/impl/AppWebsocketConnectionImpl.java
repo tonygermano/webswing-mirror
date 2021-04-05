@@ -7,6 +7,7 @@ import org.webswing.model.app.in.ServerToAppFrameMsgIn;
 import org.webswing.model.app.out.AppHandshakeMsgOut;
 import org.webswing.model.app.out.AppToServerFrameMsgOut;
 import org.webswing.model.appframe.in.AppFrameMsgIn;
+import org.webswing.model.common.in.RecordingStatusEnum;
 import org.webswing.server.common.util.JwtUtil;
 import org.webswing.services.impl.connection.ServerConnection;
 import org.webswing.toolkit.util.Util;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -47,6 +49,8 @@ public class AppWebsocketConnectionImpl implements ServerConnection {
 	private Timer reconnectTimer = new Timer(true);
 	private AtomicBoolean reconnectScheduled = new AtomicBoolean(false);
 	private AtomicBoolean interruptReconnect = new AtomicBoolean(false);
+	
+	private Object sendLock = new Object();
 	
 	public AppWebsocketConnectionImpl() {
 	}
@@ -130,7 +134,7 @@ public class AppWebsocketConnectionImpl implements ServerConnection {
     
     @OnClose
     public void onClose(CloseReason closeReason) {
-    	AppLogger.error("Websocket closed to server [" + serverUrl + "]" 
+    	AppLogger.info("Websocket closed to server [" + serverUrl + "]"
     			+ (closeReason != null ? ", close code [" + closeReason.getCloseCode().getCode() + "], reason [" + closeReason.getReasonPhrase() + "]!" : ""));
 
     	if (!Util.getWebToolkit().getSessionWatchdog().isTerminated()) {
@@ -208,17 +212,19 @@ public class AppWebsocketConnectionImpl implements ServerConnection {
 			AppLogger.debug("Cannot send message, session closed!");
 			return;
 		}
-		
-		if (Util.getWebToolkit().isRecording() && msgOut.getAppFrameMsgOut() != null) {
+
+		if (Util.getWebToolkit().getRecordingStatus() == RecordingStatusEnum.RECORDING && msgOut.getAppFrameMsgOut() != null) {
 			Util.getWebToolkit().recordFrame(msgOut.getAppFrameMsgOut());
 		}
 		
 		try {
 			byte[] encoded = protoMapper.encodeProto(msgOut);
-			session.getAsyncRemote().sendBinary(ByteBuffer.wrap(encoded));
-		} catch (IOException e) {
+			synchronized (sendLock) {
+				session.getAsyncRemote().sendBinary(ByteBuffer.wrap(encoded)).get();
+			}
+		} catch (IOException | InterruptedException | ExecutionException e) {
 			AppLogger.error("Error sending msg to server [" + serverUrl + "] , session [" + session.getId() + "]", e.getMessage());
-			AppLogger.debug(e.getMessage(),e);
+			AppLogger.debug(e.getMessage(), e);
 		}
 	}
 	

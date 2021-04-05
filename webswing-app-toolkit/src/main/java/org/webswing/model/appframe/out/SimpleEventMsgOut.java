@@ -13,7 +13,8 @@ public enum SimpleEventMsgOut implements MsgOut {
 	shutDownAutoLogoutNotification,
 	sessionTimeoutWarning,
 	sessionTimedOutNotification,
-	applicationBusy;
+	applicationBusy,
+	reconnectInstanceNotFound;
 
 	public AppFrameMsgOut buildMsgOut() {
 		AppFrameMsgOut result = new AppFrameMsgOut();

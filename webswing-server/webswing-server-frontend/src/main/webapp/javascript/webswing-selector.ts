@@ -129,19 +129,14 @@ loadTranslations().then(
         }
 
         function logout() {
-            $.ajax({
-                xhrFields: {
-                    withCredentials: true
-                },
-                type: 'GET',
-                url: 'logout',
-                beforeSend: (xhr) => {
-                    xhr.setRequestHeader('Authorization', 'Bearer ' + util.getToken());
-                }
-            }).done(() => {
-                localStorage.setItem("webswingLogout", Date.now().toString());
-                location.reload();
-            });
+            const clearElement=()=>{
+                $('#webswing-header').html('');
+                $('#webswing-links').html('');
+                const content =$('#webswing-content');
+                content.html('');
+                return content;
+            }
+            util.webswingLogout("",clearElement,()=>location.reload(), ()=>location.reload(),false);
         }
     }
 ).catch((e) => {

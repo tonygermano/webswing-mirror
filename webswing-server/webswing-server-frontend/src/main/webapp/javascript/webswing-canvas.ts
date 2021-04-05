@@ -124,15 +124,8 @@ export class CanvasModule extends ModuleDef<typeof canvasInjectable, ICanvasServ
     }
 
     public height() {
-        let offset = 0;
-
         if (this.api.cfg.touchMode && this.touchHeight !== 0) {
-            if (this.api.touchBarEnabled()) {
-                const touchBar = this.api.cfg.rootElement.parent().find('div[data-id="touchBar"]');
-                offset += touchBar.height()!;
-            }
-
-            return this.touchHeight - offset;
+            return this.touchHeight;
         }
 
         return Math.floor(this.api.cfg.rootElement.height()!);

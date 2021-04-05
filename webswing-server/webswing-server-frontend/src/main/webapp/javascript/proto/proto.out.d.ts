@@ -1525,7 +1525,8 @@ export namespace appFrameProtoOut {
         shutDownAutoLogoutNotification = 7,
         sessionTimeoutWarning = 8,
         sessionTimedOutNotification = 9,
-        applicationBusy = 10
+        applicationBusy = 10,
+        reconnectInstanceNotFound = 11
     }
 
     /** Properties of a JsEvalRequestMsgOutProto. */

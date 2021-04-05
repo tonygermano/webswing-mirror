@@ -490,6 +490,10 @@ $root.appFrameProtoOut = (function() {
             case 10:
                 message.event = 10;
                 break;
+            case "reconnectInstanceNotFound":
+            case 11:
+                message.event = 11;
+                break;
             }
             if (object.jsRequest != null) {
                 if (typeof object.jsRequest !== "object")
@@ -4052,6 +4056,7 @@ $root.appFrameProtoOut = (function() {
      * @property {number} sessionTimeoutWarning=8 sessionTimeoutWarning value
      * @property {number} sessionTimedOutNotification=9 sessionTimedOutNotification value
      * @property {number} applicationBusy=10 applicationBusy value
+     * @property {number} reconnectInstanceNotFound=11 reconnectInstanceNotFound value
      */
     appFrameProtoOut.SimpleEventMsgOutProto = (function() {
         var valuesById = {}, values = Object.create(valuesById);
@@ -4066,6 +4071,7 @@ $root.appFrameProtoOut = (function() {
         values[valuesById[8] = "sessionTimeoutWarning"] = 8;
         values[valuesById[9] = "sessionTimedOutNotification"] = 9;
         values[valuesById[10] = "applicationBusy"] = 10;
+        values[valuesById[11] = "reconnectInstanceNotFound"] = 11;
         return values;
     })();
 

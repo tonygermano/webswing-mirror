@@ -33,6 +33,7 @@ public enum WebswingAction {
 	rest_stopApp(AccessType.admin),
 	rest_createApp(AccessType.admin),
 	rest_removeApp(AccessType.admin),
+	rest_controlSessionPool(AccessType.admin),
 	rest_getThreadDump(AccessType.admin, AccessType.support),
 	rest_requestThreadDump(AccessType.admin, AccessType.support),
 	rest_toggleStatisticsLogging(AccessType.admin, AccessType.support),

@@ -35,10 +35,8 @@ import org.webswing.model.appframe.out.SimpleEventMsgOut;
 import org.webswing.model.browser.in.BrowserToServerFrameMsgIn;
 import org.webswing.model.browser.out.ConnectionInfoMsgOut;
 import org.webswing.model.browser.out.ServerToBrowserFrameMsgOut;
-import org.webswing.model.common.in.ConnectionHandshakeMsgIn;
-import org.webswing.model.common.in.SimpleEventMsgIn;
+import org.webswing.model.common.in.*;
 import org.webswing.model.common.in.SimpleEventMsgIn.SimpleEventType;
-import org.webswing.model.common.in.TimestampsMsgIn;
 import org.webswing.server.api.model.ProcessStatusEnum;
 import org.webswing.server.api.services.sessionpool.ServerSessionPoolConnector;
 import org.webswing.server.api.services.swinginstance.ConnectedSwingInstance;
@@ -79,6 +77,9 @@ public class SwingInstanceImpl implements Serializable, ConnectedSwingInstance {
 	private PrimaryWebSocketConnection webConnection;
 	private MirrorWebSocketConnection mirroredWebConnection;
 	private ApplicationWebSocketConnection appConnection;
+
+	private MirroringStatusEnum mirroringStatus = MirroringStatusEnum.NOT_MIRRORING;
+	private Runnable doAfterMirroringAccepted;
 	
 	private ServerSessionPoolConnector poolConnector;
 
@@ -239,18 +240,21 @@ public class SwingInstanceImpl implements Serializable, ConnectedSwingInstance {
 			disconnectMirroredWebSession(false);
 		}
 		this.mirroredWebConnection = mirror;
-		notifyMirrorViewConnected();
+
+		startMirroring(mirror);
 	}
 
 	@Override
 	public void disconnectMirroredWebSession(boolean disconnect) {
 		disconnectMirroredWebSession(null, disconnect);
+		stopMirroring(this.mirroredWebConnection);
 	}
 	
 	@Override
 	public void disconnectMirroredWebSession(String sessionId, boolean disconnect) {
 		if (this.mirroredWebConnection != null) {
 			if (sessionId == null || StringUtils.equals(this.mirroredWebConnection.getMirrorSessionId(), sessionId)) {
+				sendSimpleEvent(SimpleEventType.stopMirroring);
 				notifyMirrorViewDisconnected();
 				if (disconnect) {
 					this.mirroredWebConnection.disconnect("Disconnected.");
@@ -258,6 +262,29 @@ public class SwingInstanceImpl implements Serializable, ConnectedSwingInstance {
 				this.mirroredWebConnection = null;
 			}
 		}
+	}
+
+	public void startMirroring(MirrorWebSocketConnection mirror) {
+		mirroringStatus = MirroringStatusEnum.WAITING_FOR_MIRRORING_APPROVAL;
+		sendSimpleEvent(SimpleEventType.startMirroring);
+		doAfterMirroringAccepted = () -> {
+			this.mirroredWebConnection = mirror;
+			notifyMirrorViewConnected();
+		};
+	}
+
+	public void stopMirroring(MirrorWebSocketConnection mirror) {
+		mirroringStatus = MirroringStatusEnum.NOT_MIRRORING;
+		this.mirroredWebConnection = null;
+		sendSimpleEvent(SimpleEventType.stopMirroring);
+		doAfterMirroringAccepted = () -> {};
+	}
+
+	private void setMirroringStatus(MirroringStatusEnum mirroringStatus) {
+		if (doAfterMirroringAccepted != null && this.mirroringStatus != MirroringStatusEnum.MIRRORING && mirroringStatus == MirroringStatusEnum.MIRRORING) { // Mirroring accepted and started
+			doAfterMirroringAccepted.run();
+		}
+		this.mirroringStatus = mirroringStatus;
 	}
 	
 	@Override
@@ -321,6 +348,8 @@ public class SwingInstanceImpl implements Serializable, ConnectedSwingInstance {
 
 		if (msgOut.getSessionData() != null) {
 			this.sessionData = msgOut.getSessionData();
+
+			setMirroringStatus(sessionData.getMirroringStatus());
 		}
 		
 		if (msgOut.getAppFrameMsgOut() != null) {
@@ -359,7 +388,9 @@ public class SwingInstanceImpl implements Serializable, ConnectedSwingInstance {
 	public void handleBrowserMirrorMessage(byte[] frame) {
 		if (mirroredWebConnection != null) {
 			synchronized (mirroredWebConnection) {
-				mirroredWebConnection.handleBrowserMirrorMessage(frame);
+				if (mirroringStatus == MirroringStatusEnum.MIRRORING) {
+					mirroredWebConnection.handleBrowserMirrorMessage(frame);
+				}
 			}
 		} else {
 			log.warn("Mirror not connected [" + getInstanceId() + "]!");
@@ -421,7 +452,9 @@ public class SwingInstanceImpl implements Serializable, ConnectedSwingInstance {
 		if (mirroredWebConnection != null) {
 			synchronized (mirroredWebConnection) {
 				if (mirroredWebConnection.isConnected()) {
-					mirroredWebConnection.sendMessage(msgOut);
+					if (mirroringStatus == MirroringStatusEnum.MIRRORING) {
+						mirroredWebConnection.sendMessage(msgOut);
+					}
 				}
 			}
 		}
@@ -513,13 +546,22 @@ public class SwingInstanceImpl implements Serializable, ConnectedSwingInstance {
 	public boolean isRunning() {
 		return endedAt == null;
 	}
-	
+
 	@Override
-	public void toggleRecording() {
+	public void startRecording() {
+		sendSimpleEvent(SimpleEventType.startRecording);
+	}
+
+	@Override
+	public void stopRecording() {
+		sendSimpleEvent(SimpleEventType.stopRecording);
+	}
+
+	private void sendSimpleEvent(SimpleEventType simpleEventType) {
 		ServerToAppFrameMsgIn msgIn = new ServerToAppFrameMsgIn();
-		SimpleEventMsgIn event = new SimpleEventMsgIn(SimpleEventType.toggleRecording);
+		SimpleEventMsgIn event = new SimpleEventMsgIn(simpleEventType);
 		msgIn.setEvents(Lists.newArrayList(event));
-		
+
 		sendMessageToApp(msgIn);
 	}
 	
@@ -687,11 +729,14 @@ public class SwingInstanceImpl implements Serializable, ConnectedSwingInstance {
 	@Override
 	public SwingSessionMsgOut toSwingSession() {
 		SwingSessionMsgOut session = new SwingSessionMsgOut();
+		session.setRecordingStatus(RecordingStatusEnum.NOT_RECORDING);
+		session.setMirroringStatus(MirroringStatusEnum.NOT_MIRRORING);
 		if (sessionData != null) {
 			session.setApplet(sessionData.isApplet());
 			session.setLoggingEnabled(sessionData.isSessionLoggingEnabled());
-			session.setRecorded(sessionData.isRecording());
 			session.setRecordingFile(sessionData.getRecordingFile());
+			session.setRecordingStatus(sessionData.getRecordingStatus());
+			session.setMirroringStatus(sessionData.getMirroringStatus());
 		}
 		session.setApplication(appName);
 		session.setApplicationPath(pathMapping);
@@ -767,11 +812,7 @@ public class SwingInstanceImpl implements Serializable, ConnectedSwingInstance {
 	
 	@Override
 	public void toggleStatisticsLogging(boolean enabled) {
-		ServerToAppFrameMsgIn msgIn = new ServerToAppFrameMsgIn();
-		SimpleEventMsgIn event = new SimpleEventMsgIn(enabled ? SimpleEventType.enableStatisticsLogging : SimpleEventType.disableStatisticsLogging);
-		msgIn.setEvents(Lists.newArrayList(event));
-		
-		sendMessageToApp(msgIn);
+		sendSimpleEvent(enabled ? SimpleEventType.enableStatisticsLogging : SimpleEventType.disableStatisticsLogging);
 	}
 	
 	public String getPathMapping() {

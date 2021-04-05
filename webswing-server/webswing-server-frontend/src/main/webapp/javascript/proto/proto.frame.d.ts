@@ -397,6 +397,22 @@ export namespace commonProto {
         public toJSON(): { [k: string]: any };
     }
 
+    /** RecordingStatusEnumProto enum. */
+    enum RecordingStatusEnumProto {
+        NOT_RECORDING = 1,
+        WAITING_FOR_RECORDING_APPROVAL = 2,
+        DENIED_RECORDING_BY_USER = 3,
+        RECORDING = 4
+    }
+
+    /** MirroringStatusEnumProto enum. */
+    enum MirroringStatusEnumProto {
+        NOT_MIRRORING = 1,
+        WAITING_FOR_MIRRORING_APPROVAL = 2,
+        DENIED_MIRRORING_BY_USER = 3,
+        MIRRORING = 4
+    }
+
     /** Properties of a SimpleEventMsgInProto. */
     interface ISimpleEventMsgInProto {
 
@@ -479,7 +495,10 @@ export namespace commonProto {
             requestWindowSwitchList = 9,
             enableStatisticsLogging = 10,
             disableStatisticsLogging = 11,
-            toggleRecording = 12
+            startRecording = 12,
+            stopRecording = 13,
+            startMirroring = 14,
+            stopMirroring = 15
         }
     }
 

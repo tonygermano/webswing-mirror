@@ -62,6 +62,10 @@ export const msg = {
         "dialog.overlay.docking.modality": "This window is blocked by another modal window.",
         "dialog.overlay.docking.focusWindow": "Show window",
         "dialog.autoReconnect": "Reconnecting...",
+        "dialog.reconnectInstanceNotFound": "Cannot connect to the original session.",
+        "dialog.reconnectInstanceNotFound.retry": "Reconnect",
+        "dialog.reconnectInstanceNotFound.newSession": "New session",
+        "dialog.reconnectInstanceNotFound.logout": "Sign out",
 
         //  SELECTOR
         "selector.welcome": "Welcome,",

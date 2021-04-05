@@ -1,37 +1,58 @@
 syntax = "proto2";
 option java_package = "org.webswing.model.adminconsole.proto";
 
+import 'CommonProto.proto';
+
 /* =================== ADMIN CONSOLE -> SERVER ====================*/
 
 message AdminConsoleFrameMsgInProto {
-	optional ToggleRecordingMsgInProto toggleRecording = 1;
-	optional ShutdownMsgInProto shutdown = 2;
+	optional AdminConsoleHandshakeMsgInProto handshake = 1;
+	optional RecordingRequestMsgInProto recordingRequest = 2;
+	optional ShutdownMsgInProto shutdown = 3;
 	optional RequestThreadDumpMsgInProto requestThreadDump = 4;
 	optional GetThreadDumpMsgInProto getThreadDump = 5;
 	optional GetInstanceCountsStatsWarningsMsgInProto getInstanceCountsStatsWarnings = 6;
 	optional GetSwingSessionsMsgInProto getSwingSessions = 7;
 	optional GetServerInfoMsgInProto getServerInfo = 8;
 	optional ToggleStatisticsLoggingMsgInProto toggleStatisticsLogging = 9;
-	optional AdminConsoleHandshakeMsgInProto handshake = 10;
-	optional GetConfigMsgInProto getConfig = 11;
-	optional GetMetaMsgInProto getMeta = 12;
-	optional ResolveConfigMsgInProto resolveConfig = 13;
-	optional SaveConfigMsgInProto saveConfig = 14;
-	optional SearchVariablesMsgInProto searchVariables = 15;
-	optional StartAppMsgInProto startApp = 16;
-	optional StopAppMsgInProto stopApp = 17;
-	optional CreateAppMsgInProto createApp = 18;
-	optional RemoveAppMsgInProto removeApp = 19;
-	optional MirrorFrameMsgInProto mirrorFrame = 20;
+	optional GetConfigMsgInProto getConfig = 10;
+	optional GetMetaMsgInProto getMeta = 11;
+	optional ResolveConfigMsgInProto resolveConfig = 12;
+	optional SaveConfigMsgInProto saveConfig = 13;
+	optional SearchVariablesMsgInProto searchVariables = 14;
+	optional StartAppMsgInProto startApp = 15;
+	optional StopAppMsgInProto stopApp = 16;
+	optional CreateAppMsgInProto createApp = 17;
+	optional RemoveAppMsgInProto removeApp = 18;
+	optional MirrorFrameMsgInProto mirrorFrame = 19;
+	optional ManageSessionPoolMsgInProto manageSessionPool = 20;
 }
 
 message AdminConsoleHandshakeMsgInProto {
 	optional string secretMessage = 1;
 }
 
-message ToggleRecordingMsgInProto {
-	optional string path = 1;
-	optional string instanceId = 2;
+message RecordingRequestMsgInProto {
+	optional RecordingRequestTypeProto type = 1;
+	optional string path = 2;
+	optional string instanceId = 3;
+
+	enum RecordingRequestTypeProto {
+		startRecording = 1;
+		stopRecording = 2;
+	}
+}
+
+message ManageSessionPoolMsgInProto {
+	enum PowerRequestTypeProto {
+		DRAIN_MODE = 1;
+		RESUME = 2;
+		STOP = 3;
+		FORCE_KILL = 4;
+	}
+
+	optional string sessionPoolId = 1;
+	optional PowerRequestTypeProto powerRequestType = 2;
 }
 
 message ToggleStatisticsLoggingMsgInProto {
@@ -196,7 +217,7 @@ message SwingSessionMsgOutProto {
 		RUNNING = 3;
 		FORCE_KILLED = 4;
 		FINISHED = 5;
-    }
+	}
 	
 	optional StatusEnumProto status = 1;
 	optional string instanceId = 2;
@@ -211,17 +232,18 @@ message SwingSessionMsgOutProto {
 	optional bool connected = 11;
 	optional bool applet = 12;
 	optional sint64 disconnectedSince = 13;
-	optional bool recorded = 14;
-	optional string recordingFile = 15;
-	optional bool loggingEnabled = 16;
-	optional bool statisticsLoggingEnabled = 17;
+	optional commonProto.RecordingStatusEnumProto recordingStatus = 14;
+	optional commonProto.MirroringStatusEnumProto mirroringStatus = 15;
+	optional string recordingFile = 16;
+	optional bool loggingEnabled = 17;
+	optional bool statisticsLoggingEnabled = 18;
 	
-	repeated string warnings = 18;
-	repeated string warningHistory = 19;
-	repeated ThreadDumpMsgOutProto threadDumps = 20;
+	repeated string warnings = 19;
+	repeated string warningHistory = 20;
+	repeated ThreadDumpMsgOutProto threadDumps = 21;
 	
-	repeated MetricMsgOutProto metrics = 21;
-	repeated StatEntryMsgOutProto stats = 22;
+	repeated MetricMsgOutProto metrics = 22;
+	repeated StatEntryMsgOutProto stats = 23;
 }
 
 message ThreadDumpMsgOutProto {
@@ -260,8 +282,9 @@ message SessionPoolInfoMsgOutProto {
 	optional string id = 1;
 	optional sint32 maxInstances = 2;
 	optional sint32 priority = 3;
-	repeated string connectedServers = 4;
-	repeated SessionPoolAppMsgOutProto appInstances = 5;
+	optional bool drainMode = 4;
+	repeated string connectedServers = 5;
+	repeated SessionPoolAppMsgOutProto appInstances = 6;
 }
 
 message SessionPoolAppMsgOutProto {

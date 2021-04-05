@@ -61,7 +61,9 @@ export const baseInjectable = {
 	manageFocusEvent: 'focusManager.manageFocusEvent' as const,
 	disposeSocket: 'socket.dispose' as const,
 	disposeCanvas: 'canvas.dispose' as const,
-	newSession: 'webswing.newSession' as const
+	newSession: 'webswing.newSession' as const,
+	clearInstanceId: 'socket.clearInstanceId' as const,
+	touchRefreshScale: 'touch.refreshScale' as const
 }
 
 export interface IBaseService {
@@ -349,13 +351,19 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 					if (this.api.currentDialog() !== this.api.dialogs.timedoutDialog) {
 						this.api.showDialog(this.api.dialogs.stoppedDialog);
 					}
+					this.api.clearInstanceId();
 					this.api.disconnect();
 				}
 			} else if (data.event === SimpleEvent.applicationAlreadyRunning) {
 				this.api.showDialog(this.api.dialogs.applicationAlreadyRunning);
+				this.api.clearInstanceId();
 				this.api.disconnect();
 			} else if (data.event === SimpleEvent.tooManyClientsNotification) {
 				this.api.showDialog(this.api.dialogs.tooManyClientsNotification);
+				this.api.clearInstanceId();
+				this.api.disconnect();
+			} else if (data.event === SimpleEvent.reconnectInstanceNotFound) {
+				this.api.showDialog(this.api.dialogs.reconnectInstanceNotFound);
 				this.api.disconnect();
 			} else if (data.event === SimpleEvent.continueOldSession) {
 				this.continueSession();
@@ -381,6 +389,7 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 			} else if (data.event === SimpleEvent.unauthorizedAccess) {
 				this.api.cfg.canPaint = false;
 				this.api.showDialog(this.api.dialogs.unauthorizedAccess);
+				this.api.clearInstanceId();
 			} else if (data.event === SimpleEvent.sessionTimeoutWarning) {
 				window.clearTimeout(this.warningTimeout);
 				this.api.showDialogBar(this.api.dialogs.inactivityTimeoutWarningDialog);
@@ -389,6 +398,7 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 				}, 2000);
 			} else if (data.event === SimpleEvent.sessionTimedOutNotification) {
 				this.api.showDialog(this.api.dialogs.timedoutDialog);
+				this.api.clearInstanceId();
 				this.api.disconnect();
 			} else if (data.event === SimpleEvent.applicationBusy) {
 				if (this.api.currentDialog() == null) {
@@ -641,6 +651,7 @@ export class BaseModule extends ModuleDef<typeof baseInjectable, IBaseService> {
 			}).catch((e: Error) => this.errorHandler(e));
 
 			this.checkCanvasAccessibleInfo();
+			this.api.touchRefreshScale();
 		} else {
 			this.processNextQueuedFrame();
 		}

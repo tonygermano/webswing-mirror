@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.webswing.model.MsgOut;
+import org.webswing.model.common.in.MirroringStatusEnum;
+import org.webswing.model.common.in.RecordingStatusEnum;
 
 public class SwingSessionMsgOut implements MsgOut {
 
@@ -14,7 +16,7 @@ public class SwingSessionMsgOut implements MsgOut {
 		EXITING,
 		RUNNING,
 		FORCE_KILLED,
-		FINISHED;
+		FINISHED
     }
 	
 	private StatusEnum status;
@@ -30,7 +32,8 @@ public class SwingSessionMsgOut implements MsgOut {
 	private boolean connected;
 	private boolean applet;
 	private long disconnectedSince;
-	private boolean recorded;
+	private RecordingStatusEnum recordingStatus;
+	private MirroringStatusEnum mirroringStatus;
 	private String recordingFile;
 	private boolean loggingEnabled;
 	private boolean statisticsLoggingEnabled;
@@ -146,12 +149,12 @@ public class SwingSessionMsgOut implements MsgOut {
 		this.disconnectedSince = disconnectedSince;
 	}
 
-	public boolean isRecorded() {
-		return recorded;
+	public RecordingStatusEnum getRecordingStatus() {
+		return recordingStatus;
 	}
 
-	public void setRecorded(boolean recorded) {
-		this.recorded = recorded;
+	public void setRecordingStatus(RecordingStatusEnum recordingStatus) {
+		this.recordingStatus = recordingStatus;
 	}
 
 	public String getRecordingFile() {
@@ -160,6 +163,14 @@ public class SwingSessionMsgOut implements MsgOut {
 
 	public void setRecordingFile(String recordingFile) {
 		this.recordingFile = recordingFile;
+	}
+
+	public MirroringStatusEnum getMirroringStatus() {
+		return mirroringStatus;
+	}
+
+	public void setMirroringStatus(MirroringStatusEnum mirroringStatus) {
+		this.mirroringStatus = mirroringStatus;
 	}
 
 	public boolean isLoggingEnabled() {

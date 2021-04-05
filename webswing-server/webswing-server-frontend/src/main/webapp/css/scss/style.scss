@@ -27,7 +27,6 @@
 	@import '_components/_basic';                   // Form fields etc
 	@import '_components/_forms';                   // Form fields etc
 	@import '_components/_modals/_login';           // Login modal
-	@import '_components/_modals/_selector';   		// Webswing app selection
 	@import '_components/_toolbars/_touch';     	// Touch interface integration
 	
 	.webswing-element-content {
@@ -47,13 +46,16 @@
 		@import '_components/_modals/_dialog';          // Common dialogs
 		@import '_components/_modals/_files';           // File up/download dialog
 		@import '_components/_modals/_paste';   		// Clipboard paste request dialog
+		@import '_components/_modals/_selector';   		// Webswing app selection
 		@import '_components/_toolbars/_clipboard';     // Clipboard integration toolbar
 		@import '_components/_toolbars/_files';     	// File dialog integration toolbar
 		@import '_components/_toolbars/_playback';     	// Session recording playback toolbar
 		@import '_components/_toolbars/_network';     	// Network monitor notifications
 		@import '_components/_toolbars/_message';     	// Message dialog toolbar
 		@import '_components/_modals/_windowSwitcher';	// Window swticher dialog
-		
+
+		@import '_utilities/responsiveUtil'; // responsive classes
+
 		canvas {
 			z-index: 100;
 		}

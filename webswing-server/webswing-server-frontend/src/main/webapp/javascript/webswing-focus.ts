@@ -5,8 +5,10 @@ import { appFrameProtoOut } from "./proto/proto.out";
 export const focusManagerInjectable = {
     cfg: 'webswing.config' as const,
     getFocusedWindow: 'base.getFocusedWindow' as const,
-    touchInputFocusGained: 'touch.inputFocusGained' as const,
-    updateFocusedHtmlCanvas: 'input.updateFocusedHtmlCanvas' as const
+    touchInputFocusLost: 'touch.inputFocusLost' as const,
+    touchCorrectPosition: 'touch.correctPosition' as const,
+    updateFocusedHtmlCanvas: 'input.updateFocusedHtmlCanvas' as const,
+    getCanvas: 'canvas.get' as const
 }
 
 export interface IFocusManagerService {
@@ -53,7 +55,7 @@ export class FocusManagerModule extends ModuleDef<typeof focusManagerInjectable,
             // set the style attributes as the focus/select cannot work well in IE
             // input.style.top = sy +'px';
             // input.style.left = sx +'px';
-            focusWithPreventScroll(input, true);
+            this.focusWithPreventScroll(input, true);
             input.select();
             // window.scrollTo(sx,sy);
         }
@@ -76,8 +78,24 @@ export class FocusManagerModule extends ModuleDef<typeof focusManagerInjectable,
             // focus input
             const input = (($(doc).find(".ws-input-hidden") as unknown) as JQuery<HTMLInputElement>)[0];
 
-            this.api.updateFocusedHtmlCanvas(input);
-            focusWithPreventScroll(input);
+            let focusInput = true;
+            if (!input) {
+                focusInput = false;
+            } else {
+                if (this.api.cfg.touchMode && !(input.classList.contains('focused-with-caret') && input.classList.contains('editable'))) {
+                    focusInput = false;
+                }
+            }
+
+            if (focusInput) {
+                this.api.updateFocusedHtmlCanvas(input);
+                this.focusWithPreventScroll(input);
+            } else {
+                document.body.focus();
+                if (this.api.cfg.touchMode) {
+                    this.api.touchCorrectPosition();
+                }
+            }
         }
     }
 
@@ -122,53 +140,70 @@ export class FocusManagerModule extends ModuleDef<typeof focusManagerInjectable,
                 input.type = 'text';
             }
 
-            updateInputPosition(input, focusEvent);
+            this.updateInputPosition(input, focusEvent);
             input.classList.add('focused-with-caret');
             if (focusEvent.editable) {
                 input.classList.add('editable');
             }
-            this.api.touchInputFocusGained();
         } else {
-            updateInputPosition(input);
+            this.updateInputPosition(input);
             input.value = '';
+            this.api.touchInputFocusLost();
         }
-
         this.focusDefault();
     }
 
-}
-function focusWithPreventScroll(focusElement: HTMLInputElement, selectInput?: boolean) {
-    if (focusElement) {
-        const temppos = focusElement.style.position;
-        const templeft = focusElement.style.left;
-        const temptop = focusElement.style.top;
-        if (detectIE() && detectIE() <= 11) {// prevent scroll does not work in IE
-            focusElement.style.position = 'fixed';
-            focusElement.style.left = '0px';
-            focusElement.style.top = '0px'
-        }
-        focusElement.focus({ preventScroll: true });
-        if (selectInput) {
-            focusElement.select();
-        }
-        if (detectIE() && detectIE() <= 11) {
-            focusElement.style.position = temppos;
-            focusElement.style.left = templeft;
-            focusElement.style.top = temptop;
+    private focusWithPreventScroll(focusElement: HTMLInputElement, selectInput?: boolean) {
+        if (focusElement) {
+            const temppos = focusElement.style.position;
+            const templeft = focusElement.style.left;
+            const temptop = focusElement.style.top;
+            if ((detectIE() && detectIE() <= 11)) {// prevent scroll does not work in IE
+                focusElement.style.position = 'fixed';
+                focusElement.style.left = '0px';
+                focusElement.style.top = '0px';
+            }
+            focusElement.focus({ preventScroll: true });
+            if (selectInput) {
+                focusElement.select();
+            }
+            if (detectIE() && detectIE() <= 11) {
+                focusElement.style.position = temppos;
+                focusElement.style.left = templeft;
+                focusElement.style.top = temptop;
+            }
         }
     }
-}
+    
+    private updateInputPosition(el: HTMLElement, focusEvent?: appFrameProtoOut.IFocusEventMsgOutProto) {
+        if (this.api.cfg.touchMode) {
+            el.style.left = '0px';
+            el.style.top = '0px';
+            
+            if (focusEvent != null) {
+                const maxX = focusEvent.x! + focusEvent.w!;
+                const maxY = focusEvent.y! + focusEvent.h!;
+                const top = Math.min(Math.max((focusEvent.y! + focusEvent.caretY!), focusEvent.y!), maxY);
+                const left = Math.min(Math.max((focusEvent.x! + focusEvent.caretX!), focusEvent.x!), maxX);
+                
+                el.style.top = top + 'px';
+                el.style.left = left + 'px';
+                el.style.height = focusEvent.caretH + 'px';
+            }
+            return;
+        }
 
-function updateInputPosition(el: HTMLElement, focusEvent?: appFrameProtoOut.IFocusEventMsgOutProto) {
-    if (focusEvent == null) {
-        el.style.top = '';
-        el.style.left = '';
-        el.style.height = '';
-    } else {
-        const maxX = focusEvent.x! + focusEvent.w!;
-        const maxY = focusEvent.y! + focusEvent.h!;
-        el.style.top = Math.min(Math.max((focusEvent.y! + focusEvent.caretY!), focusEvent.y!), maxY) + 'px';
-        el.style.left = Math.min(Math.max((focusEvent.x! + focusEvent.caretX!), focusEvent.x!), maxX) + 'px';
-        el.style.height = focusEvent.caretH + 'px';
+        if (focusEvent == null) {
+            el.style.top = '';
+            el.style.left = '';
+            el.style.height = '';
+        } else {
+            const maxX = focusEvent.x! + focusEvent.w!;
+            const maxY = focusEvent.y! + focusEvent.h!;
+            el.style.top = Math.min(Math.max((focusEvent.y! + focusEvent.caretY!), focusEvent.y!), maxY) + 'px';
+            el.style.left = Math.min(Math.max((focusEvent.x! + focusEvent.caretX!), focusEvent.x!), maxX) + 'px';
+            el.style.height = focusEvent.caretH + 'px';
+        }
     }
+
 }

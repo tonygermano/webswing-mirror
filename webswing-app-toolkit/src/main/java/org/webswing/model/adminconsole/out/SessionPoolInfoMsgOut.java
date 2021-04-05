@@ -11,17 +11,18 @@ public class SessionPoolInfoMsgOut implements MsgOut {
 	private String id;
 	private int maxInstances;
 	private int priority;
+	private boolean drainMode;
 	private List<String> connectedServers;
 	private List<SessionPoolAppMsgOut> appInstances;
 
-	public SessionPoolInfoMsgOut() {
-	}
+	public SessionPoolInfoMsgOut() {}
 
-	public SessionPoolInfoMsgOut(String id, int maxInstances, int priority, List<String> connectedServers, List<SessionPoolAppMsgOut> appInstances) {
+	public SessionPoolInfoMsgOut(String id, int maxInstances, int priority, boolean drainMode, List<String> connectedServers, List<SessionPoolAppMsgOut> appInstances) {
 		super();
 		this.id = id;
 		this.maxInstances = maxInstances;
 		this.priority = priority;
+		this.drainMode = drainMode;
 		this.connectedServers = connectedServers;
 		this.appInstances = appInstances;
 	}
@@ -66,4 +67,11 @@ public class SessionPoolInfoMsgOut implements MsgOut {
 		this.priority = priority;
 	}
 
+	public boolean getDrainMode() {
+		return drainMode;
+	}
+
+	public void setDrainMode(boolean drainMode) {
+		this.drainMode = drainMode;
+	}
 }

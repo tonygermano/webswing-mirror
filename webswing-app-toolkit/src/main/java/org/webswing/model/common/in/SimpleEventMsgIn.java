@@ -20,11 +20,13 @@ public class SimpleEventMsgIn implements MsgIn, CommonMsg {
 		requestWindowSwitchList,
 		enableStatisticsLogging,
 		disableStatisticsLogging,
-		toggleRecording
+		startRecording,
+		stopRecording,
+		startMirroring,
+		stopMirroring
 	}
 
-	public SimpleEventMsgIn() {
-	}
+	public SimpleEventMsgIn() {}
 
 	public SimpleEventMsgIn(SimpleEventType type) {
 		this.type = type;

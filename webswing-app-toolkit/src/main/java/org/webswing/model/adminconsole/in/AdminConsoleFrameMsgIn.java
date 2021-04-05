@@ -7,14 +7,15 @@ public class AdminConsoleFrameMsgIn implements MsgIn {
 	private static final long serialVersionUID = 3253892297375570414L;
 
 	private AdminConsoleHandshakeMsgIn handshake;
-	private ToggleRecordingMsgIn toggleRecording;
+	private RecordingRequestMsgIn recordingRequest;
+	private ManageSessionPoolMsgIn manageSessionPool;
 	private ShutdownMsgIn shutdown;
 	private RequestThreadDumpMsgIn requestThreadDump;
-	private ToggleStatisticsLoggingMsgIn toggleStatisticsLogging;
 	private GetThreadDumpMsgIn getThreadDump;
 	private GetInstanceCountsStatsWarningsMsgIn getInstanceCountsStatsWarnings;
 	private GetSwingSessionsMsgIn getSwingSessions;
 	private GetServerInfoMsgIn getServerInfo;
+	private ToggleStatisticsLoggingMsgIn toggleStatisticsLogging;
 	private GetConfigMsgIn getConfig;
 	private GetMetaMsgIn getMeta;
 	private ResolveConfigMsgIn resolveConfig;
@@ -34,12 +35,12 @@ public class AdminConsoleFrameMsgIn implements MsgIn {
 		this.handshake = handshake;
 	}
 
-	public ToggleRecordingMsgIn getToggleRecording() {
-		return toggleRecording;
+	public RecordingRequestMsgIn getRecordingRequest() {
+		return recordingRequest;
 	}
 
-	public void setToggleRecording(ToggleRecordingMsgIn toggleRecording) {
-		this.toggleRecording = toggleRecording;
+	public void setRecordingRequest(RecordingRequestMsgIn recordingRequest) {
+		this.recordingRequest = recordingRequest;
 	}
 
 	public ShutdownMsgIn getShutdown() {
@@ -178,4 +179,11 @@ public class AdminConsoleFrameMsgIn implements MsgIn {
 		this.mirrorFrame = mirrorFrame;
 	}
 
+	public ManageSessionPoolMsgIn getManageSessionPool() {
+		return manageSessionPool;
+	}
+
+	public void setManageSessionPool(ManageSessionPoolMsgIn manageSessionPool) {
+		this.manageSessionPool = manageSessionPool;
+	}
 }

@@ -23,7 +23,7 @@ import org.webswing.server.common.model.meta.VariableSetName;
 @ConfigType(metadataGenerator = SecuredPathConfig.SecuredPathConfigurationMetadataGenerator.class)
 // NOTE: if you change these names, please see also MigrationConfigurationProvider
 @ConfigFieldOrder({ "enabled", "path", "name", "webHomeDir", "webFolder", "restrictedResources", "langFolder", "icon", "security", "allowedCorsOrigins", "adminConsoleUrl",
-		"uploadMaxSize", "maxClients", "sessionMode", "monitorEdtEnabled", "loadingAnimationDelay", "allowStealSession", "autoLogout", "goodbyeUrl",
+		"uploadMaxSize", "maxClients", "sessionMode", "monitorEdtEnabled", "recordingConsentRequired", "mirroringConsentRequired", "loadingAnimationDelay", "allowStealSession", "autoLogout", "goodbyeUrl",
 		"dataStore" })
 public interface SecuredPathConfig extends Config {
 
@@ -98,6 +98,16 @@ public interface SecuredPathConfig extends Config {
 	@ConfigFieldDefaultValueBoolean(true)
 	@ConfigFieldDiscriminator
 	public boolean isMonitorEdtEnabled();
+
+	@ConfigField(label = "Require Recording Consent", description = "If enabled, triggering Session recording from admin console will show a dialog for users to provide their consent before Session recording is started")
+	@ConfigFieldDefaultValueBoolean(false)
+	@ConfigFieldDiscriminator
+	public boolean isRecordingConsentRequired();
+
+	@ConfigField(label = "Require Mirroring Consent", description = "If enabled, triggering Mirror View from admin console will show a dialog for users to provide their consent before Mirror View is started")
+	@ConfigFieldDefaultValueBoolean(false)
+	@ConfigFieldDiscriminator
+	public boolean isMirroringConsentRequired();
 
 	@ConfigField(label = "Loading Animation delay", description = "If EDT thread is blocked for more then defined delay in seconds, dialog with loading animation is displayed appears. Delay must be  >= 2 seconds.")
 	@ConfigFieldDefaultValueNumber(2)

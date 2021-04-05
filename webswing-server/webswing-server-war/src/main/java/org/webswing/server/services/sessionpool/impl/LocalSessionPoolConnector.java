@@ -7,6 +7,7 @@ import java.util.Map;
 import org.webswing.Constants;
 import org.webswing.model.adminconsole.out.SessionPoolAppMsgOut;
 import org.webswing.model.adminconsole.out.SessionPoolInfoMsgOut;
+import org.webswing.model.adminconsole.in.ManageSessionPoolMsgIn;
 import org.webswing.server.api.services.sessionpool.ServerSessionPoolConnector;
 import org.webswing.server.api.services.sessionpool.SessionPoolHolderService;
 import org.webswing.server.api.services.stat.StatisticsLoggerService;
@@ -139,7 +140,7 @@ public class LocalSessionPoolConnector extends ServerSessionPoolConnector {
 			appInstances.add(new SessionPoolAppMsgOut(path, instances));
 		}
 		
-		return new SessionPoolInfoMsgOut(getId(), getMaxInstances(), getPriority(), connectedServers, appInstances);
+		return new SessionPoolInfoMsgOut(getId(), getMaxInstances(), getPriority(), false, connectedServers, appInstances);
 	}
 
 
@@ -147,5 +148,15 @@ public class LocalSessionPoolConnector extends ServerSessionPoolConnector {
 		if(this.startup !=null){
 			this.startup.stop();
 		}
+	}
+
+	@Override
+	public void handleManageSessionPool(ManageSessionPoolMsgIn manageSessionPool) {
+		// nothing
+	}
+
+	@Override
+	public boolean isDrainMode() {
+		return false;
 	}
 }

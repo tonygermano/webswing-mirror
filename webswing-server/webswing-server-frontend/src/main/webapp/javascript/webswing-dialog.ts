@@ -16,7 +16,8 @@ export const dialogInjectable = {
     getMainWindowVisibilityState: 'base.getMainWindowVisibilityState' as const,
     focusDefault: 'focusManager.focusDefault' as const,
     isAutoLogout: 'socket.isAutoLogout' as const,
-    startNewSessionOnShutdown: 'base.startNewSessionOnShutdown' as const
+    startNewSessionOnShutdown: 'base.startNewSessionOnShutdown' as const,
+    clearInstanceId: 'socket.clearInstanceId' as const
 }
 
 export interface IDialogService {
@@ -48,6 +49,7 @@ interface IDialogs {
     connectionErrorDialog: IDialogContent
     tooManyClientsNotification: IDialogContent
     stoppedDialog: IDialogContent
+    reconnectInstanceNotFound: IDialogContent
     timedoutDialog: IDialogContent
     cookiesDisabledDialog: IDialogContent
     continueOldSessionDialog: IDialogContent
@@ -203,6 +205,29 @@ export class DialogModule extends ModuleDef<typeof dialogInjectable, IDialogServ
                     }
                 }
             },
+            reconnectInstanceNotFound: {
+                content: 
+                    '<p id="commonDialog-autoReconnect">${dialog.autoReconnect}<span id="commonDialog-autoReconnect-time"></span></p>' +  
+                    '<p id="commonDialog-description">${dialog.reconnectInstanceNotFound}</p>',
+                buttons: [{
+                    label: '<span class="ws-icon-arrows-cw"></class> ${dialog.reconnectInstanceNotFound.retry}',
+                    action: () => {
+                        this.api.reTrySession();
+                    }
+                }, {
+                    label: '<span class="ws-icon-certificate"></class> ${dialog.reconnectInstanceNotFound.newSession}',
+                    action: () => {
+                        this.api.clearInstanceId();
+                        this.api.reTrySession();
+                    }
+                }, () => !this.api.cfg.disableLogout && {
+                    label: '<span class="ws-icon-logout"></class> ${dialog.reconnectInstanceNotFound.logout}',
+                    action: () => {
+                        this.api.logout();
+                    }
+                }],
+                autoReconnect: true
+            },
             dockingVisibilityOverlay: {
                 type: 'visibility-overlay',
                 content: '<div class="visibility-overlay"><div class="visibility-message">${dialog.overlay.docking.visibility}</div></div>'
@@ -326,6 +351,13 @@ export class DialogModule extends ModuleDef<typeof dialogInjectable, IDialogServ
 
         this.resetAutoReconnect();
 
+		winDlg.dialog.attr("data-type", "common");
+
+		if (msg == null) {
+            winDlg.currentContent = undefined;
+            return winDlg.content;
+        }
+
         if (winDlg.dialog.is(":visible") && winDlg.currentContent === msg) {
             // do not re-create the same dialog if it's already showing
             this.checkAndSetupAutoReconnect(msg, winDlg.content);
@@ -346,6 +378,11 @@ export class DialogModule extends ModuleDef<typeof dialogInjectable, IDialogServ
 
     private showBar(msg: IDialogContent) {
         const winBar = this.getBar();
+        
+        if (msg == null) {
+            winBar.currentContentBar = undefined;
+            return winBar.barContent;
+        }
 
         winBar.currentContentBar = msg;
         this.generateContent(msg, winBar.bar, winBar.barHeader, winBar.barContent);

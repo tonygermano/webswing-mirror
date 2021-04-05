@@ -83,7 +83,8 @@ message JvmStatsMsgOutProto {
 message SessionDataMsgOutProto {
 	optional bool applet = 1;
 	optional bool sessionLoggingEnabled = 2;
-	optional bool recording = 3;
-	optional string recordingFile = 4;
-	optional bool statisticsLoggingEnabled = 5;
+	optional commonProto.RecordingStatusEnumProto recordingStatus = 3;
+	optional commonProto.MirroringStatusEnumProto mirroringStatus = 4;
+	optional string recordingFile = 5;
+	optional bool statisticsLoggingEnabled = 6;
 }

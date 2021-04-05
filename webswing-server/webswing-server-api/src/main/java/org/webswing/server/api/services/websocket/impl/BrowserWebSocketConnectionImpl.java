@@ -310,9 +310,9 @@ public class BrowserWebSocketConnectionImpl extends AbstractWebSocketConnection 
 		}
 		throw new WsException("User '" + checkUser + "' is not allowed to execute action '" + action + "'", HttpServletResponse.SC_UNAUTHORIZED);
 	}
-	
+
 	@Override
-	public boolean isRecording() {
+	public boolean isRecordingFlagged() {
 		return Boolean.parseBoolean((String) session.getUserProperties().get(Constants.HTTP_ATTR_RECORDING_FLAG));
 	}
 	

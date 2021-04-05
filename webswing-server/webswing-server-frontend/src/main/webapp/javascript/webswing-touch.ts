@@ -21,18 +21,19 @@ export const touchInjectable = {
 	showBar: 'dialog.showBar' as const,
 	dialogs: 'dialog.content' as const,
 	hasUndockedWindows: 'base.hasUndockedWindows' as const,
-	focusInput: 'focusManager.focusInput' as const,
 	focusDefault: 'focusManager.focusDefault' as const
 }
 
 export interface ITouchService {
 	'touch.register': (config: ITouchBarConfig) => void,
 	'touch.cursorChanged': (cursorMsg: appFrameProtoOut.ICursorChangeEventMsgOutProto) => void,
-	'touch.inputFocusGained': () => void,
+	'touch.inputFocusLost': () => void,
 	'touch.touchBarConfig': ITouchBarConfig,
 	'touch.touchBarEnabled': () => boolean,
 	'touch.switchMode': (doSwitch: boolean, dontAsk: boolean) => void,
-	'touch.dispose': () => void
+	'touch.dispose': () => void,
+	'touch.correctPosition': () => void,
+	'touch.refreshScale': () => void
 }
 
 interface ITouchBarConfig {
@@ -114,16 +115,20 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 	private currentConfig: ITouchBarConfig | null = null;
 	private lastRootWidth = 0;
 	private lastRootHeight = 0;
+	private lastWinWidth = 0;
+	private lastWinHeight = 0;
 
 	public provides() {
 		return {
 			'touch.register': this.register,
 			'touch.cursorChanged': this.cursorChanged,
-			'touch.inputFocusGained': this.inputFocusGained,
+			'touch.inputFocusLost': this.inputFocusLost,
 			'touch.touchBarConfig': this.touchBarConfig(),
 			'touch.touchBarEnabled': () => this.touchBar != null,
 			'touch.switchMode': this.switchMode,
-			'touch.dispose': this.dispose
+			'touch.dispose': this.dispose,
+			'touch.correctPosition': this.correctPosition,
+			'touch.refreshScale': this.refreshScale
 		}
 	}
 
@@ -180,7 +185,7 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 						label: '<span class="ws-icon-keyboard" role="button"></span>',
 						title: '${touch.keyboard}',
 						enabled: true,
-						hidden: false,
+						hidden: true,
 						action: (button: JQuery<HTMLElement>) => {
 							this.buttonOpenKeyboard(button);
 						}
@@ -284,16 +289,18 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 			return false;
 		};
 
-		this.input.blur();
-		this.api.focusDefault();
-
 		this.registered = true;
 		this.api.cfg.touchMode = true;
 		this.currentMode = "touch";
 		this.touchpadMode = false;
+		
+		this.input.blur();
+		this.api.focusDefault();
 
 		this.lastRootWidth = this.api.cfg.rootElement.width()!;
 		this.lastRootHeight = this.api.cfg.rootElement.height()!;
+		this.lastWinWidth = Math.round(document.body.clientWidth);
+		this.lastWinHeight = Math.round(document.body.clientHeight);
 
 		this.api.cfg.rootElement.parent().append(html);
 		if (!this.api.cfg.hideTouchBar) {
@@ -339,18 +346,17 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 		this.api.cfg.rootElement[0].onselectstart = () => {
 			return true;
 		};
-
-		this.touchBar = undefined;
-		this.registered = false;
-		this.api.cfg.touchMode = false;
-		this.currentMode = "mouse";
-
+		
 		this.api.sendHandshake();
-
+		
 		clearInterval(this.sendInterval);
 		clearInterval(this.canvasResizeInterval);
-
+		
 		$(".touch-control, #ws-cursor").remove();
+
+		this.touchBar = undefined;
+		this.currentMode = "mouse";
+		this.registered = false;
 	}
 
 	// handler functions
@@ -359,7 +365,7 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 			$("#fake-input").remove();
 			if (!this.input.is(':focus')) {
 				if (this.focusCounter === 0) {
-					this.api.focusInput(this.input[0]);
+					this.api.focusDefault();
 					this.focusCounter++;
 				}
 			} else {
@@ -368,7 +374,7 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 					this.input![0].selectionStart = this.input![0].selectionEnd = this.input![0].value.length;
 				}
 			}
-			this.correctInputPosition();
+			// this.correctInputPosition();
 		} else {
 			// prevent focusing input without caret
 			e.preventDefault();
@@ -381,7 +387,7 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 		this.focusCounter = 0;
 		this.input?.val('');
 		$("#fake-input").remove();
-		// this.api.focusDefault();
+		this.api.focusDefault();
 		// force canvas repaint
 		this.repaint();
 	}
@@ -540,7 +546,8 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 	
 	private initMisc(config: ITouchBarConfig | null) {
 		if (config) {
-			this.scalingEnabled = config.scalingEnabled;
+			// this.scalingEnabled = config.scalingEnabled;
+			this.scalingEnabled = false;
 			this.staticScaleEnabled = config.staticScaleEnabled;
 		}
 		
@@ -550,24 +557,56 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 	}
 
 	private initScale() {
-		let touchBarHeight = 0;
-		if (this.touchBar && this.touchBar != null) {
-			touchBarHeight = this.touchBar.height()!;
-		}
-
-		const initScale = Math.min(document.body.offsetWidth / this.api.getRootWidth(), (document.body.offsetHeight - touchBarHeight) / this.api.getRootHeight());
-		
 		if (this.scalingEnabled) {
+			let touchBarHeight = 0;
+			if (this.touchBar && this.touchBar != null) {
+				touchBarHeight = this.touchBar.height()!;
+			}
+			const initScale = Math.min(document.body.offsetWidth / this.api.getRootWidth(), (document.body.offsetHeight - touchBarHeight) / this.api.getRootHeight());
 			$(this.canvas!).data("scale", initScale);
 			$(this.canvas!).data("minscale", initScale);
 			this.doScaleCanvas(initScale);
 		} else if (this.staticScaleEnabled) {
+			const parentHeight = this.api.cfg.rootElement[0].clientHeight;
+			const parentWidth = this.api.cfg.rootElement[0].clientWidth;
+			const initScale = Math.min(parentWidth / this.api.getRootWidth(), parentHeight / this.api.getRootHeight());
 			// init static zoom scale on root element
 			$(this.canvas!).data("scale", initScale);
-			const parent = this.api.cfg.rootElement[0] as HTMLElement;
-			parent.style.zoom = initScale + "";
+			
+			this.refreshScale();
+
 			// const vp = document.querySelector("meta[name='viewport']");
 			// vp!.setAttribute("content", "width=device-width, user-scalable=no, initial-scale=" + initScale + ", maximum-scale=" + initScale);
+		}
+	}
+
+	private refreshScale() {
+		if (this.staticScaleEnabled) {
+			const scale = $(this.canvas!).data("scale") || 1.0;
+
+			const zoomEls = this.api.cfg.rootElement[0].querySelectorAll(".webswing-canvas:not([data-id=canvas]), .ws-input-hidden");
+			zoomEls.forEach((zoomEl) => {
+				(zoomEl as HTMLElement).style.zoom = scale + "";
+			});
+		}
+	}
+	
+	private disposeScale() {
+		if (this.scalingEnabled) {
+			$(this.canvas!).data("scale", 1);
+			$(this.canvas!).data("minscale", 1);
+			this.doScaleCanvas(1.0);
+		} else if (this.staticScaleEnabled) {
+			// init static zoom scale on root element
+			$(this.canvas!).data("scale", 1);
+
+			const zoomEls = this.api.cfg.rootElement[0].querySelectorAll(".webswing-canvas:not([data-id=canvas]), .ws-input-hidden");
+			zoomEls.forEach((zoomEl) => {
+				(zoomEl as HTMLElement).style.zoom = "1";
+			});
+			
+			// const vp = document.querySelector("meta[name='viewport']");
+			// vp!.setAttribute("content", "width=device-width, user-scalable=no, initial-scale=" + "1" + ", maximum-scale=" + "1");
 		}
 	}
 
@@ -620,26 +659,36 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 		}
 	}
 
-	private inputFocusGained() {
+	private inputFocusLost() {
 		if (!this.input || !this.registered || !this.api.cfg.touchMode) {
 			return;
 		}
-
-		if (!this.input.is(".focused-with-caret.editable")) {
+	
+		if (this.input.is(".focused-with-caret.editable")) {
 			return;
 		}
 
-		const top = this.input[0].style.top;
-		const left = this.input[0].style.left;
-		const height = this.input[0].style.height;
-
-		this.input.data("topOrig", top);
-		this.input.data("leftOrig", left);
-		this.input.data("heightOrig", height);
-
-		this.correctInputPosition();
+		this.hideKeyboard();
+		// this.focusFakeInput();
 	}
 
+	private focusFakeInput() {
+		// focus fake input
+		// iOS: need to focus this input to be able to focus on the real keyboard input not from user-initiated event
+		// https://stackoverflow.com/questions/12204571/mobile-safari-javascript-focus-method-on-inputfield-only-works-with-click
+		if (!$("#fake-input").length) {
+			const fakeInput = $('<input type="text" id="fake-input" style="position: absolute; opacity: 0; height: 0; font-size: 16px;" readonly="true">');
+			$("body").prepend(fakeInput);
+
+			fakeInput.on("focus", () => {
+				setTimeout(() => {
+					$("#fake-input").remove();
+				}, 1000);
+			});
+		}
+		$("#fake-input")[0].focus({ preventScroll: true });
+	}
+	
 	private switchMode(doSwitch: boolean, dontAsk: boolean) {
 		this.switchModeRequested = false;
 
@@ -664,8 +713,9 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 			}
 		} else {
 			// switch to mouse
-			this.doScaleCanvas(1.0); // make sure there is no touch scale applied
+			this.disposeScale(); // make sure there is no touch scale applied
 			this.dispose();
+			this.api.cfg.touchMode = false;
 		}
 
 		this.switchModeAlreadySwitched = true;
@@ -690,8 +740,9 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 	}
 
 	private buttonSwitchToDesktop(_: JQuery<HTMLElement>) {
-		this.doScaleCanvas(1.0); // make sure there is no touch scale applied
+		this.disposeScale(); // make sure there is no touch scale applied
 		this.dispose();
+		this.api.cfg.touchMode = false;
 	}
 
 	private buttonCopy(button: JQuery<HTMLElement>) {
@@ -981,8 +1032,6 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 
 			parent[0].scrollLeft = scrollLeft;
 			parent[0].scrollTop = scrollTop;
-
-			this.correctInputPosition();
 		} else {
 			this.scaling = false;
 		}
@@ -1111,21 +1160,10 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 				}
 
 				this.api.send({ events: eventMsg });
-				this.hideKeyboard();
-
-				// focus fake input
-				// iOS: need to focus this input to be able to focus on the real keyboard input not from user-initiated event
-				if (!$("#fake-input").length) {
-					const fakeInput = $('<input type="text" id="fake-input" style="position: absolute; opacity: 0; height: 0; font-size: 16px;" readonly="true">');
-					$("body").prepend(fakeInput);
-
-					fakeInput.on("focus", () => {
-						setTimeout(() => {
-							$("#fake-input").remove();
-						}, 1000);
-					});
+				
+				if (isIOS()) {
+					this.focusFakeInput();
 				}
-				$("#fake-input")[0].focus({ preventScroll: true });
 
 				this.cancelAnimateDrag();
 				this.cancelAnimateLongPress();
@@ -1264,16 +1302,28 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 	// animate functions
 
 	private animateTap(x: number, y: number) {
+		if (window.pageYOffset > 0) {
+			y += window.pageYOffset;
+		}
+
 		const tap = $("#ws-touch-effect");
 		tap.removeClass("animate animateLong animateLongOut").css({ top: (y - tap.height()! / 2) + 'px', left: (x - tap.width()! / 2) + 'px' }).addClass("animate");
 	}
 
 	private animateLongPress(x: number, y: number) {
+		if (window.pageYOffset > 0) {
+			y += window.pageYOffset;
+		}
+
 		const tap = $("#ws-touch-effect");
 		tap.removeClass("animate animateLong animateLongOut").css({ top: (y - tap.height()! / 2) + 'px', left: (x - tap.width()! / 2) + 'px' }).addClass("animateLong");
 	}
 
 	private animateLongPressOut(x: number, y: number) {
+		if (window.pageYOffset > 0) {
+			y += window.pageYOffset;
+		}
+
 		const tap = $("#ws-touch-effect");
 		tap.removeClass("animate animateLong animateLongOut").css({ top: (y - tap.height()! / 2) + 'px', left: (x - tap.width()! / 2) + 'px' }).addClass("animateLongOut");
 	}
@@ -1291,6 +1341,10 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 	}
 
 	private animateDrag(x: number, y: number) {
+		if (window.pageYOffset > 0) {
+			y += window.pageYOffset;
+		}
+
 		const el = $('.ws-drag-effect');
 		el.css({ 'top': (y - el.height()! / 2) + "px", 'left': (x - el.width()! / 2) + "px" }).show();
 	}
@@ -1332,8 +1386,6 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 		}
 		$(this.canvas!).data("scale", scale);
 
-		this.correctInputPosition();
-
 		if (scale !== 1.0) {
 			$("#ws-canvas-scale").show();
 			$("#ws-canvas-scale .scale-restore").show();
@@ -1350,19 +1402,16 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 		this.repaint();
 	}
 
-	private correctInputPosition() {
-		if (!this.input?.is(".focused-with-caret.editable")) {
-			return;
+	private correctPosition() {
+		if (this.api.cfg.rootElement[0].scrollTop > 0) {
+			this.api.cfg.rootElement[0].scrollTo(0, 0);
 		}
 
-		const top = this.input.data("topOrig");
-		const left = this.input.data("leftOrig");
-		const height = this.input.data("heightOrig");
-		const scale = $(this.canvas!).data("scale") || 1.0;
-
-		this.input[0].style.top = (parseInt(top, 10) * scale) + "px";
-		this.input[0].style.left = (parseInt(left, 10) * scale) + "px";
-		this.input[0].style.height = (parseInt(height, 10) * scale) + "px";
+		if (!this.isKeyboardProbablyShowing) {
+			if (this.staticScaleEnabled) {
+				this.initScale();
+			}
+		}
 	}
 
 	private sendWordsUsingKeypressEvent(data: string) {
@@ -1404,15 +1453,17 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 	}
 
 	private createMouseEvent(targetElement: Element | null, type: appFrameProtoIn.MouseEventMsgInProto.MouseEventTypeProto, x: number, y: number, button: number): appFrameProtoIn.IInputEventMsgInProto {
-		let rect;
+		let rectElement;
+		const scale = $(this.canvas!).data("scale") || 1.0;
+		
 		if (targetElement && targetElement != null && targetElement.parentNode && targetElement.parentNode != null && (targetElement.parentNode as Element).getBoundingClientRect) {
-			if ($(targetElement).is(".internal")) {
-				rect = (targetElement.parentNode?.parentNode as Element).getBoundingClientRect();
+			if (targetElement.matches(".internal")) {
+				rectElement = targetElement.parentElement?.parentElement;
 			} else {
-				rect = (targetElement.parentNode as Element).getBoundingClientRect();
+				rectElement = targetElement.parentElement;
 			}
 		} else {
-			rect = this.api.getCanvas().getBoundingClientRect();
+			rectElement = this.api.getCanvas();
 		}
 
 		let winId;
@@ -1427,36 +1478,45 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 				winId = $(targetElement).data("id");
 			}
 		}
-
-		// return relative mouse position
-		let mouseX = Math.round(x - rect.left);
-		let mouseY = Math.round(y - rect.top);
-
+		
 		if (type === MouseEventType.mouseup && (!targetElement || !targetElement.matches || !targetElement.matches("canvas.webswing-canvas"))) {
 			// fix for detached composition canvas windows that might overlay same coordinates space, when clicked outside a canvas
-			mouseX = -1;
-			mouseY = -1;
+			return {
+				mouse: {
+					x: -1,
+					y: -1,
+					type,
+					button,
+					buttons: button === 0 ? 0 : Math.pow(2, button),
+					winId: winId || "",
+					timeMilis: Date.now() % 86400000
+				}
+			}
 		}
-
+		
 		if (type === MouseEventType.mouseup && targetElement && targetElement.matches && !targetElement.matches("canvas.webswing-canvas") && targetElement.closest(".webswing-html-canvas") != null) {
 			// fix for mouseup over an HtmlWindow div content
-			rect = (targetElement?.closest(".webswing-html-canvas")?.parentNode as Element)?.getBoundingClientRect();
-
-			mouseX = Math.round(x - rect.left);
-			mouseY = Math.round(y - rect.top);
+			rectElement = targetElement?.closest(".webswing-html-canvas")?.parentElement;
 		}
 
-		const scale = $(this.canvas!).data("scale") || 1.0;
+		const pos = {
+			left: rectElement!.getBoundingClientRect().left,
+			top: rectElement!.getBoundingClientRect().top
+		};
 
-		if (mouseX !== -1 && mouseY !== -1 && targetElement && targetElement.parentElement) {
-			mouseX += targetElement.parentElement.scrollLeft;
-			mouseY += targetElement.parentElement.scrollTop;
+		// return relative mouse position
+		let mouseX = Math.round((x - pos.left) / scale);
+		let mouseY = Math.round((y - pos.top) / scale);
+
+		if (targetElement && targetElement.parentElement) {
+			mouseX += (targetElement.parentElement.scrollLeft / scale);
+			mouseY += (targetElement.parentElement.scrollTop / scale);
 		}
 
 		return {
 			mouse: {
-				x: Math.round(mouseX / scale),
-				y: Math.round(mouseY / scale),
+				x: Math.round(mouseX),
+				y: Math.round(mouseY),
 				type,
 				button,
 				buttons: button === 0 ? 0 : Math.pow(2, button),
@@ -1513,32 +1573,29 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 		}
 	}
 
-	private isKeyboardShowing() {
-		return this.input?.is(".focused-with-caret.editable");
-	}
-
 	private showKeyboard() {
-		if (this.input) {
-			this.input.addClass('focused-with-caret editable');
-			this.api.focusInput(this.input[0]);
-		}
+		// if (this.input) {
+		// 	this.input.addClass('focused-with-caret editable');
+		// 	this.api.focusInput(this.input[0]);
+		// }
 	}
 
 	private hideKeyboard() {
-		if (!this.input || !this.isKeyboardShowing()) {
+		if (!this.input) {
 			return;
 		}
+
+		// this is important, do not remove
+		this.input[0].style.top = '';
+		this.input[0].style.left = '';
+		this.input[0].style.height = '';
+
 		this.input.removeClass('focused-with-caret editable');
 		this.input.blur();
+		this.api.focusDefault();
 	}
 
 	private resizeCheck() {
-		const w = this.api.getRootWidth();
-		const h = this.api.getRootHeight();
-		const widthChanged = $(this.canvas!).width() !== w;
-		const heightChanged = $(this.canvas!).height() !== h;
-		const sizeChanged = widthChanged || heightChanged;
-
 		if (!this.api.cfg.mirror && this.canvas != null) {
 			if (this.lastRootWidth !== this.api.cfg.rootElement.width() || this.lastRootHeight !== this.api.cfg.rootElement.height()) {
 				if (this.scalingEnabled) {
@@ -1552,23 +1609,48 @@ export class TouchModule extends ModuleDef<typeof touchInjectable, ITouchService
 
 				this.lastRootWidth = this.api.cfg.rootElement.width()!;
 				this.lastRootHeight = this.api.cfg.rootElement.height()!;
-			}
 
-			if (sizeChanged) {
-				if (this.input?.is(".focused-with-caret.editable")) {
-					if (this.canvas && !widthChanged && (h - $(this.canvas).height()!) < 100) {
-						// canvas should resize height to smaller and input is focused = keyboard is probably showing
-						this.isKeyboardProbablyShowing = true;
-					}
-					return;
+				if (this.api.cfg.rootElement.is(".composition")) {
+					// when using compositing window manager, the root canvas has 0 size
+					// we need to do a handshake only if the root element has changed size
+					this.api.sendHandshake();
 				}
-
-				this.doResize();
-			} else if (this.input?.is(".focused-with-caret.editable") && this.isKeyboardProbablyShowing) {
-				// size has not changed but input is still focused and keyboard is probably showing = user probably closed keyboard with device back button
-				// unfocus input
-				this.hideKeyboard();
 			}
+
+			if (!this.api.cfg.rootElement.is(".composition")) {
+				const w = this.api.getRootWidth();
+				const h = this.api.getRootHeight();
+				const widthChanged = Math.round($(this.canvas!).width()!) !== w;
+				const heightChanged = Math.round($(this.canvas!).height()!) !== h;
+				const sizeChanged = widthChanged || heightChanged;
+				if (sizeChanged) {
+					this.doResize();
+				}
+			}
+
+			const winWidthChanged = this.lastWinWidth !== Math.round(document.body.clientWidth);
+			const winHeightChanged = this.lastWinHeight !== Math.round(document.body.clientHeight);
+
+			if (winWidthChanged && winHeightChanged) {
+				this.correctPosition();
+			}
+			
+			if ((winHeightChanged && !winWidthChanged && this.lastWinHeight - document.body.clientHeight > 100)) {
+				if (this.input?.is(".focused-with-caret.editable")) {
+					this.isKeyboardProbablyShowing = true;
+				}
+				return;
+			} else {
+				if (this.input?.is(".focused-with-caret.editable") && this.isKeyboardProbablyShowing) {
+					// size has not changed but input is still focused and keyboard is probably showing = user probably closed keyboard with device back button
+					// unfocus input
+					this.isKeyboardProbablyShowing = false;
+					this.hideKeyboard();
+				}
+			}
+			
+			this.lastWinWidth = Math.round(document.body.clientWidth);
+			this.lastWinHeight = Math.round(document.body.clientHeight);
 
 			this.isKeyboardProbablyShowing = false;
 		}

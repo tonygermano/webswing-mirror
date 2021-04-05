@@ -1,4 +1,4 @@
-// Filename: _app-selection.scss
+// Filename: _selector.scss
 // Description: App selection modal component. Shows the apps currently available in Webswing.
 
 
@@ -7,10 +7,6 @@
 
     text-align: left;
     max-width: 80%;
-
-	&-content {
-        @include rel('margin-top', 40px);
-	}
 
 	&-container {
         display: block;

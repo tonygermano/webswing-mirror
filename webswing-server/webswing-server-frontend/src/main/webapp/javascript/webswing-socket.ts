@@ -29,7 +29,8 @@ export interface ISocketService {
     'socket.instanceId': () => string | undefined,
     'socket.awaitResponse': (callback: (result: JsResultMsgOrError) => void, request: AppFrameIn, correlationId: string, timeout: number) => void,
     'socket.dispose': () => void,
-    'socket.isAutoLogout': () => boolean
+    'socket.isAutoLogout': () => boolean,
+    'socket.clearInstanceId': () => void
 }
 
 export type AppFrame = AppFrameOut
@@ -68,6 +69,7 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
             'socket.awaitResponse': this.awaitResponse,
             'socket.dispose': this.dispose,
             'socket.isAutoLogout': this.isAutoLogout,
+            'socket.clearInstanceId': this.clearInstanceId
         }
     }
 
@@ -82,7 +84,8 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
             this.socket.close(1000, "Disconnecting instance.");
         }
         this.socket = undefined;
-        this.instanceId = undefined;
+        // do not clear instanceId, used for reconnect
+        // this.instanceId = undefined;
     }
 
     public send(message: AppFrameIn) {
@@ -131,6 +134,10 @@ export class SocketModule extends ModuleDef<typeof socketInjectable, ISocketServ
     public getInstanceId() {
         return this.instanceId;
     }
+    
+    public clearInstanceId() {
+        this.instanceId = undefined;
+	}
 
     private sendAppFrame(appFrameProto: serverBrowserFrameProto.BrowserToServerFrameMsgInProto) {
         if (this.socket && this.socket != null) {

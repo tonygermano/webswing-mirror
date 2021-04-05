@@ -19,28 +19,41 @@ public final class AdminConsoleProto {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>optional .ToggleRecordingMsgInProto toggleRecording = 1;</code>
+     * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 1;</code>
      */
-    boolean hasToggleRecording();
+    boolean hasHandshake();
     /**
-     * <code>optional .ToggleRecordingMsgInProto toggleRecording = 1;</code>
+     * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 1;</code>
      */
-    org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto getToggleRecording();
+    org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto getHandshake();
     /**
-     * <code>optional .ToggleRecordingMsgInProto toggleRecording = 1;</code>
+     * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 1;</code>
      */
-    org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProtoOrBuilder getToggleRecordingOrBuilder();
+    org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProtoOrBuilder getHandshakeOrBuilder();
 
     /**
-     * <code>optional .ShutdownMsgInProto shutdown = 2;</code>
+     * <code>optional .RecordingRequestMsgInProto recordingRequest = 2;</code>
+     */
+    boolean hasRecordingRequest();
+    /**
+     * <code>optional .RecordingRequestMsgInProto recordingRequest = 2;</code>
+     */
+    org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto getRecordingRequest();
+    /**
+     * <code>optional .RecordingRequestMsgInProto recordingRequest = 2;</code>
+     */
+    org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProtoOrBuilder getRecordingRequestOrBuilder();
+
+    /**
+     * <code>optional .ShutdownMsgInProto shutdown = 3;</code>
      */
     boolean hasShutdown();
     /**
-     * <code>optional .ShutdownMsgInProto shutdown = 2;</code>
+     * <code>optional .ShutdownMsgInProto shutdown = 3;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto getShutdown();
     /**
-     * <code>optional .ShutdownMsgInProto shutdown = 2;</code>
+     * <code>optional .ShutdownMsgInProto shutdown = 3;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProtoOrBuilder getShutdownOrBuilder();
 
@@ -123,147 +136,147 @@ public final class AdminConsoleProto {
     org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleStatisticsLoggingMsgInProtoOrBuilder getToggleStatisticsLoggingOrBuilder();
 
     /**
-     * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 10;</code>
-     */
-    boolean hasHandshake();
-    /**
-     * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 10;</code>
-     */
-    org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto getHandshake();
-    /**
-     * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 10;</code>
-     */
-    org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProtoOrBuilder getHandshakeOrBuilder();
-
-    /**
-     * <code>optional .GetConfigMsgInProto getConfig = 11;</code>
+     * <code>optional .GetConfigMsgInProto getConfig = 10;</code>
      */
     boolean hasGetConfig();
     /**
-     * <code>optional .GetConfigMsgInProto getConfig = 11;</code>
+     * <code>optional .GetConfigMsgInProto getConfig = 10;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProto getGetConfig();
     /**
-     * <code>optional .GetConfigMsgInProto getConfig = 11;</code>
+     * <code>optional .GetConfigMsgInProto getConfig = 10;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProtoOrBuilder getGetConfigOrBuilder();
 
     /**
-     * <code>optional .GetMetaMsgInProto getMeta = 12;</code>
+     * <code>optional .GetMetaMsgInProto getMeta = 11;</code>
      */
     boolean hasGetMeta();
     /**
-     * <code>optional .GetMetaMsgInProto getMeta = 12;</code>
+     * <code>optional .GetMetaMsgInProto getMeta = 11;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProto getGetMeta();
     /**
-     * <code>optional .GetMetaMsgInProto getMeta = 12;</code>
+     * <code>optional .GetMetaMsgInProto getMeta = 11;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProtoOrBuilder getGetMetaOrBuilder();
 
     /**
-     * <code>optional .ResolveConfigMsgInProto resolveConfig = 13;</code>
+     * <code>optional .ResolveConfigMsgInProto resolveConfig = 12;</code>
      */
     boolean hasResolveConfig();
     /**
-     * <code>optional .ResolveConfigMsgInProto resolveConfig = 13;</code>
+     * <code>optional .ResolveConfigMsgInProto resolveConfig = 12;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProto getResolveConfig();
     /**
-     * <code>optional .ResolveConfigMsgInProto resolveConfig = 13;</code>
+     * <code>optional .ResolveConfigMsgInProto resolveConfig = 12;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProtoOrBuilder getResolveConfigOrBuilder();
 
     /**
-     * <code>optional .SaveConfigMsgInProto saveConfig = 14;</code>
+     * <code>optional .SaveConfigMsgInProto saveConfig = 13;</code>
      */
     boolean hasSaveConfig();
     /**
-     * <code>optional .SaveConfigMsgInProto saveConfig = 14;</code>
+     * <code>optional .SaveConfigMsgInProto saveConfig = 13;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProto getSaveConfig();
     /**
-     * <code>optional .SaveConfigMsgInProto saveConfig = 14;</code>
+     * <code>optional .SaveConfigMsgInProto saveConfig = 13;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProtoOrBuilder getSaveConfigOrBuilder();
 
     /**
-     * <code>optional .SearchVariablesMsgInProto searchVariables = 15;</code>
+     * <code>optional .SearchVariablesMsgInProto searchVariables = 14;</code>
      */
     boolean hasSearchVariables();
     /**
-     * <code>optional .SearchVariablesMsgInProto searchVariables = 15;</code>
+     * <code>optional .SearchVariablesMsgInProto searchVariables = 14;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProto getSearchVariables();
     /**
-     * <code>optional .SearchVariablesMsgInProto searchVariables = 15;</code>
+     * <code>optional .SearchVariablesMsgInProto searchVariables = 14;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProtoOrBuilder getSearchVariablesOrBuilder();
 
     /**
-     * <code>optional .StartAppMsgInProto startApp = 16;</code>
+     * <code>optional .StartAppMsgInProto startApp = 15;</code>
      */
     boolean hasStartApp();
     /**
-     * <code>optional .StartAppMsgInProto startApp = 16;</code>
+     * <code>optional .StartAppMsgInProto startApp = 15;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProto getStartApp();
     /**
-     * <code>optional .StartAppMsgInProto startApp = 16;</code>
+     * <code>optional .StartAppMsgInProto startApp = 15;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProtoOrBuilder getStartAppOrBuilder();
 
     /**
-     * <code>optional .StopAppMsgInProto stopApp = 17;</code>
+     * <code>optional .StopAppMsgInProto stopApp = 16;</code>
      */
     boolean hasStopApp();
     /**
-     * <code>optional .StopAppMsgInProto stopApp = 17;</code>
+     * <code>optional .StopAppMsgInProto stopApp = 16;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProto getStopApp();
     /**
-     * <code>optional .StopAppMsgInProto stopApp = 17;</code>
+     * <code>optional .StopAppMsgInProto stopApp = 16;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProtoOrBuilder getStopAppOrBuilder();
 
     /**
-     * <code>optional .CreateAppMsgInProto createApp = 18;</code>
+     * <code>optional .CreateAppMsgInProto createApp = 17;</code>
      */
     boolean hasCreateApp();
     /**
-     * <code>optional .CreateAppMsgInProto createApp = 18;</code>
+     * <code>optional .CreateAppMsgInProto createApp = 17;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProto getCreateApp();
     /**
-     * <code>optional .CreateAppMsgInProto createApp = 18;</code>
+     * <code>optional .CreateAppMsgInProto createApp = 17;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProtoOrBuilder getCreateAppOrBuilder();
 
     /**
-     * <code>optional .RemoveAppMsgInProto removeApp = 19;</code>
+     * <code>optional .RemoveAppMsgInProto removeApp = 18;</code>
      */
     boolean hasRemoveApp();
     /**
-     * <code>optional .RemoveAppMsgInProto removeApp = 19;</code>
+     * <code>optional .RemoveAppMsgInProto removeApp = 18;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProto getRemoveApp();
     /**
-     * <code>optional .RemoveAppMsgInProto removeApp = 19;</code>
+     * <code>optional .RemoveAppMsgInProto removeApp = 18;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProtoOrBuilder getRemoveAppOrBuilder();
 
     /**
-     * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+     * <code>optional .MirrorFrameMsgInProto mirrorFrame = 19;</code>
      */
     boolean hasMirrorFrame();
     /**
-     * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+     * <code>optional .MirrorFrameMsgInProto mirrorFrame = 19;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto getMirrorFrame();
     /**
-     * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+     * <code>optional .MirrorFrameMsgInProto mirrorFrame = 19;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProtoOrBuilder getMirrorFrameOrBuilder();
+
+    /**
+     * <code>optional .ManageSessionPoolMsgInProto manageSessionPool = 20;</code>
+     */
+    boolean hasManageSessionPool();
+    /**
+     * <code>optional .ManageSessionPoolMsgInProto manageSessionPool = 20;</code>
+     */
+    org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto getManageSessionPool();
+    /**
+     * <code>optional .ManageSessionPoolMsgInProto manageSessionPool = 20;</code>
+     */
+    org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProtoOrBuilder getManageSessionPoolOrBuilder();
   }
   /**
    * Protobuf type {@code AdminConsoleFrameMsgInProto}
@@ -305,112 +318,8 @@ public final class AdminConsoleProto {
               done = true;
               break;
             case 10: {
-              org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000001) == 0x00000001)) {
-                subBuilder = toggleRecording_.toBuilder();
-              }
-              toggleRecording_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(toggleRecording_);
-                toggleRecording_ = subBuilder.buildPartial();
-              }
-              bitField0_ |= 0x00000001;
-              break;
-            }
-            case 18: {
-              org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000002) == 0x00000002)) {
-                subBuilder = shutdown_.toBuilder();
-              }
-              shutdown_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(shutdown_);
-                shutdown_ = subBuilder.buildPartial();
-              }
-              bitField0_ |= 0x00000002;
-              break;
-            }
-            case 34: {
-              org.webswing.model.adminconsole.proto.AdminConsoleProto.RequestThreadDumpMsgInProto.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000004) == 0x00000004)) {
-                subBuilder = requestThreadDump_.toBuilder();
-              }
-              requestThreadDump_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.RequestThreadDumpMsgInProto.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(requestThreadDump_);
-                requestThreadDump_ = subBuilder.buildPartial();
-              }
-              bitField0_ |= 0x00000004;
-              break;
-            }
-            case 42: {
-              org.webswing.model.adminconsole.proto.AdminConsoleProto.GetThreadDumpMsgInProto.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000008) == 0x00000008)) {
-                subBuilder = getThreadDump_.toBuilder();
-              }
-              getThreadDump_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.GetThreadDumpMsgInProto.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(getThreadDump_);
-                getThreadDump_ = subBuilder.buildPartial();
-              }
-              bitField0_ |= 0x00000008;
-              break;
-            }
-            case 50: {
-              org.webswing.model.adminconsole.proto.AdminConsoleProto.GetInstanceCountsStatsWarningsMsgInProto.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000010) == 0x00000010)) {
-                subBuilder = getInstanceCountsStatsWarnings_.toBuilder();
-              }
-              getInstanceCountsStatsWarnings_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.GetInstanceCountsStatsWarningsMsgInProto.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(getInstanceCountsStatsWarnings_);
-                getInstanceCountsStatsWarnings_ = subBuilder.buildPartial();
-              }
-              bitField0_ |= 0x00000010;
-              break;
-            }
-            case 58: {
-              org.webswing.model.adminconsole.proto.AdminConsoleProto.GetSwingSessionsMsgInProto.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000020) == 0x00000020)) {
-                subBuilder = getSwingSessions_.toBuilder();
-              }
-              getSwingSessions_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.GetSwingSessionsMsgInProto.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(getSwingSessions_);
-                getSwingSessions_ = subBuilder.buildPartial();
-              }
-              bitField0_ |= 0x00000020;
-              break;
-            }
-            case 66: {
-              org.webswing.model.adminconsole.proto.AdminConsoleProto.GetServerInfoMsgInProto.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000040) == 0x00000040)) {
-                subBuilder = getServerInfo_.toBuilder();
-              }
-              getServerInfo_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.GetServerInfoMsgInProto.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(getServerInfo_);
-                getServerInfo_ = subBuilder.buildPartial();
-              }
-              bitField0_ |= 0x00000040;
-              break;
-            }
-            case 74: {
-              org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleStatisticsLoggingMsgInProto.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000080) == 0x00000080)) {
-                subBuilder = toggleStatisticsLogging_.toBuilder();
-              }
-              toggleStatisticsLogging_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleStatisticsLoggingMsgInProto.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(toggleStatisticsLogging_);
-                toggleStatisticsLogging_ = subBuilder.buildPartial();
-              }
-              bitField0_ |= 0x00000080;
-              break;
-            }
-            case 82: {
               org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000100) == 0x00000100)) {
+              if (((bitField0_ & 0x00000001) == 0x00000001)) {
                 subBuilder = handshake_.toBuilder();
               }
               handshake_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.PARSER, extensionRegistry);
@@ -418,10 +327,114 @@ public final class AdminConsoleProto {
                 subBuilder.mergeFrom(handshake_);
                 handshake_ = subBuilder.buildPartial();
               }
+              bitField0_ |= 0x00000001;
+              break;
+            }
+            case 18: {
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000002) == 0x00000002)) {
+                subBuilder = recordingRequest_.toBuilder();
+              }
+              recordingRequest_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(recordingRequest_);
+                recordingRequest_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000002;
+              break;
+            }
+            case 26: {
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000004) == 0x00000004)) {
+                subBuilder = shutdown_.toBuilder();
+              }
+              shutdown_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(shutdown_);
+                shutdown_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000004;
+              break;
+            }
+            case 34: {
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.RequestThreadDumpMsgInProto.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000008) == 0x00000008)) {
+                subBuilder = requestThreadDump_.toBuilder();
+              }
+              requestThreadDump_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.RequestThreadDumpMsgInProto.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(requestThreadDump_);
+                requestThreadDump_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000008;
+              break;
+            }
+            case 42: {
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.GetThreadDumpMsgInProto.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000010) == 0x00000010)) {
+                subBuilder = getThreadDump_.toBuilder();
+              }
+              getThreadDump_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.GetThreadDumpMsgInProto.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(getThreadDump_);
+                getThreadDump_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000010;
+              break;
+            }
+            case 50: {
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.GetInstanceCountsStatsWarningsMsgInProto.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000020) == 0x00000020)) {
+                subBuilder = getInstanceCountsStatsWarnings_.toBuilder();
+              }
+              getInstanceCountsStatsWarnings_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.GetInstanceCountsStatsWarningsMsgInProto.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(getInstanceCountsStatsWarnings_);
+                getInstanceCountsStatsWarnings_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000020;
+              break;
+            }
+            case 58: {
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.GetSwingSessionsMsgInProto.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000040) == 0x00000040)) {
+                subBuilder = getSwingSessions_.toBuilder();
+              }
+              getSwingSessions_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.GetSwingSessionsMsgInProto.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(getSwingSessions_);
+                getSwingSessions_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000040;
+              break;
+            }
+            case 66: {
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.GetServerInfoMsgInProto.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000080) == 0x00000080)) {
+                subBuilder = getServerInfo_.toBuilder();
+              }
+              getServerInfo_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.GetServerInfoMsgInProto.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(getServerInfo_);
+                getServerInfo_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000080;
+              break;
+            }
+            case 74: {
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleStatisticsLoggingMsgInProto.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000100) == 0x00000100)) {
+                subBuilder = toggleStatisticsLogging_.toBuilder();
+              }
+              toggleStatisticsLogging_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleStatisticsLoggingMsgInProto.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(toggleStatisticsLogging_);
+                toggleStatisticsLogging_ = subBuilder.buildPartial();
+              }
               bitField0_ |= 0x00000100;
               break;
             }
-            case 90: {
+            case 82: {
               org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProto.Builder subBuilder = null;
               if (((bitField0_ & 0x00000200) == 0x00000200)) {
                 subBuilder = getConfig_.toBuilder();
@@ -434,7 +447,7 @@ public final class AdminConsoleProto {
               bitField0_ |= 0x00000200;
               break;
             }
-            case 98: {
+            case 90: {
               org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProto.Builder subBuilder = null;
               if (((bitField0_ & 0x00000400) == 0x00000400)) {
                 subBuilder = getMeta_.toBuilder();
@@ -447,7 +460,7 @@ public final class AdminConsoleProto {
               bitField0_ |= 0x00000400;
               break;
             }
-            case 106: {
+            case 98: {
               org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProto.Builder subBuilder = null;
               if (((bitField0_ & 0x00000800) == 0x00000800)) {
                 subBuilder = resolveConfig_.toBuilder();
@@ -460,7 +473,7 @@ public final class AdminConsoleProto {
               bitField0_ |= 0x00000800;
               break;
             }
-            case 114: {
+            case 106: {
               org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProto.Builder subBuilder = null;
               if (((bitField0_ & 0x00001000) == 0x00001000)) {
                 subBuilder = saveConfig_.toBuilder();
@@ -473,7 +486,7 @@ public final class AdminConsoleProto {
               bitField0_ |= 0x00001000;
               break;
             }
-            case 122: {
+            case 114: {
               org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProto.Builder subBuilder = null;
               if (((bitField0_ & 0x00002000) == 0x00002000)) {
                 subBuilder = searchVariables_.toBuilder();
@@ -486,7 +499,7 @@ public final class AdminConsoleProto {
               bitField0_ |= 0x00002000;
               break;
             }
-            case 130: {
+            case 122: {
               org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProto.Builder subBuilder = null;
               if (((bitField0_ & 0x00004000) == 0x00004000)) {
                 subBuilder = startApp_.toBuilder();
@@ -499,7 +512,7 @@ public final class AdminConsoleProto {
               bitField0_ |= 0x00004000;
               break;
             }
-            case 138: {
+            case 130: {
               org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProto.Builder subBuilder = null;
               if (((bitField0_ & 0x00008000) == 0x00008000)) {
                 subBuilder = stopApp_.toBuilder();
@@ -512,7 +525,7 @@ public final class AdminConsoleProto {
               bitField0_ |= 0x00008000;
               break;
             }
-            case 146: {
+            case 138: {
               org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProto.Builder subBuilder = null;
               if (((bitField0_ & 0x00010000) == 0x00010000)) {
                 subBuilder = createApp_.toBuilder();
@@ -525,7 +538,7 @@ public final class AdminConsoleProto {
               bitField0_ |= 0x00010000;
               break;
             }
-            case 154: {
+            case 146: {
               org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProto.Builder subBuilder = null;
               if (((bitField0_ & 0x00020000) == 0x00020000)) {
                 subBuilder = removeApp_.toBuilder();
@@ -538,7 +551,7 @@ public final class AdminConsoleProto {
               bitField0_ |= 0x00020000;
               break;
             }
-            case 162: {
+            case 154: {
               org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.Builder subBuilder = null;
               if (((bitField0_ & 0x00040000) == 0x00040000)) {
                 subBuilder = mirrorFrame_.toBuilder();
@@ -549,6 +562,19 @@ public final class AdminConsoleProto {
                 mirrorFrame_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00040000;
+              break;
+            }
+            case 162: {
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.Builder subBuilder = null;
+              if (((bitField0_ & 0x00080000) == 0x00080000)) {
+                subBuilder = manageSessionPool_.toBuilder();
+              }
+              manageSessionPool_ = input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(manageSessionPool_);
+                manageSessionPool_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00080000;
               break;
             }
             default: {
@@ -584,43 +610,64 @@ public final class AdminConsoleProto {
     }
 
     private int bitField0_;
-    public static final int TOGGLERECORDING_FIELD_NUMBER = 1;
-    private org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto toggleRecording_;
+    public static final int HANDSHAKE_FIELD_NUMBER = 1;
+    private org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto handshake_;
     /**
-     * <code>optional .ToggleRecordingMsgInProto toggleRecording = 1;</code>
+     * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 1;</code>
      */
-    public boolean hasToggleRecording() {
+    public boolean hasHandshake() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional .ToggleRecordingMsgInProto toggleRecording = 1;</code>
+     * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 1;</code>
      */
-    public org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto getToggleRecording() {
-      return toggleRecording_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.getDefaultInstance() : toggleRecording_;
+    public org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto getHandshake() {
+      return handshake_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.getDefaultInstance() : handshake_;
     }
     /**
-     * <code>optional .ToggleRecordingMsgInProto toggleRecording = 1;</code>
+     * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 1;</code>
      */
-    public org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProtoOrBuilder getToggleRecordingOrBuilder() {
-      return toggleRecording_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.getDefaultInstance() : toggleRecording_;
+    public org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProtoOrBuilder getHandshakeOrBuilder() {
+      return handshake_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.getDefaultInstance() : handshake_;
     }
 
-    public static final int SHUTDOWN_FIELD_NUMBER = 2;
-    private org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto shutdown_;
+    public static final int RECORDINGREQUEST_FIELD_NUMBER = 2;
+    private org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto recordingRequest_;
     /**
-     * <code>optional .ShutdownMsgInProto shutdown = 2;</code>
+     * <code>optional .RecordingRequestMsgInProto recordingRequest = 2;</code>
      */
-    public boolean hasShutdown() {
+    public boolean hasRecordingRequest() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional .ShutdownMsgInProto shutdown = 2;</code>
+     * <code>optional .RecordingRequestMsgInProto recordingRequest = 2;</code>
+     */
+    public org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto getRecordingRequest() {
+      return recordingRequest_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.getDefaultInstance() : recordingRequest_;
+    }
+    /**
+     * <code>optional .RecordingRequestMsgInProto recordingRequest = 2;</code>
+     */
+    public org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProtoOrBuilder getRecordingRequestOrBuilder() {
+      return recordingRequest_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.getDefaultInstance() : recordingRequest_;
+    }
+
+    public static final int SHUTDOWN_FIELD_NUMBER = 3;
+    private org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto shutdown_;
+    /**
+     * <code>optional .ShutdownMsgInProto shutdown = 3;</code>
+     */
+    public boolean hasShutdown() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional .ShutdownMsgInProto shutdown = 3;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto getShutdown() {
       return shutdown_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto.getDefaultInstance() : shutdown_;
     }
     /**
-     * <code>optional .ShutdownMsgInProto shutdown = 2;</code>
+     * <code>optional .ShutdownMsgInProto shutdown = 3;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProtoOrBuilder getShutdownOrBuilder() {
       return shutdown_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto.getDefaultInstance() : shutdown_;
@@ -632,7 +679,7 @@ public final class AdminConsoleProto {
      * <code>optional .RequestThreadDumpMsgInProto requestThreadDump = 4;</code>
      */
     public boolean hasRequestThreadDump() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
      * <code>optional .RequestThreadDumpMsgInProto requestThreadDump = 4;</code>
@@ -653,7 +700,7 @@ public final class AdminConsoleProto {
      * <code>optional .GetThreadDumpMsgInProto getThreadDump = 5;</code>
      */
     public boolean hasGetThreadDump() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
      * <code>optional .GetThreadDumpMsgInProto getThreadDump = 5;</code>
@@ -674,7 +721,7 @@ public final class AdminConsoleProto {
      * <code>optional .GetInstanceCountsStatsWarningsMsgInProto getInstanceCountsStatsWarnings = 6;</code>
      */
     public boolean hasGetInstanceCountsStatsWarnings() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
+      return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
      * <code>optional .GetInstanceCountsStatsWarningsMsgInProto getInstanceCountsStatsWarnings = 6;</code>
@@ -695,7 +742,7 @@ public final class AdminConsoleProto {
      * <code>optional .GetSwingSessionsMsgInProto getSwingSessions = 7;</code>
      */
     public boolean hasGetSwingSessions() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
+      return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
      * <code>optional .GetSwingSessionsMsgInProto getSwingSessions = 7;</code>
@@ -716,7 +763,7 @@ public final class AdminConsoleProto {
      * <code>optional .GetServerInfoMsgInProto getServerInfo = 8;</code>
      */
     public boolean hasGetServerInfo() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
+      return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
      * <code>optional .GetServerInfoMsgInProto getServerInfo = 8;</code>
@@ -737,7 +784,7 @@ public final class AdminConsoleProto {
      * <code>optional .ToggleStatisticsLoggingMsgInProto toggleStatisticsLogging = 9;</code>
      */
     public boolean hasToggleStatisticsLogging() {
-      return ((bitField0_ & 0x00000080) == 0x00000080);
+      return ((bitField0_ & 0x00000100) == 0x00000100);
     }
     /**
      * <code>optional .ToggleStatisticsLoggingMsgInProto toggleStatisticsLogging = 9;</code>
@@ -752,235 +799,235 @@ public final class AdminConsoleProto {
       return toggleStatisticsLogging_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleStatisticsLoggingMsgInProto.getDefaultInstance() : toggleStatisticsLogging_;
     }
 
-    public static final int HANDSHAKE_FIELD_NUMBER = 10;
-    private org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto handshake_;
-    /**
-     * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 10;</code>
-     */
-    public boolean hasHandshake() {
-      return ((bitField0_ & 0x00000100) == 0x00000100);
-    }
-    /**
-     * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 10;</code>
-     */
-    public org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto getHandshake() {
-      return handshake_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.getDefaultInstance() : handshake_;
-    }
-    /**
-     * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 10;</code>
-     */
-    public org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProtoOrBuilder getHandshakeOrBuilder() {
-      return handshake_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.getDefaultInstance() : handshake_;
-    }
-
-    public static final int GETCONFIG_FIELD_NUMBER = 11;
+    public static final int GETCONFIG_FIELD_NUMBER = 10;
     private org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProto getConfig_;
     /**
-     * <code>optional .GetConfigMsgInProto getConfig = 11;</code>
+     * <code>optional .GetConfigMsgInProto getConfig = 10;</code>
      */
     public boolean hasGetConfig() {
       return ((bitField0_ & 0x00000200) == 0x00000200);
     }
     /**
-     * <code>optional .GetConfigMsgInProto getConfig = 11;</code>
+     * <code>optional .GetConfigMsgInProto getConfig = 10;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProto getGetConfig() {
       return getConfig_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProto.getDefaultInstance() : getConfig_;
     }
     /**
-     * <code>optional .GetConfigMsgInProto getConfig = 11;</code>
+     * <code>optional .GetConfigMsgInProto getConfig = 10;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProtoOrBuilder getGetConfigOrBuilder() {
       return getConfig_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProto.getDefaultInstance() : getConfig_;
     }
 
-    public static final int GETMETA_FIELD_NUMBER = 12;
+    public static final int GETMETA_FIELD_NUMBER = 11;
     private org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProto getMeta_;
     /**
-     * <code>optional .GetMetaMsgInProto getMeta = 12;</code>
+     * <code>optional .GetMetaMsgInProto getMeta = 11;</code>
      */
     public boolean hasGetMeta() {
       return ((bitField0_ & 0x00000400) == 0x00000400);
     }
     /**
-     * <code>optional .GetMetaMsgInProto getMeta = 12;</code>
+     * <code>optional .GetMetaMsgInProto getMeta = 11;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProto getGetMeta() {
       return getMeta_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProto.getDefaultInstance() : getMeta_;
     }
     /**
-     * <code>optional .GetMetaMsgInProto getMeta = 12;</code>
+     * <code>optional .GetMetaMsgInProto getMeta = 11;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProtoOrBuilder getGetMetaOrBuilder() {
       return getMeta_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProto.getDefaultInstance() : getMeta_;
     }
 
-    public static final int RESOLVECONFIG_FIELD_NUMBER = 13;
+    public static final int RESOLVECONFIG_FIELD_NUMBER = 12;
     private org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProto resolveConfig_;
     /**
-     * <code>optional .ResolveConfigMsgInProto resolveConfig = 13;</code>
+     * <code>optional .ResolveConfigMsgInProto resolveConfig = 12;</code>
      */
     public boolean hasResolveConfig() {
       return ((bitField0_ & 0x00000800) == 0x00000800);
     }
     /**
-     * <code>optional .ResolveConfigMsgInProto resolveConfig = 13;</code>
+     * <code>optional .ResolveConfigMsgInProto resolveConfig = 12;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProto getResolveConfig() {
       return resolveConfig_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProto.getDefaultInstance() : resolveConfig_;
     }
     /**
-     * <code>optional .ResolveConfigMsgInProto resolveConfig = 13;</code>
+     * <code>optional .ResolveConfigMsgInProto resolveConfig = 12;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProtoOrBuilder getResolveConfigOrBuilder() {
       return resolveConfig_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProto.getDefaultInstance() : resolveConfig_;
     }
 
-    public static final int SAVECONFIG_FIELD_NUMBER = 14;
+    public static final int SAVECONFIG_FIELD_NUMBER = 13;
     private org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProto saveConfig_;
     /**
-     * <code>optional .SaveConfigMsgInProto saveConfig = 14;</code>
+     * <code>optional .SaveConfigMsgInProto saveConfig = 13;</code>
      */
     public boolean hasSaveConfig() {
       return ((bitField0_ & 0x00001000) == 0x00001000);
     }
     /**
-     * <code>optional .SaveConfigMsgInProto saveConfig = 14;</code>
+     * <code>optional .SaveConfigMsgInProto saveConfig = 13;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProto getSaveConfig() {
       return saveConfig_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProto.getDefaultInstance() : saveConfig_;
     }
     /**
-     * <code>optional .SaveConfigMsgInProto saveConfig = 14;</code>
+     * <code>optional .SaveConfigMsgInProto saveConfig = 13;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProtoOrBuilder getSaveConfigOrBuilder() {
       return saveConfig_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProto.getDefaultInstance() : saveConfig_;
     }
 
-    public static final int SEARCHVARIABLES_FIELD_NUMBER = 15;
+    public static final int SEARCHVARIABLES_FIELD_NUMBER = 14;
     private org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProto searchVariables_;
     /**
-     * <code>optional .SearchVariablesMsgInProto searchVariables = 15;</code>
+     * <code>optional .SearchVariablesMsgInProto searchVariables = 14;</code>
      */
     public boolean hasSearchVariables() {
       return ((bitField0_ & 0x00002000) == 0x00002000);
     }
     /**
-     * <code>optional .SearchVariablesMsgInProto searchVariables = 15;</code>
+     * <code>optional .SearchVariablesMsgInProto searchVariables = 14;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProto getSearchVariables() {
       return searchVariables_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProto.getDefaultInstance() : searchVariables_;
     }
     /**
-     * <code>optional .SearchVariablesMsgInProto searchVariables = 15;</code>
+     * <code>optional .SearchVariablesMsgInProto searchVariables = 14;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProtoOrBuilder getSearchVariablesOrBuilder() {
       return searchVariables_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProto.getDefaultInstance() : searchVariables_;
     }
 
-    public static final int STARTAPP_FIELD_NUMBER = 16;
+    public static final int STARTAPP_FIELD_NUMBER = 15;
     private org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProto startApp_;
     /**
-     * <code>optional .StartAppMsgInProto startApp = 16;</code>
+     * <code>optional .StartAppMsgInProto startApp = 15;</code>
      */
     public boolean hasStartApp() {
       return ((bitField0_ & 0x00004000) == 0x00004000);
     }
     /**
-     * <code>optional .StartAppMsgInProto startApp = 16;</code>
+     * <code>optional .StartAppMsgInProto startApp = 15;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProto getStartApp() {
       return startApp_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProto.getDefaultInstance() : startApp_;
     }
     /**
-     * <code>optional .StartAppMsgInProto startApp = 16;</code>
+     * <code>optional .StartAppMsgInProto startApp = 15;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProtoOrBuilder getStartAppOrBuilder() {
       return startApp_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProto.getDefaultInstance() : startApp_;
     }
 
-    public static final int STOPAPP_FIELD_NUMBER = 17;
+    public static final int STOPAPP_FIELD_NUMBER = 16;
     private org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProto stopApp_;
     /**
-     * <code>optional .StopAppMsgInProto stopApp = 17;</code>
+     * <code>optional .StopAppMsgInProto stopApp = 16;</code>
      */
     public boolean hasStopApp() {
       return ((bitField0_ & 0x00008000) == 0x00008000);
     }
     /**
-     * <code>optional .StopAppMsgInProto stopApp = 17;</code>
+     * <code>optional .StopAppMsgInProto stopApp = 16;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProto getStopApp() {
       return stopApp_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProto.getDefaultInstance() : stopApp_;
     }
     /**
-     * <code>optional .StopAppMsgInProto stopApp = 17;</code>
+     * <code>optional .StopAppMsgInProto stopApp = 16;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProtoOrBuilder getStopAppOrBuilder() {
       return stopApp_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProto.getDefaultInstance() : stopApp_;
     }
 
-    public static final int CREATEAPP_FIELD_NUMBER = 18;
+    public static final int CREATEAPP_FIELD_NUMBER = 17;
     private org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProto createApp_;
     /**
-     * <code>optional .CreateAppMsgInProto createApp = 18;</code>
+     * <code>optional .CreateAppMsgInProto createApp = 17;</code>
      */
     public boolean hasCreateApp() {
       return ((bitField0_ & 0x00010000) == 0x00010000);
     }
     /**
-     * <code>optional .CreateAppMsgInProto createApp = 18;</code>
+     * <code>optional .CreateAppMsgInProto createApp = 17;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProto getCreateApp() {
       return createApp_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProto.getDefaultInstance() : createApp_;
     }
     /**
-     * <code>optional .CreateAppMsgInProto createApp = 18;</code>
+     * <code>optional .CreateAppMsgInProto createApp = 17;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProtoOrBuilder getCreateAppOrBuilder() {
       return createApp_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProto.getDefaultInstance() : createApp_;
     }
 
-    public static final int REMOVEAPP_FIELD_NUMBER = 19;
+    public static final int REMOVEAPP_FIELD_NUMBER = 18;
     private org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProto removeApp_;
     /**
-     * <code>optional .RemoveAppMsgInProto removeApp = 19;</code>
+     * <code>optional .RemoveAppMsgInProto removeApp = 18;</code>
      */
     public boolean hasRemoveApp() {
       return ((bitField0_ & 0x00020000) == 0x00020000);
     }
     /**
-     * <code>optional .RemoveAppMsgInProto removeApp = 19;</code>
+     * <code>optional .RemoveAppMsgInProto removeApp = 18;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProto getRemoveApp() {
       return removeApp_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProto.getDefaultInstance() : removeApp_;
     }
     /**
-     * <code>optional .RemoveAppMsgInProto removeApp = 19;</code>
+     * <code>optional .RemoveAppMsgInProto removeApp = 18;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProtoOrBuilder getRemoveAppOrBuilder() {
       return removeApp_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProto.getDefaultInstance() : removeApp_;
     }
 
-    public static final int MIRRORFRAME_FIELD_NUMBER = 20;
+    public static final int MIRRORFRAME_FIELD_NUMBER = 19;
     private org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto mirrorFrame_;
     /**
-     * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+     * <code>optional .MirrorFrameMsgInProto mirrorFrame = 19;</code>
      */
     public boolean hasMirrorFrame() {
       return ((bitField0_ & 0x00040000) == 0x00040000);
     }
     /**
-     * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+     * <code>optional .MirrorFrameMsgInProto mirrorFrame = 19;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto getMirrorFrame() {
       return mirrorFrame_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.getDefaultInstance() : mirrorFrame_;
     }
     /**
-     * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+     * <code>optional .MirrorFrameMsgInProto mirrorFrame = 19;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProtoOrBuilder getMirrorFrameOrBuilder() {
       return mirrorFrame_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.getDefaultInstance() : mirrorFrame_;
+    }
+
+    public static final int MANAGESESSIONPOOL_FIELD_NUMBER = 20;
+    private org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto manageSessionPool_;
+    /**
+     * <code>optional .ManageSessionPoolMsgInProto manageSessionPool = 20;</code>
+     */
+    public boolean hasManageSessionPool() {
+      return ((bitField0_ & 0x00080000) == 0x00080000);
+    }
+    /**
+     * <code>optional .ManageSessionPoolMsgInProto manageSessionPool = 20;</code>
+     */
+    public org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto getManageSessionPool() {
+      return manageSessionPool_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.getDefaultInstance() : manageSessionPool_;
+    }
+    /**
+     * <code>optional .ManageSessionPoolMsgInProto manageSessionPool = 20;</code>
+     */
+    public org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProtoOrBuilder getManageSessionPoolOrBuilder() {
+      return manageSessionPool_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.getDefaultInstance() : manageSessionPool_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -998,61 +1045,64 @@ public final class AdminConsoleProto {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeMessage(1, getToggleRecording());
+        output.writeMessage(1, getHandshake());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeMessage(2, getShutdown());
+        output.writeMessage(2, getRecordingRequest());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeMessage(4, getRequestThreadDump());
+        output.writeMessage(3, getShutdown());
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeMessage(5, getGetThreadDump());
+        output.writeMessage(4, getRequestThreadDump());
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeMessage(6, getGetInstanceCountsStatsWarnings());
+        output.writeMessage(5, getGetThreadDump());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeMessage(7, getGetSwingSessions());
+        output.writeMessage(6, getGetInstanceCountsStatsWarnings());
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeMessage(8, getGetServerInfo());
+        output.writeMessage(7, getGetSwingSessions());
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        output.writeMessage(9, getToggleStatisticsLogging());
+        output.writeMessage(8, getGetServerInfo());
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        output.writeMessage(10, getHandshake());
+        output.writeMessage(9, getToggleStatisticsLogging());
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
-        output.writeMessage(11, getGetConfig());
+        output.writeMessage(10, getGetConfig());
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
-        output.writeMessage(12, getGetMeta());
+        output.writeMessage(11, getGetMeta());
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
-        output.writeMessage(13, getResolveConfig());
+        output.writeMessage(12, getResolveConfig());
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
-        output.writeMessage(14, getSaveConfig());
+        output.writeMessage(13, getSaveConfig());
       }
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
-        output.writeMessage(15, getSearchVariables());
+        output.writeMessage(14, getSearchVariables());
       }
       if (((bitField0_ & 0x00004000) == 0x00004000)) {
-        output.writeMessage(16, getStartApp());
+        output.writeMessage(15, getStartApp());
       }
       if (((bitField0_ & 0x00008000) == 0x00008000)) {
-        output.writeMessage(17, getStopApp());
+        output.writeMessage(16, getStopApp());
       }
       if (((bitField0_ & 0x00010000) == 0x00010000)) {
-        output.writeMessage(18, getCreateApp());
+        output.writeMessage(17, getCreateApp());
       }
       if (((bitField0_ & 0x00020000) == 0x00020000)) {
-        output.writeMessage(19, getRemoveApp());
+        output.writeMessage(18, getRemoveApp());
       }
       if (((bitField0_ & 0x00040000) == 0x00040000)) {
-        output.writeMessage(20, getMirrorFrame());
+        output.writeMessage(19, getMirrorFrame());
+      }
+      if (((bitField0_ & 0x00080000) == 0x00080000)) {
+        output.writeMessage(20, getManageSessionPool());
       }
       unknownFields.writeTo(output);
     }
@@ -1065,79 +1115,83 @@ public final class AdminConsoleProto {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, getToggleRecording());
+          .computeMessageSize(1, getHandshake());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getShutdown());
+          .computeMessageSize(2, getRecordingRequest());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, getRequestThreadDump());
+          .computeMessageSize(3, getShutdown());
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, getGetThreadDump());
+          .computeMessageSize(4, getRequestThreadDump());
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(6, getGetInstanceCountsStatsWarnings());
+          .computeMessageSize(5, getGetThreadDump());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(7, getGetSwingSessions());
+          .computeMessageSize(6, getGetInstanceCountsStatsWarnings());
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(8, getGetServerInfo());
+          .computeMessageSize(7, getGetSwingSessions());
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(9, getToggleStatisticsLogging());
+          .computeMessageSize(8, getGetServerInfo());
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(10, getHandshake());
+          .computeMessageSize(9, getToggleStatisticsLogging());
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(11, getGetConfig());
+          .computeMessageSize(10, getGetConfig());
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(12, getGetMeta());
+          .computeMessageSize(11, getGetMeta());
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(13, getResolveConfig());
+          .computeMessageSize(12, getResolveConfig());
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(14, getSaveConfig());
+          .computeMessageSize(13, getSaveConfig());
       }
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(15, getSearchVariables());
+          .computeMessageSize(14, getSearchVariables());
       }
       if (((bitField0_ & 0x00004000) == 0x00004000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(16, getStartApp());
+          .computeMessageSize(15, getStartApp());
       }
       if (((bitField0_ & 0x00008000) == 0x00008000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(17, getStopApp());
+          .computeMessageSize(16, getStopApp());
       }
       if (((bitField0_ & 0x00010000) == 0x00010000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(18, getCreateApp());
+          .computeMessageSize(17, getCreateApp());
       }
       if (((bitField0_ & 0x00020000) == 0x00020000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(19, getRemoveApp());
+          .computeMessageSize(18, getRemoveApp());
       }
       if (((bitField0_ & 0x00040000) == 0x00040000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(20, getMirrorFrame());
+          .computeMessageSize(19, getMirrorFrame());
+      }
+      if (((bitField0_ & 0x00080000) == 0x00080000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(20, getManageSessionPool());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1155,10 +1209,15 @@ public final class AdminConsoleProto {
       org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleFrameMsgInProto other = (org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleFrameMsgInProto) obj;
 
       boolean result = true;
-      result = result && (hasToggleRecording() == other.hasToggleRecording());
-      if (hasToggleRecording()) {
-        result = result && getToggleRecording()
-            .equals(other.getToggleRecording());
+      result = result && (hasHandshake() == other.hasHandshake());
+      if (hasHandshake()) {
+        result = result && getHandshake()
+            .equals(other.getHandshake());
+      }
+      result = result && (hasRecordingRequest() == other.hasRecordingRequest());
+      if (hasRecordingRequest()) {
+        result = result && getRecordingRequest()
+            .equals(other.getRecordingRequest());
       }
       result = result && (hasShutdown() == other.hasShutdown());
       if (hasShutdown()) {
@@ -1194,11 +1253,6 @@ public final class AdminConsoleProto {
       if (hasToggleStatisticsLogging()) {
         result = result && getToggleStatisticsLogging()
             .equals(other.getToggleStatisticsLogging());
-      }
-      result = result && (hasHandshake() == other.hasHandshake());
-      if (hasHandshake()) {
-        result = result && getHandshake()
-            .equals(other.getHandshake());
       }
       result = result && (hasGetConfig() == other.hasGetConfig());
       if (hasGetConfig()) {
@@ -1250,6 +1304,11 @@ public final class AdminConsoleProto {
         result = result && getMirrorFrame()
             .equals(other.getMirrorFrame());
       }
+      result = result && (hasManageSessionPool() == other.hasManageSessionPool());
+      if (hasManageSessionPool()) {
+        result = result && getManageSessionPool()
+            .equals(other.getManageSessionPool());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -1261,9 +1320,13 @@ public final class AdminConsoleProto {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasToggleRecording()) {
-        hash = (37 * hash) + TOGGLERECORDING_FIELD_NUMBER;
-        hash = (53 * hash) + getToggleRecording().hashCode();
+      if (hasHandshake()) {
+        hash = (37 * hash) + HANDSHAKE_FIELD_NUMBER;
+        hash = (53 * hash) + getHandshake().hashCode();
+      }
+      if (hasRecordingRequest()) {
+        hash = (37 * hash) + RECORDINGREQUEST_FIELD_NUMBER;
+        hash = (53 * hash) + getRecordingRequest().hashCode();
       }
       if (hasShutdown()) {
         hash = (37 * hash) + SHUTDOWN_FIELD_NUMBER;
@@ -1292,10 +1355,6 @@ public final class AdminConsoleProto {
       if (hasToggleStatisticsLogging()) {
         hash = (37 * hash) + TOGGLESTATISTICSLOGGING_FIELD_NUMBER;
         hash = (53 * hash) + getToggleStatisticsLogging().hashCode();
-      }
-      if (hasHandshake()) {
-        hash = (37 * hash) + HANDSHAKE_FIELD_NUMBER;
-        hash = (53 * hash) + getHandshake().hashCode();
       }
       if (hasGetConfig()) {
         hash = (37 * hash) + GETCONFIG_FIELD_NUMBER;
@@ -1336,6 +1395,10 @@ public final class AdminConsoleProto {
       if (hasMirrorFrame()) {
         hash = (37 * hash) + MIRRORFRAME_FIELD_NUMBER;
         hash = (53 * hash) + getMirrorFrame().hashCode();
+      }
+      if (hasManageSessionPool()) {
+        hash = (37 * hash) + MANAGESESSIONPOOL_FIELD_NUMBER;
+        hash = (53 * hash) + getManageSessionPool().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -1465,7 +1528,8 @@ public final class AdminConsoleProto {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
-          getToggleRecordingFieldBuilder();
+          getHandshakeFieldBuilder();
+          getRecordingRequestFieldBuilder();
           getShutdownFieldBuilder();
           getRequestThreadDumpFieldBuilder();
           getGetThreadDumpFieldBuilder();
@@ -1473,7 +1537,6 @@ public final class AdminConsoleProto {
           getGetSwingSessionsFieldBuilder();
           getGetServerInfoFieldBuilder();
           getToggleStatisticsLoggingFieldBuilder();
-          getHandshakeFieldBuilder();
           getGetConfigFieldBuilder();
           getGetMetaFieldBuilder();
           getResolveConfigFieldBuilder();
@@ -1484,63 +1547,64 @@ public final class AdminConsoleProto {
           getCreateAppFieldBuilder();
           getRemoveAppFieldBuilder();
           getMirrorFrameFieldBuilder();
+          getManageSessionPoolFieldBuilder();
         }
       }
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        if (toggleRecordingBuilder_ == null) {
-          toggleRecording_ = null;
+        if (handshakeBuilder_ == null) {
+          handshake_ = null;
         } else {
-          toggleRecordingBuilder_.clear();
+          handshakeBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000001);
+        if (recordingRequestBuilder_ == null) {
+          recordingRequest_ = null;
+        } else {
+          recordingRequestBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000002);
         if (shutdownBuilder_ == null) {
           shutdown_ = null;
         } else {
           shutdownBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000004);
         if (requestThreadDumpBuilder_ == null) {
           requestThreadDump_ = null;
         } else {
           requestThreadDumpBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000008);
         if (getThreadDumpBuilder_ == null) {
           getThreadDump_ = null;
         } else {
           getThreadDumpBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         if (getInstanceCountsStatsWarningsBuilder_ == null) {
           getInstanceCountsStatsWarnings_ = null;
         } else {
           getInstanceCountsStatsWarningsBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000020);
         if (getSwingSessionsBuilder_ == null) {
           getSwingSessions_ = null;
         } else {
           getSwingSessionsBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000040);
         if (getServerInfoBuilder_ == null) {
           getServerInfo_ = null;
         } else {
           getServerInfoBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000080);
         if (toggleStatisticsLoggingBuilder_ == null) {
           toggleStatisticsLogging_ = null;
         } else {
           toggleStatisticsLoggingBuilder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000080);
-        if (handshakeBuilder_ == null) {
-          handshake_ = null;
-        } else {
-          handshakeBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000100);
         if (getConfigBuilder_ == null) {
@@ -1603,6 +1667,12 @@ public final class AdminConsoleProto {
           mirrorFrameBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00040000);
+        if (manageSessionPoolBuilder_ == null) {
+          manageSessionPool_ = null;
+        } else {
+          manageSessionPoolBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00080000);
         return this;
       }
 
@@ -1634,74 +1704,74 @@ public final class AdminConsoleProto {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        if (toggleRecordingBuilder_ == null) {
-          result.toggleRecording_ = toggleRecording_;
+        if (handshakeBuilder_ == null) {
+          result.handshake_ = handshake_;
         } else {
-          result.toggleRecording_ = toggleRecordingBuilder_.build();
+          result.handshake_ = handshakeBuilder_.build();
         }
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
+        }
+        if (recordingRequestBuilder_ == null) {
+          result.recordingRequest_ = recordingRequest_;
+        } else {
+          result.recordingRequest_ = recordingRequestBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
         }
         if (shutdownBuilder_ == null) {
           result.shutdown_ = shutdown_;
         } else {
           result.shutdown_ = shutdownBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-          to_bitField0_ |= 0x00000004;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
         }
         if (requestThreadDumpBuilder_ == null) {
           result.requestThreadDump_ = requestThreadDump_;
         } else {
           result.requestThreadDump_ = requestThreadDumpBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
-          to_bitField0_ |= 0x00000008;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
         }
         if (getThreadDumpBuilder_ == null) {
           result.getThreadDump_ = getThreadDump_;
         } else {
           result.getThreadDump_ = getThreadDumpBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
-          to_bitField0_ |= 0x00000010;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
         }
         if (getInstanceCountsStatsWarningsBuilder_ == null) {
           result.getInstanceCountsStatsWarnings_ = getInstanceCountsStatsWarnings_;
         } else {
           result.getInstanceCountsStatsWarnings_ = getInstanceCountsStatsWarningsBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
-          to_bitField0_ |= 0x00000020;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
         }
         if (getSwingSessionsBuilder_ == null) {
           result.getSwingSessions_ = getSwingSessions_;
         } else {
           result.getSwingSessions_ = getSwingSessionsBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
-          to_bitField0_ |= 0x00000040;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
         }
         if (getServerInfoBuilder_ == null) {
           result.getServerInfo_ = getServerInfo_;
         } else {
           result.getServerInfo_ = getServerInfoBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
-          to_bitField0_ |= 0x00000080;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000100;
         }
         if (toggleStatisticsLoggingBuilder_ == null) {
           result.toggleStatisticsLogging_ = toggleStatisticsLogging_;
         } else {
           result.toggleStatisticsLogging_ = toggleStatisticsLoggingBuilder_.build();
-        }
-        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
-          to_bitField0_ |= 0x00000100;
-        }
-        if (handshakeBuilder_ == null) {
-          result.handshake_ = handshake_;
-        } else {
-          result.handshake_ = handshakeBuilder_.build();
         }
         if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
           to_bitField0_ |= 0x00000200;
@@ -1783,6 +1853,14 @@ public final class AdminConsoleProto {
         } else {
           result.mirrorFrame_ = mirrorFrameBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00080000) == 0x00080000)) {
+          to_bitField0_ |= 0x00080000;
+        }
+        if (manageSessionPoolBuilder_ == null) {
+          result.manageSessionPool_ = manageSessionPool_;
+        } else {
+          result.manageSessionPool_ = manageSessionPoolBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1832,8 +1910,11 @@ public final class AdminConsoleProto {
 
       public Builder mergeFrom(org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleFrameMsgInProto other) {
         if (other == org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleFrameMsgInProto.getDefaultInstance()) return this;
-        if (other.hasToggleRecording()) {
-          mergeToggleRecording(other.getToggleRecording());
+        if (other.hasHandshake()) {
+          mergeHandshake(other.getHandshake());
+        }
+        if (other.hasRecordingRequest()) {
+          mergeRecordingRequest(other.getRecordingRequest());
         }
         if (other.hasShutdown()) {
           mergeShutdown(other.getShutdown());
@@ -1855,9 +1936,6 @@ public final class AdminConsoleProto {
         }
         if (other.hasToggleStatisticsLogging()) {
           mergeToggleStatisticsLogging(other.getToggleStatisticsLogging());
-        }
-        if (other.hasHandshake()) {
-          mergeHandshake(other.getHandshake());
         }
         if (other.hasGetConfig()) {
           mergeGetConfig(other.getGetConfig());
@@ -1889,6 +1967,9 @@ public final class AdminConsoleProto {
         if (other.hasMirrorFrame()) {
           mergeMirrorFrame(other.getMirrorFrame());
         }
+        if (other.hasManageSessionPool()) {
+          mergeManageSessionPool(other.getManageSessionPool());
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -1919,135 +2000,253 @@ public final class AdminConsoleProto {
       }
       private int bitField0_;
 
-      private org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto toggleRecording_ = null;
+      private org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto handshake_ = null;
       private com.google.protobuf.SingleFieldBuilderV3<
-          org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProtoOrBuilder> toggleRecordingBuilder_;
+          org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProtoOrBuilder> handshakeBuilder_;
       /**
-       * <code>optional .ToggleRecordingMsgInProto toggleRecording = 1;</code>
+       * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 1;</code>
        */
-      public boolean hasToggleRecording() {
+      public boolean hasHandshake() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional .ToggleRecordingMsgInProto toggleRecording = 1;</code>
+       * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 1;</code>
        */
-      public org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto getToggleRecording() {
-        if (toggleRecordingBuilder_ == null) {
-          return toggleRecording_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.getDefaultInstance() : toggleRecording_;
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto getHandshake() {
+        if (handshakeBuilder_ == null) {
+          return handshake_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.getDefaultInstance() : handshake_;
         } else {
-          return toggleRecordingBuilder_.getMessage();
+          return handshakeBuilder_.getMessage();
         }
       }
       /**
-       * <code>optional .ToggleRecordingMsgInProto toggleRecording = 1;</code>
+       * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 1;</code>
        */
-      public Builder setToggleRecording(org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto value) {
-        if (toggleRecordingBuilder_ == null) {
+      public Builder setHandshake(org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto value) {
+        if (handshakeBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          toggleRecording_ = value;
+          handshake_ = value;
           onChanged();
         } else {
-          toggleRecordingBuilder_.setMessage(value);
+          handshakeBuilder_.setMessage(value);
         }
         bitField0_ |= 0x00000001;
         return this;
       }
       /**
-       * <code>optional .ToggleRecordingMsgInProto toggleRecording = 1;</code>
+       * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 1;</code>
        */
-      public Builder setToggleRecording(
-          org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.Builder builderForValue) {
-        if (toggleRecordingBuilder_ == null) {
-          toggleRecording_ = builderForValue.build();
+      public Builder setHandshake(
+          org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.Builder builderForValue) {
+        if (handshakeBuilder_ == null) {
+          handshake_ = builderForValue.build();
           onChanged();
         } else {
-          toggleRecordingBuilder_.setMessage(builderForValue.build());
+          handshakeBuilder_.setMessage(builderForValue.build());
         }
         bitField0_ |= 0x00000001;
         return this;
       }
       /**
-       * <code>optional .ToggleRecordingMsgInProto toggleRecording = 1;</code>
+       * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 1;</code>
        */
-      public Builder mergeToggleRecording(org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto value) {
-        if (toggleRecordingBuilder_ == null) {
+      public Builder mergeHandshake(org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto value) {
+        if (handshakeBuilder_ == null) {
           if (((bitField0_ & 0x00000001) == 0x00000001) &&
-              toggleRecording_ != null &&
-              toggleRecording_ != org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.getDefaultInstance()) {
-            toggleRecording_ =
-              org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.newBuilder(toggleRecording_).mergeFrom(value).buildPartial();
+              handshake_ != null &&
+              handshake_ != org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.getDefaultInstance()) {
+            handshake_ =
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.newBuilder(handshake_).mergeFrom(value).buildPartial();
           } else {
-            toggleRecording_ = value;
+            handshake_ = value;
           }
           onChanged();
         } else {
-          toggleRecordingBuilder_.mergeFrom(value);
+          handshakeBuilder_.mergeFrom(value);
         }
         bitField0_ |= 0x00000001;
         return this;
       }
       /**
-       * <code>optional .ToggleRecordingMsgInProto toggleRecording = 1;</code>
+       * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 1;</code>
        */
-      public Builder clearToggleRecording() {
-        if (toggleRecordingBuilder_ == null) {
-          toggleRecording_ = null;
+      public Builder clearHandshake() {
+        if (handshakeBuilder_ == null) {
+          handshake_ = null;
           onChanged();
         } else {
-          toggleRecordingBuilder_.clear();
+          handshakeBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
       }
       /**
-       * <code>optional .ToggleRecordingMsgInProto toggleRecording = 1;</code>
+       * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 1;</code>
        */
-      public org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.Builder getToggleRecordingBuilder() {
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.Builder getHandshakeBuilder() {
         bitField0_ |= 0x00000001;
         onChanged();
-        return getToggleRecordingFieldBuilder().getBuilder();
+        return getHandshakeFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .ToggleRecordingMsgInProto toggleRecording = 1;</code>
+       * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 1;</code>
        */
-      public org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProtoOrBuilder getToggleRecordingOrBuilder() {
-        if (toggleRecordingBuilder_ != null) {
-          return toggleRecordingBuilder_.getMessageOrBuilder();
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProtoOrBuilder getHandshakeOrBuilder() {
+        if (handshakeBuilder_ != null) {
+          return handshakeBuilder_.getMessageOrBuilder();
         } else {
-          return toggleRecording_ == null ?
-              org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.getDefaultInstance() : toggleRecording_;
+          return handshake_ == null ?
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.getDefaultInstance() : handshake_;
         }
       }
       /**
-       * <code>optional .ToggleRecordingMsgInProto toggleRecording = 1;</code>
+       * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProtoOrBuilder> 
-          getToggleRecordingFieldBuilder() {
-        if (toggleRecordingBuilder_ == null) {
-          toggleRecordingBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProtoOrBuilder>(
-                  getToggleRecording(),
+          org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProtoOrBuilder> 
+          getHandshakeFieldBuilder() {
+        if (handshakeBuilder_ == null) {
+          handshakeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProtoOrBuilder>(
+                  getHandshake(),
                   getParentForChildren(),
                   isClean());
-          toggleRecording_ = null;
+          handshake_ = null;
         }
-        return toggleRecordingBuilder_;
+        return handshakeBuilder_;
+      }
+
+      private org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto recordingRequest_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProtoOrBuilder> recordingRequestBuilder_;
+      /**
+       * <code>optional .RecordingRequestMsgInProto recordingRequest = 2;</code>
+       */
+      public boolean hasRecordingRequest() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional .RecordingRequestMsgInProto recordingRequest = 2;</code>
+       */
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto getRecordingRequest() {
+        if (recordingRequestBuilder_ == null) {
+          return recordingRequest_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.getDefaultInstance() : recordingRequest_;
+        } else {
+          return recordingRequestBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .RecordingRequestMsgInProto recordingRequest = 2;</code>
+       */
+      public Builder setRecordingRequest(org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto value) {
+        if (recordingRequestBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          recordingRequest_ = value;
+          onChanged();
+        } else {
+          recordingRequestBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      /**
+       * <code>optional .RecordingRequestMsgInProto recordingRequest = 2;</code>
+       */
+      public Builder setRecordingRequest(
+          org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.Builder builderForValue) {
+        if (recordingRequestBuilder_ == null) {
+          recordingRequest_ = builderForValue.build();
+          onChanged();
+        } else {
+          recordingRequestBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      /**
+       * <code>optional .RecordingRequestMsgInProto recordingRequest = 2;</code>
+       */
+      public Builder mergeRecordingRequest(org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto value) {
+        if (recordingRequestBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) == 0x00000002) &&
+              recordingRequest_ != null &&
+              recordingRequest_ != org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.getDefaultInstance()) {
+            recordingRequest_ =
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.newBuilder(recordingRequest_).mergeFrom(value).buildPartial();
+          } else {
+            recordingRequest_ = value;
+          }
+          onChanged();
+        } else {
+          recordingRequestBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      /**
+       * <code>optional .RecordingRequestMsgInProto recordingRequest = 2;</code>
+       */
+      public Builder clearRecordingRequest() {
+        if (recordingRequestBuilder_ == null) {
+          recordingRequest_ = null;
+          onChanged();
+        } else {
+          recordingRequestBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+      /**
+       * <code>optional .RecordingRequestMsgInProto recordingRequest = 2;</code>
+       */
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.Builder getRecordingRequestBuilder() {
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return getRecordingRequestFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .RecordingRequestMsgInProto recordingRequest = 2;</code>
+       */
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProtoOrBuilder getRecordingRequestOrBuilder() {
+        if (recordingRequestBuilder_ != null) {
+          return recordingRequestBuilder_.getMessageOrBuilder();
+        } else {
+          return recordingRequest_ == null ?
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.getDefaultInstance() : recordingRequest_;
+        }
+      }
+      /**
+       * <code>optional .RecordingRequestMsgInProto recordingRequest = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProtoOrBuilder> 
+          getRecordingRequestFieldBuilder() {
+        if (recordingRequestBuilder_ == null) {
+          recordingRequestBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProtoOrBuilder>(
+                  getRecordingRequest(),
+                  getParentForChildren(),
+                  isClean());
+          recordingRequest_ = null;
+        }
+        return recordingRequestBuilder_;
       }
 
       private org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto shutdown_ = null;
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProtoOrBuilder> shutdownBuilder_;
       /**
-       * <code>optional .ShutdownMsgInProto shutdown = 2;</code>
+       * <code>optional .ShutdownMsgInProto shutdown = 3;</code>
        */
       public boolean hasShutdown() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional .ShutdownMsgInProto shutdown = 2;</code>
+       * <code>optional .ShutdownMsgInProto shutdown = 3;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto getShutdown() {
         if (shutdownBuilder_ == null) {
@@ -2057,7 +2256,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .ShutdownMsgInProto shutdown = 2;</code>
+       * <code>optional .ShutdownMsgInProto shutdown = 3;</code>
        */
       public Builder setShutdown(org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto value) {
         if (shutdownBuilder_ == null) {
@@ -2069,11 +2268,11 @@ public final class AdminConsoleProto {
         } else {
           shutdownBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         return this;
       }
       /**
-       * <code>optional .ShutdownMsgInProto shutdown = 2;</code>
+       * <code>optional .ShutdownMsgInProto shutdown = 3;</code>
        */
       public Builder setShutdown(
           org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto.Builder builderForValue) {
@@ -2083,15 +2282,15 @@ public final class AdminConsoleProto {
         } else {
           shutdownBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         return this;
       }
       /**
-       * <code>optional .ShutdownMsgInProto shutdown = 2;</code>
+       * <code>optional .ShutdownMsgInProto shutdown = 3;</code>
        */
       public Builder mergeShutdown(org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto value) {
         if (shutdownBuilder_ == null) {
-          if (((bitField0_ & 0x00000002) == 0x00000002) &&
+          if (((bitField0_ & 0x00000004) == 0x00000004) &&
               shutdown_ != null &&
               shutdown_ != org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto.getDefaultInstance()) {
             shutdown_ =
@@ -2103,11 +2302,11 @@ public final class AdminConsoleProto {
         } else {
           shutdownBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         return this;
       }
       /**
-       * <code>optional .ShutdownMsgInProto shutdown = 2;</code>
+       * <code>optional .ShutdownMsgInProto shutdown = 3;</code>
        */
       public Builder clearShutdown() {
         if (shutdownBuilder_ == null) {
@@ -2116,19 +2315,19 @@ public final class AdminConsoleProto {
         } else {
           shutdownBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
       /**
-       * <code>optional .ShutdownMsgInProto shutdown = 2;</code>
+       * <code>optional .ShutdownMsgInProto shutdown = 3;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto.Builder getShutdownBuilder() {
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         onChanged();
         return getShutdownFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .ShutdownMsgInProto shutdown = 2;</code>
+       * <code>optional .ShutdownMsgInProto shutdown = 3;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProtoOrBuilder getShutdownOrBuilder() {
         if (shutdownBuilder_ != null) {
@@ -2139,7 +2338,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .ShutdownMsgInProto shutdown = 2;</code>
+       * <code>optional .ShutdownMsgInProto shutdown = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.ShutdownMsgInProtoOrBuilder> 
@@ -2162,7 +2361,7 @@ public final class AdminConsoleProto {
        * <code>optional .RequestThreadDumpMsgInProto requestThreadDump = 4;</code>
        */
       public boolean hasRequestThreadDump() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
        * <code>optional .RequestThreadDumpMsgInProto requestThreadDump = 4;</code>
@@ -2187,7 +2386,7 @@ public final class AdminConsoleProto {
         } else {
           requestThreadDumpBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         return this;
       }
       /**
@@ -2201,7 +2400,7 @@ public final class AdminConsoleProto {
         } else {
           requestThreadDumpBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         return this;
       }
       /**
@@ -2209,7 +2408,7 @@ public final class AdminConsoleProto {
        */
       public Builder mergeRequestThreadDump(org.webswing.model.adminconsole.proto.AdminConsoleProto.RequestThreadDumpMsgInProto value) {
         if (requestThreadDumpBuilder_ == null) {
-          if (((bitField0_ & 0x00000004) == 0x00000004) &&
+          if (((bitField0_ & 0x00000008) == 0x00000008) &&
               requestThreadDump_ != null &&
               requestThreadDump_ != org.webswing.model.adminconsole.proto.AdminConsoleProto.RequestThreadDumpMsgInProto.getDefaultInstance()) {
             requestThreadDump_ =
@@ -2221,7 +2420,7 @@ public final class AdminConsoleProto {
         } else {
           requestThreadDumpBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         return this;
       }
       /**
@@ -2234,14 +2433,14 @@ public final class AdminConsoleProto {
         } else {
           requestThreadDumpBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
       /**
        * <code>optional .RequestThreadDumpMsgInProto requestThreadDump = 4;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.RequestThreadDumpMsgInProto.Builder getRequestThreadDumpBuilder() {
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         onChanged();
         return getRequestThreadDumpFieldBuilder().getBuilder();
       }
@@ -2280,7 +2479,7 @@ public final class AdminConsoleProto {
        * <code>optional .GetThreadDumpMsgInProto getThreadDump = 5;</code>
        */
       public boolean hasGetThreadDump() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
        * <code>optional .GetThreadDumpMsgInProto getThreadDump = 5;</code>
@@ -2305,7 +2504,7 @@ public final class AdminConsoleProto {
         } else {
           getThreadDumpBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         return this;
       }
       /**
@@ -2319,7 +2518,7 @@ public final class AdminConsoleProto {
         } else {
           getThreadDumpBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         return this;
       }
       /**
@@ -2327,7 +2526,7 @@ public final class AdminConsoleProto {
        */
       public Builder mergeGetThreadDump(org.webswing.model.adminconsole.proto.AdminConsoleProto.GetThreadDumpMsgInProto value) {
         if (getThreadDumpBuilder_ == null) {
-          if (((bitField0_ & 0x00000008) == 0x00000008) &&
+          if (((bitField0_ & 0x00000010) == 0x00000010) &&
               getThreadDump_ != null &&
               getThreadDump_ != org.webswing.model.adminconsole.proto.AdminConsoleProto.GetThreadDumpMsgInProto.getDefaultInstance()) {
             getThreadDump_ =
@@ -2339,7 +2538,7 @@ public final class AdminConsoleProto {
         } else {
           getThreadDumpBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         return this;
       }
       /**
@@ -2352,14 +2551,14 @@ public final class AdminConsoleProto {
         } else {
           getThreadDumpBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
       /**
        * <code>optional .GetThreadDumpMsgInProto getThreadDump = 5;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.GetThreadDumpMsgInProto.Builder getGetThreadDumpBuilder() {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         onChanged();
         return getGetThreadDumpFieldBuilder().getBuilder();
       }
@@ -2398,7 +2597,7 @@ public final class AdminConsoleProto {
        * <code>optional .GetInstanceCountsStatsWarningsMsgInProto getInstanceCountsStatsWarnings = 6;</code>
        */
       public boolean hasGetInstanceCountsStatsWarnings() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
+        return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
        * <code>optional .GetInstanceCountsStatsWarningsMsgInProto getInstanceCountsStatsWarnings = 6;</code>
@@ -2423,7 +2622,7 @@ public final class AdminConsoleProto {
         } else {
           getInstanceCountsStatsWarningsBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         return this;
       }
       /**
@@ -2437,7 +2636,7 @@ public final class AdminConsoleProto {
         } else {
           getInstanceCountsStatsWarningsBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         return this;
       }
       /**
@@ -2445,7 +2644,7 @@ public final class AdminConsoleProto {
        */
       public Builder mergeGetInstanceCountsStatsWarnings(org.webswing.model.adminconsole.proto.AdminConsoleProto.GetInstanceCountsStatsWarningsMsgInProto value) {
         if (getInstanceCountsStatsWarningsBuilder_ == null) {
-          if (((bitField0_ & 0x00000010) == 0x00000010) &&
+          if (((bitField0_ & 0x00000020) == 0x00000020) &&
               getInstanceCountsStatsWarnings_ != null &&
               getInstanceCountsStatsWarnings_ != org.webswing.model.adminconsole.proto.AdminConsoleProto.GetInstanceCountsStatsWarningsMsgInProto.getDefaultInstance()) {
             getInstanceCountsStatsWarnings_ =
@@ -2457,7 +2656,7 @@ public final class AdminConsoleProto {
         } else {
           getInstanceCountsStatsWarningsBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         return this;
       }
       /**
@@ -2470,14 +2669,14 @@ public final class AdminConsoleProto {
         } else {
           getInstanceCountsStatsWarningsBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
       /**
        * <code>optional .GetInstanceCountsStatsWarningsMsgInProto getInstanceCountsStatsWarnings = 6;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.GetInstanceCountsStatsWarningsMsgInProto.Builder getGetInstanceCountsStatsWarningsBuilder() {
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         onChanged();
         return getGetInstanceCountsStatsWarningsFieldBuilder().getBuilder();
       }
@@ -2516,7 +2715,7 @@ public final class AdminConsoleProto {
        * <code>optional .GetSwingSessionsMsgInProto getSwingSessions = 7;</code>
        */
       public boolean hasGetSwingSessions() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
+        return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
        * <code>optional .GetSwingSessionsMsgInProto getSwingSessions = 7;</code>
@@ -2541,7 +2740,7 @@ public final class AdminConsoleProto {
         } else {
           getSwingSessionsBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         return this;
       }
       /**
@@ -2555,7 +2754,7 @@ public final class AdminConsoleProto {
         } else {
           getSwingSessionsBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         return this;
       }
       /**
@@ -2563,7 +2762,7 @@ public final class AdminConsoleProto {
        */
       public Builder mergeGetSwingSessions(org.webswing.model.adminconsole.proto.AdminConsoleProto.GetSwingSessionsMsgInProto value) {
         if (getSwingSessionsBuilder_ == null) {
-          if (((bitField0_ & 0x00000020) == 0x00000020) &&
+          if (((bitField0_ & 0x00000040) == 0x00000040) &&
               getSwingSessions_ != null &&
               getSwingSessions_ != org.webswing.model.adminconsole.proto.AdminConsoleProto.GetSwingSessionsMsgInProto.getDefaultInstance()) {
             getSwingSessions_ =
@@ -2575,7 +2774,7 @@ public final class AdminConsoleProto {
         } else {
           getSwingSessionsBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         return this;
       }
       /**
@@ -2588,14 +2787,14 @@ public final class AdminConsoleProto {
         } else {
           getSwingSessionsBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
       /**
        * <code>optional .GetSwingSessionsMsgInProto getSwingSessions = 7;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.GetSwingSessionsMsgInProto.Builder getGetSwingSessionsBuilder() {
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         onChanged();
         return getGetSwingSessionsFieldBuilder().getBuilder();
       }
@@ -2634,7 +2833,7 @@ public final class AdminConsoleProto {
        * <code>optional .GetServerInfoMsgInProto getServerInfo = 8;</code>
        */
       public boolean hasGetServerInfo() {
-        return ((bitField0_ & 0x00000040) == 0x00000040);
+        return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
        * <code>optional .GetServerInfoMsgInProto getServerInfo = 8;</code>
@@ -2659,7 +2858,7 @@ public final class AdminConsoleProto {
         } else {
           getServerInfoBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         return this;
       }
       /**
@@ -2673,7 +2872,7 @@ public final class AdminConsoleProto {
         } else {
           getServerInfoBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         return this;
       }
       /**
@@ -2681,7 +2880,7 @@ public final class AdminConsoleProto {
        */
       public Builder mergeGetServerInfo(org.webswing.model.adminconsole.proto.AdminConsoleProto.GetServerInfoMsgInProto value) {
         if (getServerInfoBuilder_ == null) {
-          if (((bitField0_ & 0x00000040) == 0x00000040) &&
+          if (((bitField0_ & 0x00000080) == 0x00000080) &&
               getServerInfo_ != null &&
               getServerInfo_ != org.webswing.model.adminconsole.proto.AdminConsoleProto.GetServerInfoMsgInProto.getDefaultInstance()) {
             getServerInfo_ =
@@ -2693,7 +2892,7 @@ public final class AdminConsoleProto {
         } else {
           getServerInfoBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         return this;
       }
       /**
@@ -2706,14 +2905,14 @@ public final class AdminConsoleProto {
         } else {
           getServerInfoBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
       /**
        * <code>optional .GetServerInfoMsgInProto getServerInfo = 8;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.GetServerInfoMsgInProto.Builder getGetServerInfoBuilder() {
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         onChanged();
         return getGetServerInfoFieldBuilder().getBuilder();
       }
@@ -2752,7 +2951,7 @@ public final class AdminConsoleProto {
        * <code>optional .ToggleStatisticsLoggingMsgInProto toggleStatisticsLogging = 9;</code>
        */
       public boolean hasToggleStatisticsLogging() {
-        return ((bitField0_ & 0x00000080) == 0x00000080);
+        return ((bitField0_ & 0x00000100) == 0x00000100);
       }
       /**
        * <code>optional .ToggleStatisticsLoggingMsgInProto toggleStatisticsLogging = 9;</code>
@@ -2777,7 +2976,7 @@ public final class AdminConsoleProto {
         } else {
           toggleStatisticsLoggingBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
         return this;
       }
       /**
@@ -2791,7 +2990,7 @@ public final class AdminConsoleProto {
         } else {
           toggleStatisticsLoggingBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
         return this;
       }
       /**
@@ -2799,7 +2998,7 @@ public final class AdminConsoleProto {
        */
       public Builder mergeToggleStatisticsLogging(org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleStatisticsLoggingMsgInProto value) {
         if (toggleStatisticsLoggingBuilder_ == null) {
-          if (((bitField0_ & 0x00000080) == 0x00000080) &&
+          if (((bitField0_ & 0x00000100) == 0x00000100) &&
               toggleStatisticsLogging_ != null &&
               toggleStatisticsLogging_ != org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleStatisticsLoggingMsgInProto.getDefaultInstance()) {
             toggleStatisticsLogging_ =
@@ -2811,7 +3010,7 @@ public final class AdminConsoleProto {
         } else {
           toggleStatisticsLoggingBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
         return this;
       }
       /**
@@ -2824,14 +3023,14 @@ public final class AdminConsoleProto {
         } else {
           toggleStatisticsLoggingBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000080);
+        bitField0_ = (bitField0_ & ~0x00000100);
         return this;
       }
       /**
        * <code>optional .ToggleStatisticsLoggingMsgInProto toggleStatisticsLogging = 9;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleStatisticsLoggingMsgInProto.Builder getToggleStatisticsLoggingBuilder() {
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
         onChanged();
         return getToggleStatisticsLoggingFieldBuilder().getBuilder();
       }
@@ -2863,135 +3062,17 @@ public final class AdminConsoleProto {
         return toggleStatisticsLoggingBuilder_;
       }
 
-      private org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto handshake_ = null;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProtoOrBuilder> handshakeBuilder_;
-      /**
-       * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 10;</code>
-       */
-      public boolean hasHandshake() {
-        return ((bitField0_ & 0x00000100) == 0x00000100);
-      }
-      /**
-       * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 10;</code>
-       */
-      public org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto getHandshake() {
-        if (handshakeBuilder_ == null) {
-          return handshake_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.getDefaultInstance() : handshake_;
-        } else {
-          return handshakeBuilder_.getMessage();
-        }
-      }
-      /**
-       * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 10;</code>
-       */
-      public Builder setHandshake(org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto value) {
-        if (handshakeBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          handshake_ = value;
-          onChanged();
-        } else {
-          handshakeBuilder_.setMessage(value);
-        }
-        bitField0_ |= 0x00000100;
-        return this;
-      }
-      /**
-       * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 10;</code>
-       */
-      public Builder setHandshake(
-          org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.Builder builderForValue) {
-        if (handshakeBuilder_ == null) {
-          handshake_ = builderForValue.build();
-          onChanged();
-        } else {
-          handshakeBuilder_.setMessage(builderForValue.build());
-        }
-        bitField0_ |= 0x00000100;
-        return this;
-      }
-      /**
-       * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 10;</code>
-       */
-      public Builder mergeHandshake(org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto value) {
-        if (handshakeBuilder_ == null) {
-          if (((bitField0_ & 0x00000100) == 0x00000100) &&
-              handshake_ != null &&
-              handshake_ != org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.getDefaultInstance()) {
-            handshake_ =
-              org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.newBuilder(handshake_).mergeFrom(value).buildPartial();
-          } else {
-            handshake_ = value;
-          }
-          onChanged();
-        } else {
-          handshakeBuilder_.mergeFrom(value);
-        }
-        bitField0_ |= 0x00000100;
-        return this;
-      }
-      /**
-       * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 10;</code>
-       */
-      public Builder clearHandshake() {
-        if (handshakeBuilder_ == null) {
-          handshake_ = null;
-          onChanged();
-        } else {
-          handshakeBuilder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000100);
-        return this;
-      }
-      /**
-       * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 10;</code>
-       */
-      public org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.Builder getHandshakeBuilder() {
-        bitField0_ |= 0x00000100;
-        onChanged();
-        return getHandshakeFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 10;</code>
-       */
-      public org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProtoOrBuilder getHandshakeOrBuilder() {
-        if (handshakeBuilder_ != null) {
-          return handshakeBuilder_.getMessageOrBuilder();
-        } else {
-          return handshake_ == null ?
-              org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.getDefaultInstance() : handshake_;
-        }
-      }
-      /**
-       * <code>optional .AdminConsoleHandshakeMsgInProto handshake = 10;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProtoOrBuilder> 
-          getHandshakeFieldBuilder() {
-        if (handshakeBuilder_ == null) {
-          handshakeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.AdminConsoleHandshakeMsgInProtoOrBuilder>(
-                  getHandshake(),
-                  getParentForChildren(),
-                  isClean());
-          handshake_ = null;
-        }
-        return handshakeBuilder_;
-      }
-
       private org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProto getConfig_ = null;
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProtoOrBuilder> getConfigBuilder_;
       /**
-       * <code>optional .GetConfigMsgInProto getConfig = 11;</code>
+       * <code>optional .GetConfigMsgInProto getConfig = 10;</code>
        */
       public boolean hasGetConfig() {
         return ((bitField0_ & 0x00000200) == 0x00000200);
       }
       /**
-       * <code>optional .GetConfigMsgInProto getConfig = 11;</code>
+       * <code>optional .GetConfigMsgInProto getConfig = 10;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProto getGetConfig() {
         if (getConfigBuilder_ == null) {
@@ -3001,7 +3082,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .GetConfigMsgInProto getConfig = 11;</code>
+       * <code>optional .GetConfigMsgInProto getConfig = 10;</code>
        */
       public Builder setGetConfig(org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProto value) {
         if (getConfigBuilder_ == null) {
@@ -3017,7 +3098,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .GetConfigMsgInProto getConfig = 11;</code>
+       * <code>optional .GetConfigMsgInProto getConfig = 10;</code>
        */
       public Builder setGetConfig(
           org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProto.Builder builderForValue) {
@@ -3031,7 +3112,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .GetConfigMsgInProto getConfig = 11;</code>
+       * <code>optional .GetConfigMsgInProto getConfig = 10;</code>
        */
       public Builder mergeGetConfig(org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProto value) {
         if (getConfigBuilder_ == null) {
@@ -3051,7 +3132,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .GetConfigMsgInProto getConfig = 11;</code>
+       * <code>optional .GetConfigMsgInProto getConfig = 10;</code>
        */
       public Builder clearGetConfig() {
         if (getConfigBuilder_ == null) {
@@ -3064,7 +3145,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .GetConfigMsgInProto getConfig = 11;</code>
+       * <code>optional .GetConfigMsgInProto getConfig = 10;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProto.Builder getGetConfigBuilder() {
         bitField0_ |= 0x00000200;
@@ -3072,7 +3153,7 @@ public final class AdminConsoleProto {
         return getGetConfigFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .GetConfigMsgInProto getConfig = 11;</code>
+       * <code>optional .GetConfigMsgInProto getConfig = 10;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProtoOrBuilder getGetConfigOrBuilder() {
         if (getConfigBuilder_ != null) {
@@ -3083,7 +3164,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .GetConfigMsgInProto getConfig = 11;</code>
+       * <code>optional .GetConfigMsgInProto getConfig = 10;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.GetConfigMsgInProtoOrBuilder> 
@@ -3103,13 +3184,13 @@ public final class AdminConsoleProto {
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProtoOrBuilder> getMetaBuilder_;
       /**
-       * <code>optional .GetMetaMsgInProto getMeta = 12;</code>
+       * <code>optional .GetMetaMsgInProto getMeta = 11;</code>
        */
       public boolean hasGetMeta() {
         return ((bitField0_ & 0x00000400) == 0x00000400);
       }
       /**
-       * <code>optional .GetMetaMsgInProto getMeta = 12;</code>
+       * <code>optional .GetMetaMsgInProto getMeta = 11;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProto getGetMeta() {
         if (getMetaBuilder_ == null) {
@@ -3119,7 +3200,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .GetMetaMsgInProto getMeta = 12;</code>
+       * <code>optional .GetMetaMsgInProto getMeta = 11;</code>
        */
       public Builder setGetMeta(org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProto value) {
         if (getMetaBuilder_ == null) {
@@ -3135,7 +3216,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .GetMetaMsgInProto getMeta = 12;</code>
+       * <code>optional .GetMetaMsgInProto getMeta = 11;</code>
        */
       public Builder setGetMeta(
           org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProto.Builder builderForValue) {
@@ -3149,7 +3230,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .GetMetaMsgInProto getMeta = 12;</code>
+       * <code>optional .GetMetaMsgInProto getMeta = 11;</code>
        */
       public Builder mergeGetMeta(org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProto value) {
         if (getMetaBuilder_ == null) {
@@ -3169,7 +3250,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .GetMetaMsgInProto getMeta = 12;</code>
+       * <code>optional .GetMetaMsgInProto getMeta = 11;</code>
        */
       public Builder clearGetMeta() {
         if (getMetaBuilder_ == null) {
@@ -3182,7 +3263,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .GetMetaMsgInProto getMeta = 12;</code>
+       * <code>optional .GetMetaMsgInProto getMeta = 11;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProto.Builder getGetMetaBuilder() {
         bitField0_ |= 0x00000400;
@@ -3190,7 +3271,7 @@ public final class AdminConsoleProto {
         return getGetMetaFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .GetMetaMsgInProto getMeta = 12;</code>
+       * <code>optional .GetMetaMsgInProto getMeta = 11;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProtoOrBuilder getGetMetaOrBuilder() {
         if (getMetaBuilder_ != null) {
@@ -3201,7 +3282,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .GetMetaMsgInProto getMeta = 12;</code>
+       * <code>optional .GetMetaMsgInProto getMeta = 11;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.GetMetaMsgInProtoOrBuilder> 
@@ -3221,13 +3302,13 @@ public final class AdminConsoleProto {
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProtoOrBuilder> resolveConfigBuilder_;
       /**
-       * <code>optional .ResolveConfigMsgInProto resolveConfig = 13;</code>
+       * <code>optional .ResolveConfigMsgInProto resolveConfig = 12;</code>
        */
       public boolean hasResolveConfig() {
         return ((bitField0_ & 0x00000800) == 0x00000800);
       }
       /**
-       * <code>optional .ResolveConfigMsgInProto resolveConfig = 13;</code>
+       * <code>optional .ResolveConfigMsgInProto resolveConfig = 12;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProto getResolveConfig() {
         if (resolveConfigBuilder_ == null) {
@@ -3237,7 +3318,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .ResolveConfigMsgInProto resolveConfig = 13;</code>
+       * <code>optional .ResolveConfigMsgInProto resolveConfig = 12;</code>
        */
       public Builder setResolveConfig(org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProto value) {
         if (resolveConfigBuilder_ == null) {
@@ -3253,7 +3334,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .ResolveConfigMsgInProto resolveConfig = 13;</code>
+       * <code>optional .ResolveConfigMsgInProto resolveConfig = 12;</code>
        */
       public Builder setResolveConfig(
           org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProto.Builder builderForValue) {
@@ -3267,7 +3348,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .ResolveConfigMsgInProto resolveConfig = 13;</code>
+       * <code>optional .ResolveConfigMsgInProto resolveConfig = 12;</code>
        */
       public Builder mergeResolveConfig(org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProto value) {
         if (resolveConfigBuilder_ == null) {
@@ -3287,7 +3368,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .ResolveConfigMsgInProto resolveConfig = 13;</code>
+       * <code>optional .ResolveConfigMsgInProto resolveConfig = 12;</code>
        */
       public Builder clearResolveConfig() {
         if (resolveConfigBuilder_ == null) {
@@ -3300,7 +3381,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .ResolveConfigMsgInProto resolveConfig = 13;</code>
+       * <code>optional .ResolveConfigMsgInProto resolveConfig = 12;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProto.Builder getResolveConfigBuilder() {
         bitField0_ |= 0x00000800;
@@ -3308,7 +3389,7 @@ public final class AdminConsoleProto {
         return getResolveConfigFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .ResolveConfigMsgInProto resolveConfig = 13;</code>
+       * <code>optional .ResolveConfigMsgInProto resolveConfig = 12;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProtoOrBuilder getResolveConfigOrBuilder() {
         if (resolveConfigBuilder_ != null) {
@@ -3319,7 +3400,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .ResolveConfigMsgInProto resolveConfig = 13;</code>
+       * <code>optional .ResolveConfigMsgInProto resolveConfig = 12;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.ResolveConfigMsgInProtoOrBuilder> 
@@ -3339,13 +3420,13 @@ public final class AdminConsoleProto {
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProtoOrBuilder> saveConfigBuilder_;
       /**
-       * <code>optional .SaveConfigMsgInProto saveConfig = 14;</code>
+       * <code>optional .SaveConfigMsgInProto saveConfig = 13;</code>
        */
       public boolean hasSaveConfig() {
         return ((bitField0_ & 0x00001000) == 0x00001000);
       }
       /**
-       * <code>optional .SaveConfigMsgInProto saveConfig = 14;</code>
+       * <code>optional .SaveConfigMsgInProto saveConfig = 13;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProto getSaveConfig() {
         if (saveConfigBuilder_ == null) {
@@ -3355,7 +3436,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .SaveConfigMsgInProto saveConfig = 14;</code>
+       * <code>optional .SaveConfigMsgInProto saveConfig = 13;</code>
        */
       public Builder setSaveConfig(org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProto value) {
         if (saveConfigBuilder_ == null) {
@@ -3371,7 +3452,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .SaveConfigMsgInProto saveConfig = 14;</code>
+       * <code>optional .SaveConfigMsgInProto saveConfig = 13;</code>
        */
       public Builder setSaveConfig(
           org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProto.Builder builderForValue) {
@@ -3385,7 +3466,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .SaveConfigMsgInProto saveConfig = 14;</code>
+       * <code>optional .SaveConfigMsgInProto saveConfig = 13;</code>
        */
       public Builder mergeSaveConfig(org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProto value) {
         if (saveConfigBuilder_ == null) {
@@ -3405,7 +3486,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .SaveConfigMsgInProto saveConfig = 14;</code>
+       * <code>optional .SaveConfigMsgInProto saveConfig = 13;</code>
        */
       public Builder clearSaveConfig() {
         if (saveConfigBuilder_ == null) {
@@ -3418,7 +3499,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .SaveConfigMsgInProto saveConfig = 14;</code>
+       * <code>optional .SaveConfigMsgInProto saveConfig = 13;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProto.Builder getSaveConfigBuilder() {
         bitField0_ |= 0x00001000;
@@ -3426,7 +3507,7 @@ public final class AdminConsoleProto {
         return getSaveConfigFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .SaveConfigMsgInProto saveConfig = 14;</code>
+       * <code>optional .SaveConfigMsgInProto saveConfig = 13;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProtoOrBuilder getSaveConfigOrBuilder() {
         if (saveConfigBuilder_ != null) {
@@ -3437,7 +3518,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .SaveConfigMsgInProto saveConfig = 14;</code>
+       * <code>optional .SaveConfigMsgInProto saveConfig = 13;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.SaveConfigMsgInProtoOrBuilder> 
@@ -3457,13 +3538,13 @@ public final class AdminConsoleProto {
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProtoOrBuilder> searchVariablesBuilder_;
       /**
-       * <code>optional .SearchVariablesMsgInProto searchVariables = 15;</code>
+       * <code>optional .SearchVariablesMsgInProto searchVariables = 14;</code>
        */
       public boolean hasSearchVariables() {
         return ((bitField0_ & 0x00002000) == 0x00002000);
       }
       /**
-       * <code>optional .SearchVariablesMsgInProto searchVariables = 15;</code>
+       * <code>optional .SearchVariablesMsgInProto searchVariables = 14;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProto getSearchVariables() {
         if (searchVariablesBuilder_ == null) {
@@ -3473,7 +3554,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .SearchVariablesMsgInProto searchVariables = 15;</code>
+       * <code>optional .SearchVariablesMsgInProto searchVariables = 14;</code>
        */
       public Builder setSearchVariables(org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProto value) {
         if (searchVariablesBuilder_ == null) {
@@ -3489,7 +3570,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .SearchVariablesMsgInProto searchVariables = 15;</code>
+       * <code>optional .SearchVariablesMsgInProto searchVariables = 14;</code>
        */
       public Builder setSearchVariables(
           org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProto.Builder builderForValue) {
@@ -3503,7 +3584,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .SearchVariablesMsgInProto searchVariables = 15;</code>
+       * <code>optional .SearchVariablesMsgInProto searchVariables = 14;</code>
        */
       public Builder mergeSearchVariables(org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProto value) {
         if (searchVariablesBuilder_ == null) {
@@ -3523,7 +3604,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .SearchVariablesMsgInProto searchVariables = 15;</code>
+       * <code>optional .SearchVariablesMsgInProto searchVariables = 14;</code>
        */
       public Builder clearSearchVariables() {
         if (searchVariablesBuilder_ == null) {
@@ -3536,7 +3617,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .SearchVariablesMsgInProto searchVariables = 15;</code>
+       * <code>optional .SearchVariablesMsgInProto searchVariables = 14;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProto.Builder getSearchVariablesBuilder() {
         bitField0_ |= 0x00002000;
@@ -3544,7 +3625,7 @@ public final class AdminConsoleProto {
         return getSearchVariablesFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .SearchVariablesMsgInProto searchVariables = 15;</code>
+       * <code>optional .SearchVariablesMsgInProto searchVariables = 14;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProtoOrBuilder getSearchVariablesOrBuilder() {
         if (searchVariablesBuilder_ != null) {
@@ -3555,7 +3636,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .SearchVariablesMsgInProto searchVariables = 15;</code>
+       * <code>optional .SearchVariablesMsgInProto searchVariables = 14;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.SearchVariablesMsgInProtoOrBuilder> 
@@ -3575,13 +3656,13 @@ public final class AdminConsoleProto {
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProtoOrBuilder> startAppBuilder_;
       /**
-       * <code>optional .StartAppMsgInProto startApp = 16;</code>
+       * <code>optional .StartAppMsgInProto startApp = 15;</code>
        */
       public boolean hasStartApp() {
         return ((bitField0_ & 0x00004000) == 0x00004000);
       }
       /**
-       * <code>optional .StartAppMsgInProto startApp = 16;</code>
+       * <code>optional .StartAppMsgInProto startApp = 15;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProto getStartApp() {
         if (startAppBuilder_ == null) {
@@ -3591,7 +3672,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .StartAppMsgInProto startApp = 16;</code>
+       * <code>optional .StartAppMsgInProto startApp = 15;</code>
        */
       public Builder setStartApp(org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProto value) {
         if (startAppBuilder_ == null) {
@@ -3607,7 +3688,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .StartAppMsgInProto startApp = 16;</code>
+       * <code>optional .StartAppMsgInProto startApp = 15;</code>
        */
       public Builder setStartApp(
           org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProto.Builder builderForValue) {
@@ -3621,7 +3702,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .StartAppMsgInProto startApp = 16;</code>
+       * <code>optional .StartAppMsgInProto startApp = 15;</code>
        */
       public Builder mergeStartApp(org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProto value) {
         if (startAppBuilder_ == null) {
@@ -3641,7 +3722,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .StartAppMsgInProto startApp = 16;</code>
+       * <code>optional .StartAppMsgInProto startApp = 15;</code>
        */
       public Builder clearStartApp() {
         if (startAppBuilder_ == null) {
@@ -3654,7 +3735,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .StartAppMsgInProto startApp = 16;</code>
+       * <code>optional .StartAppMsgInProto startApp = 15;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProto.Builder getStartAppBuilder() {
         bitField0_ |= 0x00004000;
@@ -3662,7 +3743,7 @@ public final class AdminConsoleProto {
         return getStartAppFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .StartAppMsgInProto startApp = 16;</code>
+       * <code>optional .StartAppMsgInProto startApp = 15;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProtoOrBuilder getStartAppOrBuilder() {
         if (startAppBuilder_ != null) {
@@ -3673,7 +3754,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .StartAppMsgInProto startApp = 16;</code>
+       * <code>optional .StartAppMsgInProto startApp = 15;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.StartAppMsgInProtoOrBuilder> 
@@ -3693,13 +3774,13 @@ public final class AdminConsoleProto {
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProtoOrBuilder> stopAppBuilder_;
       /**
-       * <code>optional .StopAppMsgInProto stopApp = 17;</code>
+       * <code>optional .StopAppMsgInProto stopApp = 16;</code>
        */
       public boolean hasStopApp() {
         return ((bitField0_ & 0x00008000) == 0x00008000);
       }
       /**
-       * <code>optional .StopAppMsgInProto stopApp = 17;</code>
+       * <code>optional .StopAppMsgInProto stopApp = 16;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProto getStopApp() {
         if (stopAppBuilder_ == null) {
@@ -3709,7 +3790,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .StopAppMsgInProto stopApp = 17;</code>
+       * <code>optional .StopAppMsgInProto stopApp = 16;</code>
        */
       public Builder setStopApp(org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProto value) {
         if (stopAppBuilder_ == null) {
@@ -3725,7 +3806,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .StopAppMsgInProto stopApp = 17;</code>
+       * <code>optional .StopAppMsgInProto stopApp = 16;</code>
        */
       public Builder setStopApp(
           org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProto.Builder builderForValue) {
@@ -3739,7 +3820,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .StopAppMsgInProto stopApp = 17;</code>
+       * <code>optional .StopAppMsgInProto stopApp = 16;</code>
        */
       public Builder mergeStopApp(org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProto value) {
         if (stopAppBuilder_ == null) {
@@ -3759,7 +3840,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .StopAppMsgInProto stopApp = 17;</code>
+       * <code>optional .StopAppMsgInProto stopApp = 16;</code>
        */
       public Builder clearStopApp() {
         if (stopAppBuilder_ == null) {
@@ -3772,7 +3853,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .StopAppMsgInProto stopApp = 17;</code>
+       * <code>optional .StopAppMsgInProto stopApp = 16;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProto.Builder getStopAppBuilder() {
         bitField0_ |= 0x00008000;
@@ -3780,7 +3861,7 @@ public final class AdminConsoleProto {
         return getStopAppFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .StopAppMsgInProto stopApp = 17;</code>
+       * <code>optional .StopAppMsgInProto stopApp = 16;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProtoOrBuilder getStopAppOrBuilder() {
         if (stopAppBuilder_ != null) {
@@ -3791,7 +3872,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .StopAppMsgInProto stopApp = 17;</code>
+       * <code>optional .StopAppMsgInProto stopApp = 16;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.StopAppMsgInProtoOrBuilder> 
@@ -3811,13 +3892,13 @@ public final class AdminConsoleProto {
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProtoOrBuilder> createAppBuilder_;
       /**
-       * <code>optional .CreateAppMsgInProto createApp = 18;</code>
+       * <code>optional .CreateAppMsgInProto createApp = 17;</code>
        */
       public boolean hasCreateApp() {
         return ((bitField0_ & 0x00010000) == 0x00010000);
       }
       /**
-       * <code>optional .CreateAppMsgInProto createApp = 18;</code>
+       * <code>optional .CreateAppMsgInProto createApp = 17;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProto getCreateApp() {
         if (createAppBuilder_ == null) {
@@ -3827,7 +3908,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .CreateAppMsgInProto createApp = 18;</code>
+       * <code>optional .CreateAppMsgInProto createApp = 17;</code>
        */
       public Builder setCreateApp(org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProto value) {
         if (createAppBuilder_ == null) {
@@ -3843,7 +3924,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .CreateAppMsgInProto createApp = 18;</code>
+       * <code>optional .CreateAppMsgInProto createApp = 17;</code>
        */
       public Builder setCreateApp(
           org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProto.Builder builderForValue) {
@@ -3857,7 +3938,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .CreateAppMsgInProto createApp = 18;</code>
+       * <code>optional .CreateAppMsgInProto createApp = 17;</code>
        */
       public Builder mergeCreateApp(org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProto value) {
         if (createAppBuilder_ == null) {
@@ -3877,7 +3958,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .CreateAppMsgInProto createApp = 18;</code>
+       * <code>optional .CreateAppMsgInProto createApp = 17;</code>
        */
       public Builder clearCreateApp() {
         if (createAppBuilder_ == null) {
@@ -3890,7 +3971,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .CreateAppMsgInProto createApp = 18;</code>
+       * <code>optional .CreateAppMsgInProto createApp = 17;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProto.Builder getCreateAppBuilder() {
         bitField0_ |= 0x00010000;
@@ -3898,7 +3979,7 @@ public final class AdminConsoleProto {
         return getCreateAppFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .CreateAppMsgInProto createApp = 18;</code>
+       * <code>optional .CreateAppMsgInProto createApp = 17;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProtoOrBuilder getCreateAppOrBuilder() {
         if (createAppBuilder_ != null) {
@@ -3909,7 +3990,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .CreateAppMsgInProto createApp = 18;</code>
+       * <code>optional .CreateAppMsgInProto createApp = 17;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.CreateAppMsgInProtoOrBuilder> 
@@ -3929,13 +4010,13 @@ public final class AdminConsoleProto {
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProtoOrBuilder> removeAppBuilder_;
       /**
-       * <code>optional .RemoveAppMsgInProto removeApp = 19;</code>
+       * <code>optional .RemoveAppMsgInProto removeApp = 18;</code>
        */
       public boolean hasRemoveApp() {
         return ((bitField0_ & 0x00020000) == 0x00020000);
       }
       /**
-       * <code>optional .RemoveAppMsgInProto removeApp = 19;</code>
+       * <code>optional .RemoveAppMsgInProto removeApp = 18;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProto getRemoveApp() {
         if (removeAppBuilder_ == null) {
@@ -3945,7 +4026,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .RemoveAppMsgInProto removeApp = 19;</code>
+       * <code>optional .RemoveAppMsgInProto removeApp = 18;</code>
        */
       public Builder setRemoveApp(org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProto value) {
         if (removeAppBuilder_ == null) {
@@ -3961,7 +4042,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .RemoveAppMsgInProto removeApp = 19;</code>
+       * <code>optional .RemoveAppMsgInProto removeApp = 18;</code>
        */
       public Builder setRemoveApp(
           org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProto.Builder builderForValue) {
@@ -3975,7 +4056,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .RemoveAppMsgInProto removeApp = 19;</code>
+       * <code>optional .RemoveAppMsgInProto removeApp = 18;</code>
        */
       public Builder mergeRemoveApp(org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProto value) {
         if (removeAppBuilder_ == null) {
@@ -3995,7 +4076,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .RemoveAppMsgInProto removeApp = 19;</code>
+       * <code>optional .RemoveAppMsgInProto removeApp = 18;</code>
        */
       public Builder clearRemoveApp() {
         if (removeAppBuilder_ == null) {
@@ -4008,7 +4089,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .RemoveAppMsgInProto removeApp = 19;</code>
+       * <code>optional .RemoveAppMsgInProto removeApp = 18;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProto.Builder getRemoveAppBuilder() {
         bitField0_ |= 0x00020000;
@@ -4016,7 +4097,7 @@ public final class AdminConsoleProto {
         return getRemoveAppFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .RemoveAppMsgInProto removeApp = 19;</code>
+       * <code>optional .RemoveAppMsgInProto removeApp = 18;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProtoOrBuilder getRemoveAppOrBuilder() {
         if (removeAppBuilder_ != null) {
@@ -4027,7 +4108,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .RemoveAppMsgInProto removeApp = 19;</code>
+       * <code>optional .RemoveAppMsgInProto removeApp = 18;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.RemoveAppMsgInProtoOrBuilder> 
@@ -4047,13 +4128,13 @@ public final class AdminConsoleProto {
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProtoOrBuilder> mirrorFrameBuilder_;
       /**
-       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 19;</code>
        */
       public boolean hasMirrorFrame() {
         return ((bitField0_ & 0x00040000) == 0x00040000);
       }
       /**
-       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 19;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto getMirrorFrame() {
         if (mirrorFrameBuilder_ == null) {
@@ -4063,7 +4144,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 19;</code>
        */
       public Builder setMirrorFrame(org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto value) {
         if (mirrorFrameBuilder_ == null) {
@@ -4079,7 +4160,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 19;</code>
        */
       public Builder setMirrorFrame(
           org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.Builder builderForValue) {
@@ -4093,7 +4174,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 19;</code>
        */
       public Builder mergeMirrorFrame(org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto value) {
         if (mirrorFrameBuilder_ == null) {
@@ -4113,7 +4194,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 19;</code>
        */
       public Builder clearMirrorFrame() {
         if (mirrorFrameBuilder_ == null) {
@@ -4126,7 +4207,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 19;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.Builder getMirrorFrameBuilder() {
         bitField0_ |= 0x00040000;
@@ -4134,7 +4215,7 @@ public final class AdminConsoleProto {
         return getMirrorFrameFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 19;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProtoOrBuilder getMirrorFrameOrBuilder() {
         if (mirrorFrameBuilder_ != null) {
@@ -4145,7 +4226,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 20;</code>
+       * <code>optional .MirrorFrameMsgInProto mirrorFrame = 19;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.MirrorFrameMsgInProtoOrBuilder> 
@@ -4159,6 +4240,124 @@ public final class AdminConsoleProto {
           mirrorFrame_ = null;
         }
         return mirrorFrameBuilder_;
+      }
+
+      private org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto manageSessionPool_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProtoOrBuilder> manageSessionPoolBuilder_;
+      /**
+       * <code>optional .ManageSessionPoolMsgInProto manageSessionPool = 20;</code>
+       */
+      public boolean hasManageSessionPool() {
+        return ((bitField0_ & 0x00080000) == 0x00080000);
+      }
+      /**
+       * <code>optional .ManageSessionPoolMsgInProto manageSessionPool = 20;</code>
+       */
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto getManageSessionPool() {
+        if (manageSessionPoolBuilder_ == null) {
+          return manageSessionPool_ == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.getDefaultInstance() : manageSessionPool_;
+        } else {
+          return manageSessionPoolBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .ManageSessionPoolMsgInProto manageSessionPool = 20;</code>
+       */
+      public Builder setManageSessionPool(org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto value) {
+        if (manageSessionPoolBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          manageSessionPool_ = value;
+          onChanged();
+        } else {
+          manageSessionPoolBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00080000;
+        return this;
+      }
+      /**
+       * <code>optional .ManageSessionPoolMsgInProto manageSessionPool = 20;</code>
+       */
+      public Builder setManageSessionPool(
+          org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.Builder builderForValue) {
+        if (manageSessionPoolBuilder_ == null) {
+          manageSessionPool_ = builderForValue.build();
+          onChanged();
+        } else {
+          manageSessionPoolBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00080000;
+        return this;
+      }
+      /**
+       * <code>optional .ManageSessionPoolMsgInProto manageSessionPool = 20;</code>
+       */
+      public Builder mergeManageSessionPool(org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto value) {
+        if (manageSessionPoolBuilder_ == null) {
+          if (((bitField0_ & 0x00080000) == 0x00080000) &&
+              manageSessionPool_ != null &&
+              manageSessionPool_ != org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.getDefaultInstance()) {
+            manageSessionPool_ =
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.newBuilder(manageSessionPool_).mergeFrom(value).buildPartial();
+          } else {
+            manageSessionPool_ = value;
+          }
+          onChanged();
+        } else {
+          manageSessionPoolBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00080000;
+        return this;
+      }
+      /**
+       * <code>optional .ManageSessionPoolMsgInProto manageSessionPool = 20;</code>
+       */
+      public Builder clearManageSessionPool() {
+        if (manageSessionPoolBuilder_ == null) {
+          manageSessionPool_ = null;
+          onChanged();
+        } else {
+          manageSessionPoolBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00080000);
+        return this;
+      }
+      /**
+       * <code>optional .ManageSessionPoolMsgInProto manageSessionPool = 20;</code>
+       */
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.Builder getManageSessionPoolBuilder() {
+        bitField0_ |= 0x00080000;
+        onChanged();
+        return getManageSessionPoolFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .ManageSessionPoolMsgInProto manageSessionPool = 20;</code>
+       */
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProtoOrBuilder getManageSessionPoolOrBuilder() {
+        if (manageSessionPoolBuilder_ != null) {
+          return manageSessionPoolBuilder_.getMessageOrBuilder();
+        } else {
+          return manageSessionPool_ == null ?
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.getDefaultInstance() : manageSessionPool_;
+        }
+      }
+      /**
+       * <code>optional .ManageSessionPoolMsgInProto manageSessionPool = 20;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProtoOrBuilder> 
+          getManageSessionPoolFieldBuilder() {
+        if (manageSessionPoolBuilder_ == null) {
+          manageSessionPoolBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProtoOrBuilder>(
+                  getManageSessionPool(),
+                  getParentForChildren(),
+                  isClean());
+          manageSessionPool_ = null;
+        }
+        return manageSessionPoolBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -4796,51 +4995,61 @@ public final class AdminConsoleProto {
 
   }
 
-  public interface ToggleRecordingMsgInProtoOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:ToggleRecordingMsgInProto)
+  public interface RecordingRequestMsgInProtoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:RecordingRequestMsgInProto)
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>optional string path = 1;</code>
+     * <code>optional .RecordingRequestMsgInProto.RecordingRequestTypeProto type = 1;</code>
+     */
+    boolean hasType();
+    /**
+     * <code>optional .RecordingRequestMsgInProto.RecordingRequestTypeProto type = 1;</code>
+     */
+    org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.RecordingRequestTypeProto getType();
+
+    /**
+     * <code>optional string path = 2;</code>
      */
     boolean hasPath();
     /**
-     * <code>optional string path = 1;</code>
+     * <code>optional string path = 2;</code>
      */
     java.lang.String getPath();
     /**
-     * <code>optional string path = 1;</code>
+     * <code>optional string path = 2;</code>
      */
     com.google.protobuf.ByteString
         getPathBytes();
 
     /**
-     * <code>optional string instanceId = 2;</code>
+     * <code>optional string instanceId = 3;</code>
      */
     boolean hasInstanceId();
     /**
-     * <code>optional string instanceId = 2;</code>
+     * <code>optional string instanceId = 3;</code>
      */
     java.lang.String getInstanceId();
     /**
-     * <code>optional string instanceId = 2;</code>
+     * <code>optional string instanceId = 3;</code>
      */
     com.google.protobuf.ByteString
         getInstanceIdBytes();
   }
   /**
-   * Protobuf type {@code ToggleRecordingMsgInProto}
+   * Protobuf type {@code RecordingRequestMsgInProto}
    */
-  public  static final class ToggleRecordingMsgInProto extends
+  public  static final class RecordingRequestMsgInProto extends
       com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:ToggleRecordingMsgInProto)
-      ToggleRecordingMsgInProtoOrBuilder {
+      // @@protoc_insertion_point(message_implements:RecordingRequestMsgInProto)
+      RecordingRequestMsgInProtoOrBuilder {
   private static final long serialVersionUID = 0L;
-    // Use ToggleRecordingMsgInProto.newBuilder() to construct.
-    private ToggleRecordingMsgInProto(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    // Use RecordingRequestMsgInProto.newBuilder() to construct.
+    private RecordingRequestMsgInProto(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
-    private ToggleRecordingMsgInProto() {
+    private RecordingRequestMsgInProto() {
+      type_ = 1;
       path_ = "";
       instanceId_ = "";
     }
@@ -4850,7 +5059,7 @@ public final class AdminConsoleProto {
     getUnknownFields() {
       return this.unknownFields;
     }
-    private ToggleRecordingMsgInProto(
+    private RecordingRequestMsgInProto(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -4869,15 +5078,27 @@ public final class AdminConsoleProto {
             case 0:
               done = true;
               break;
-            case 10: {
-              com.google.protobuf.ByteString bs = input.readBytes();
-              bitField0_ |= 0x00000001;
-              path_ = bs;
+            case 8: {
+              int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.RecordingRequestTypeProto value = org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.RecordingRequestTypeProto.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(1, rawValue);
+              } else {
+                bitField0_ |= 0x00000001;
+                type_ = rawValue;
+              }
               break;
             }
             case 18: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
+              path_ = bs;
+              break;
+            }
+            case 26: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000004;
               instanceId_ = bs;
               break;
             }
@@ -4902,28 +5123,135 @@ public final class AdminConsoleProto {
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_ToggleRecordingMsgInProto_descriptor;
+      return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_RecordingRequestMsgInProto_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_ToggleRecordingMsgInProto_fieldAccessorTable
+      return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_RecordingRequestMsgInProto_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.class, org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.Builder.class);
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.class, org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.Builder.class);
+    }
+
+    /**
+     * Protobuf enum {@code RecordingRequestMsgInProto.RecordingRequestTypeProto}
+     */
+    public enum RecordingRequestTypeProto
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>startRecording = 1;</code>
+       */
+      startRecording(1),
+      /**
+       * <code>stopRecording = 2;</code>
+       */
+      stopRecording(2),
+      ;
+
+      /**
+       * <code>startRecording = 1;</code>
+       */
+      public static final int startRecording_VALUE = 1;
+      /**
+       * <code>stopRecording = 2;</code>
+       */
+      public static final int stopRecording_VALUE = 2;
+
+
+      public final int getNumber() {
+        return value;
+      }
+
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static RecordingRequestTypeProto valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static RecordingRequestTypeProto forNumber(int value) {
+        switch (value) {
+          case 1: return startRecording;
+          case 2: return stopRecording;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<RecordingRequestTypeProto>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static final com.google.protobuf.Internal.EnumLiteMap<
+          RecordingRequestTypeProto> internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<RecordingRequestTypeProto>() {
+              public RecordingRequestTypeProto findValueByNumber(int number) {
+                return RecordingRequestTypeProto.forNumber(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(ordinal());
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final RecordingRequestTypeProto[] VALUES = values();
+
+      public static RecordingRequestTypeProto valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int value;
+
+      private RecordingRequestTypeProto(int value) {
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:RecordingRequestMsgInProto.RecordingRequestTypeProto)
     }
 
     private int bitField0_;
-    public static final int PATH_FIELD_NUMBER = 1;
-    private volatile java.lang.Object path_;
+    public static final int TYPE_FIELD_NUMBER = 1;
+    private int type_;
     /**
-     * <code>optional string path = 1;</code>
+     * <code>optional .RecordingRequestMsgInProto.RecordingRequestTypeProto type = 1;</code>
      */
-    public boolean hasPath() {
+    public boolean hasType() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional string path = 1;</code>
+     * <code>optional .RecordingRequestMsgInProto.RecordingRequestTypeProto type = 1;</code>
+     */
+    public org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.RecordingRequestTypeProto getType() {
+      @SuppressWarnings("deprecation")
+      org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.RecordingRequestTypeProto result = org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.RecordingRequestTypeProto.valueOf(type_);
+      return result == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.RecordingRequestTypeProto.startRecording : result;
+    }
+
+    public static final int PATH_FIELD_NUMBER = 2;
+    private volatile java.lang.Object path_;
+    /**
+     * <code>optional string path = 2;</code>
+     */
+    public boolean hasPath() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional string path = 2;</code>
      */
     public java.lang.String getPath() {
       java.lang.Object ref = path_;
@@ -4940,7 +5268,7 @@ public final class AdminConsoleProto {
       }
     }
     /**
-     * <code>optional string path = 1;</code>
+     * <code>optional string path = 2;</code>
      */
     public com.google.protobuf.ByteString
         getPathBytes() {
@@ -4956,16 +5284,16 @@ public final class AdminConsoleProto {
       }
     }
 
-    public static final int INSTANCEID_FIELD_NUMBER = 2;
+    public static final int INSTANCEID_FIELD_NUMBER = 3;
     private volatile java.lang.Object instanceId_;
     /**
-     * <code>optional string instanceId = 2;</code>
+     * <code>optional string instanceId = 3;</code>
      */
     public boolean hasInstanceId() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional string instanceId = 2;</code>
+     * <code>optional string instanceId = 3;</code>
      */
     public java.lang.String getInstanceId() {
       java.lang.Object ref = instanceId_;
@@ -4982,7 +5310,7 @@ public final class AdminConsoleProto {
       }
     }
     /**
-     * <code>optional string instanceId = 2;</code>
+     * <code>optional string instanceId = 3;</code>
      */
     public com.google.protobuf.ByteString
         getInstanceIdBytes() {
@@ -5013,10 +5341,13 @@ public final class AdminConsoleProto {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, path_);
+        output.writeEnum(1, type_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, instanceId_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, path_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, instanceId_);
       }
       unknownFields.writeTo(output);
     }
@@ -5028,10 +5359,14 @@ public final class AdminConsoleProto {
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, path_);
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(1, type_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, instanceId_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, path_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, instanceId_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5043,12 +5378,16 @@ public final class AdminConsoleProto {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto)) {
+      if (!(obj instanceof org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto)) {
         return super.equals(obj);
       }
-      org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto other = (org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto) obj;
+      org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto other = (org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto) obj;
 
       boolean result = true;
+      result = result && (hasType() == other.hasType());
+      if (hasType()) {
+        result = result && type_ == other.type_;
+      }
       result = result && (hasPath() == other.hasPath());
       if (hasPath()) {
         result = result && getPath()
@@ -5070,6 +5409,10 @@ public final class AdminConsoleProto {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasType()) {
+        hash = (37 * hash) + TYPE_FIELD_NUMBER;
+        hash = (53 * hash) + type_;
+      }
       if (hasPath()) {
         hash = (37 * hash) + PATH_FIELD_NUMBER;
         hash = (53 * hash) + getPath().hashCode();
@@ -5083,69 +5426,69 @@ public final class AdminConsoleProto {
       return hash;
     }
 
-    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto parseFrom(
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto parseFrom(
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto parseFrom(
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto parseFrom(
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto parseFrom(byte[] data)
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto parseFrom(
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto parseFrom(java.io.InputStream input)
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto parseFrom(
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
-    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto parseDelimitedFrom(java.io.InputStream input)
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input);
     }
-    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto parseDelimitedFrom(
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto parseFrom(
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto parseFrom(
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -5158,7 +5501,7 @@ public final class AdminConsoleProto {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto prototype) {
+    public static Builder newBuilder(org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     @java.lang.Override
@@ -5174,26 +5517,26 @@ public final class AdminConsoleProto {
       return builder;
     }
     /**
-     * Protobuf type {@code ToggleRecordingMsgInProto}
+     * Protobuf type {@code RecordingRequestMsgInProto}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:ToggleRecordingMsgInProto)
-        org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProtoOrBuilder {
+        // @@protoc_insertion_point(builder_implements:RecordingRequestMsgInProto)
+        org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProtoOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_ToggleRecordingMsgInProto_descriptor;
+        return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_RecordingRequestMsgInProto_descriptor;
       }
 
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_ToggleRecordingMsgInProto_fieldAccessorTable
+        return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_RecordingRequestMsgInProto_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.class, org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.Builder.class);
+                org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.class, org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.Builder.class);
       }
 
-      // Construct using org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.newBuilder()
+      // Construct using org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -5211,27 +5554,29 @@ public final class AdminConsoleProto {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        path_ = "";
+        type_ = 1;
         bitField0_ = (bitField0_ & ~0x00000001);
-        instanceId_ = "";
+        path_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
+        instanceId_ = "";
+        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
 
       @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_ToggleRecordingMsgInProto_descriptor;
+        return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_RecordingRequestMsgInProto_descriptor;
       }
 
       @java.lang.Override
-      public org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto getDefaultInstanceForType() {
-        return org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.getDefaultInstance();
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto getDefaultInstanceForType() {
+        return org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.getDefaultInstance();
       }
 
       @java.lang.Override
-      public org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto build() {
-        org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto result = buildPartial();
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto build() {
+        org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
@@ -5239,16 +5584,20 @@ public final class AdminConsoleProto {
       }
 
       @java.lang.Override
-      public org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto buildPartial() {
-        org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto result = new org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto(this);
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto buildPartial() {
+        org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto result = new org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.path_ = path_;
+        result.type_ = type_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
+        }
+        result.path_ = path_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
         }
         result.instanceId_ = instanceId_;
         result.bitField0_ = to_bitField0_;
@@ -5290,23 +5639,26 @@ public final class AdminConsoleProto {
       }
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto) {
-          return mergeFrom((org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto)other);
+        if (other instanceof org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto) {
+          return mergeFrom((org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto other) {
-        if (other == org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto.getDefaultInstance()) return this;
+      public Builder mergeFrom(org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto other) {
+        if (other == org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.getDefaultInstance()) return this;
+        if (other.hasType()) {
+          setType(other.getType());
+        }
         if (other.hasPath()) {
-          bitField0_ |= 0x00000001;
+          bitField0_ |= 0x00000002;
           path_ = other.path_;
           onChanged();
         }
         if (other.hasInstanceId()) {
-          bitField0_ |= 0x00000002;
+          bitField0_ |= 0x00000004;
           instanceId_ = other.instanceId_;
           onChanged();
         }
@@ -5325,11 +5677,11 @@ public final class AdminConsoleProto {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto parsedMessage = null;
+        org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto) e.getUnfinishedMessage();
+          parsedMessage = (org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
@@ -5340,15 +5692,52 @@ public final class AdminConsoleProto {
       }
       private int bitField0_;
 
-      private java.lang.Object path_ = "";
+      private int type_ = 1;
       /**
-       * <code>optional string path = 1;</code>
+       * <code>optional .RecordingRequestMsgInProto.RecordingRequestTypeProto type = 1;</code>
        */
-      public boolean hasPath() {
+      public boolean hasType() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional string path = 1;</code>
+       * <code>optional .RecordingRequestMsgInProto.RecordingRequestTypeProto type = 1;</code>
+       */
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.RecordingRequestTypeProto getType() {
+        @SuppressWarnings("deprecation")
+        org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.RecordingRequestTypeProto result = org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.RecordingRequestTypeProto.valueOf(type_);
+        return result == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.RecordingRequestTypeProto.startRecording : result;
+      }
+      /**
+       * <code>optional .RecordingRequestMsgInProto.RecordingRequestTypeProto type = 1;</code>
+       */
+      public Builder setType(org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto.RecordingRequestTypeProto value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000001;
+        type_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .RecordingRequestMsgInProto.RecordingRequestTypeProto type = 1;</code>
+       */
+      public Builder clearType() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        type_ = 1;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object path_ = "";
+      /**
+       * <code>optional string path = 2;</code>
+       */
+      public boolean hasPath() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional string path = 2;</code>
        */
       public java.lang.String getPath() {
         java.lang.Object ref = path_;
@@ -5365,7 +5754,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional string path = 1;</code>
+       * <code>optional string path = 2;</code>
        */
       public com.google.protobuf.ByteString
           getPathBytes() {
@@ -5381,36 +5770,36 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional string path = 1;</code>
+       * <code>optional string path = 2;</code>
        */
       public Builder setPath(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000001;
+  bitField0_ |= 0x00000002;
         path_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string path = 1;</code>
+       * <code>optional string path = 2;</code>
        */
       public Builder clearPath() {
-        bitField0_ = (bitField0_ & ~0x00000001);
+        bitField0_ = (bitField0_ & ~0x00000002);
         path_ = getDefaultInstance().getPath();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string path = 1;</code>
+       * <code>optional string path = 2;</code>
        */
       public Builder setPathBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000001;
+  bitField0_ |= 0x00000002;
         path_ = value;
         onChanged();
         return this;
@@ -5418,13 +5807,13 @@ public final class AdminConsoleProto {
 
       private java.lang.Object instanceId_ = "";
       /**
-       * <code>optional string instanceId = 2;</code>
+       * <code>optional string instanceId = 3;</code>
        */
       public boolean hasInstanceId() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional string instanceId = 2;</code>
+       * <code>optional string instanceId = 3;</code>
        */
       public java.lang.String getInstanceId() {
         java.lang.Object ref = instanceId_;
@@ -5441,7 +5830,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional string instanceId = 2;</code>
+       * <code>optional string instanceId = 3;</code>
        */
       public com.google.protobuf.ByteString
           getInstanceIdBytes() {
@@ -5457,36 +5846,36 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional string instanceId = 2;</code>
+       * <code>optional string instanceId = 3;</code>
        */
       public Builder setInstanceId(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000002;
+  bitField0_ |= 0x00000004;
         instanceId_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string instanceId = 2;</code>
+       * <code>optional string instanceId = 3;</code>
        */
       public Builder clearInstanceId() {
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000004);
         instanceId_ = getDefaultInstance().getInstanceId();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string instanceId = 2;</code>
+       * <code>optional string instanceId = 3;</code>
        */
       public Builder setInstanceIdBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000002;
+  bitField0_ |= 0x00000004;
         instanceId_ = value;
         onChanged();
         return this;
@@ -5504,41 +5893,832 @@ public final class AdminConsoleProto {
       }
 
 
-      // @@protoc_insertion_point(builder_scope:ToggleRecordingMsgInProto)
+      // @@protoc_insertion_point(builder_scope:RecordingRequestMsgInProto)
     }
 
-    // @@protoc_insertion_point(class_scope:ToggleRecordingMsgInProto)
-    private static final org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:RecordingRequestMsgInProto)
+    private static final org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto();
+      DEFAULT_INSTANCE = new org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto();
     }
 
-    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto getDefaultInstance() {
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    @java.lang.Deprecated public static final com.google.protobuf.Parser<ToggleRecordingMsgInProto>
-        PARSER = new com.google.protobuf.AbstractParser<ToggleRecordingMsgInProto>() {
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<RecordingRequestMsgInProto>
+        PARSER = new com.google.protobuf.AbstractParser<RecordingRequestMsgInProto>() {
       @java.lang.Override
-      public ToggleRecordingMsgInProto parsePartialFrom(
+      public RecordingRequestMsgInProto parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ToggleRecordingMsgInProto(input, extensionRegistry);
+        return new RecordingRequestMsgInProto(input, extensionRegistry);
       }
     };
 
-    public static com.google.protobuf.Parser<ToggleRecordingMsgInProto> parser() {
+    public static com.google.protobuf.Parser<RecordingRequestMsgInProto> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<ToggleRecordingMsgInProto> getParserForType() {
+    public com.google.protobuf.Parser<RecordingRequestMsgInProto> getParserForType() {
       return PARSER;
     }
 
     @java.lang.Override
-    public org.webswing.model.adminconsole.proto.AdminConsoleProto.ToggleRecordingMsgInProto getDefaultInstanceForType() {
+    public org.webswing.model.adminconsole.proto.AdminConsoleProto.RecordingRequestMsgInProto getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface ManageSessionPoolMsgInProtoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:ManageSessionPoolMsgInProto)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional string sessionPoolId = 1;</code>
+     */
+    boolean hasSessionPoolId();
+    /**
+     * <code>optional string sessionPoolId = 1;</code>
+     */
+    java.lang.String getSessionPoolId();
+    /**
+     * <code>optional string sessionPoolId = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getSessionPoolIdBytes();
+
+    /**
+     * <code>optional .ManageSessionPoolMsgInProto.PowerRequestTypeProto powerRequestType = 2;</code>
+     */
+    boolean hasPowerRequestType();
+    /**
+     * <code>optional .ManageSessionPoolMsgInProto.PowerRequestTypeProto powerRequestType = 2;</code>
+     */
+    org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.PowerRequestTypeProto getPowerRequestType();
+  }
+  /**
+   * Protobuf type {@code ManageSessionPoolMsgInProto}
+   */
+  public  static final class ManageSessionPoolMsgInProto extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:ManageSessionPoolMsgInProto)
+      ManageSessionPoolMsgInProtoOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use ManageSessionPoolMsgInProto.newBuilder() to construct.
+    private ManageSessionPoolMsgInProto(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private ManageSessionPoolMsgInProto() {
+      sessionPoolId_ = "";
+      powerRequestType_ = 1;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private ManageSessionPoolMsgInProto(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000001;
+              sessionPoolId_ = bs;
+              break;
+            }
+            case 16: {
+              int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.PowerRequestTypeProto value = org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.PowerRequestTypeProto.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(2, rawValue);
+              } else {
+                bitField0_ |= 0x00000002;
+                powerRequestType_ = rawValue;
+              }
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_ManageSessionPoolMsgInProto_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_ManageSessionPoolMsgInProto_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.class, org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.Builder.class);
+    }
+
+    /**
+     * Protobuf enum {@code ManageSessionPoolMsgInProto.PowerRequestTypeProto}
+     */
+    public enum PowerRequestTypeProto
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>DRAIN_MODE = 1;</code>
+       */
+      DRAIN_MODE(1),
+      /**
+       * <code>RESUME = 2;</code>
+       */
+      RESUME(2),
+      /**
+       * <code>STOP = 3;</code>
+       */
+      STOP(3),
+      /**
+       * <code>FORCE_KILL = 4;</code>
+       */
+      FORCE_KILL(4),
+      ;
+
+      /**
+       * <code>DRAIN_MODE = 1;</code>
+       */
+      public static final int DRAIN_MODE_VALUE = 1;
+      /**
+       * <code>RESUME = 2;</code>
+       */
+      public static final int RESUME_VALUE = 2;
+      /**
+       * <code>STOP = 3;</code>
+       */
+      public static final int STOP_VALUE = 3;
+      /**
+       * <code>FORCE_KILL = 4;</code>
+       */
+      public static final int FORCE_KILL_VALUE = 4;
+
+
+      public final int getNumber() {
+        return value;
+      }
+
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static PowerRequestTypeProto valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static PowerRequestTypeProto forNumber(int value) {
+        switch (value) {
+          case 1: return DRAIN_MODE;
+          case 2: return RESUME;
+          case 3: return STOP;
+          case 4: return FORCE_KILL;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<PowerRequestTypeProto>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static final com.google.protobuf.Internal.EnumLiteMap<
+          PowerRequestTypeProto> internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<PowerRequestTypeProto>() {
+              public PowerRequestTypeProto findValueByNumber(int number) {
+                return PowerRequestTypeProto.forNumber(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(ordinal());
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final PowerRequestTypeProto[] VALUES = values();
+
+      public static PowerRequestTypeProto valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int value;
+
+      private PowerRequestTypeProto(int value) {
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:ManageSessionPoolMsgInProto.PowerRequestTypeProto)
+    }
+
+    private int bitField0_;
+    public static final int SESSIONPOOLID_FIELD_NUMBER = 1;
+    private volatile java.lang.Object sessionPoolId_;
+    /**
+     * <code>optional string sessionPoolId = 1;</code>
+     */
+    public boolean hasSessionPoolId() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional string sessionPoolId = 1;</code>
+     */
+    public java.lang.String getSessionPoolId() {
+      java.lang.Object ref = sessionPoolId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          sessionPoolId_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string sessionPoolId = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getSessionPoolIdBytes() {
+      java.lang.Object ref = sessionPoolId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        sessionPoolId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int POWERREQUESTTYPE_FIELD_NUMBER = 2;
+    private int powerRequestType_;
+    /**
+     * <code>optional .ManageSessionPoolMsgInProto.PowerRequestTypeProto powerRequestType = 2;</code>
+     */
+    public boolean hasPowerRequestType() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional .ManageSessionPoolMsgInProto.PowerRequestTypeProto powerRequestType = 2;</code>
+     */
+    public org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.PowerRequestTypeProto getPowerRequestType() {
+      @SuppressWarnings("deprecation")
+      org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.PowerRequestTypeProto result = org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.PowerRequestTypeProto.valueOf(powerRequestType_);
+      return result == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.PowerRequestTypeProto.DRAIN_MODE : result;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, sessionPoolId_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeEnum(2, powerRequestType_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, sessionPoolId_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(2, powerRequestType_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto)) {
+        return super.equals(obj);
+      }
+      org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto other = (org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto) obj;
+
+      boolean result = true;
+      result = result && (hasSessionPoolId() == other.hasSessionPoolId());
+      if (hasSessionPoolId()) {
+        result = result && getSessionPoolId()
+            .equals(other.getSessionPoolId());
+      }
+      result = result && (hasPowerRequestType() == other.hasPowerRequestType());
+      if (hasPowerRequestType()) {
+        result = result && powerRequestType_ == other.powerRequestType_;
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasSessionPoolId()) {
+        hash = (37 * hash) + SESSIONPOOLID_FIELD_NUMBER;
+        hash = (53 * hash) + getSessionPoolId().hashCode();
+      }
+      if (hasPowerRequestType()) {
+        hash = (37 * hash) + POWERREQUESTTYPE_FIELD_NUMBER;
+        hash = (53 * hash) + powerRequestType_;
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code ManageSessionPoolMsgInProto}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:ManageSessionPoolMsgInProto)
+        org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProtoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_ManageSessionPoolMsgInProto_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_ManageSessionPoolMsgInProto_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.class, org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.Builder.class);
+      }
+
+      // Construct using org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        sessionPoolId_ = "";
+        bitField0_ = (bitField0_ & ~0x00000001);
+        powerRequestType_ = 1;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.webswing.model.adminconsole.proto.AdminConsoleProto.internal_static_ManageSessionPoolMsgInProto_descriptor;
+      }
+
+      @java.lang.Override
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto getDefaultInstanceForType() {
+        return org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto build() {
+        org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto buildPartial() {
+        org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto result = new org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.sessionPoolId_ = sessionPoolId_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.powerRequestType_ = powerRequestType_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto) {
+          return mergeFrom((org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto other) {
+        if (other == org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.getDefaultInstance()) return this;
+        if (other.hasSessionPoolId()) {
+          bitField0_ |= 0x00000001;
+          sessionPoolId_ = other.sessionPoolId_;
+          onChanged();
+        }
+        if (other.hasPowerRequestType()) {
+          setPowerRequestType(other.getPowerRequestType());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object sessionPoolId_ = "";
+      /**
+       * <code>optional string sessionPoolId = 1;</code>
+       */
+      public boolean hasSessionPoolId() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional string sessionPoolId = 1;</code>
+       */
+      public java.lang.String getSessionPoolId() {
+        java.lang.Object ref = sessionPoolId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            sessionPoolId_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string sessionPoolId = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getSessionPoolIdBytes() {
+        java.lang.Object ref = sessionPoolId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          sessionPoolId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string sessionPoolId = 1;</code>
+       */
+      public Builder setSessionPoolId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        sessionPoolId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string sessionPoolId = 1;</code>
+       */
+      public Builder clearSessionPoolId() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        sessionPoolId_ = getDefaultInstance().getSessionPoolId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string sessionPoolId = 1;</code>
+       */
+      public Builder setSessionPoolIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        sessionPoolId_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int powerRequestType_ = 1;
+      /**
+       * <code>optional .ManageSessionPoolMsgInProto.PowerRequestTypeProto powerRequestType = 2;</code>
+       */
+      public boolean hasPowerRequestType() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional .ManageSessionPoolMsgInProto.PowerRequestTypeProto powerRequestType = 2;</code>
+       */
+      public org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.PowerRequestTypeProto getPowerRequestType() {
+        @SuppressWarnings("deprecation")
+        org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.PowerRequestTypeProto result = org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.PowerRequestTypeProto.valueOf(powerRequestType_);
+        return result == null ? org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.PowerRequestTypeProto.DRAIN_MODE : result;
+      }
+      /**
+       * <code>optional .ManageSessionPoolMsgInProto.PowerRequestTypeProto powerRequestType = 2;</code>
+       */
+      public Builder setPowerRequestType(org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto.PowerRequestTypeProto value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000002;
+        powerRequestType_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .ManageSessionPoolMsgInProto.PowerRequestTypeProto powerRequestType = 2;</code>
+       */
+      public Builder clearPowerRequestType() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        powerRequestType_ = 1;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:ManageSessionPoolMsgInProto)
+    }
+
+    // @@protoc_insertion_point(class_scope:ManageSessionPoolMsgInProto)
+    private static final org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto();
+    }
+
+    public static org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<ManageSessionPoolMsgInProto>
+        PARSER = new com.google.protobuf.AbstractParser<ManageSessionPoolMsgInProto>() {
+      @java.lang.Override
+      public ManageSessionPoolMsgInProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new ManageSessionPoolMsgInProto(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<ManageSessionPoolMsgInProto> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ManageSessionPoolMsgInProto> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public org.webswing.model.adminconsole.proto.AdminConsoleProto.ManageSessionPoolMsgInProto getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -29866,152 +31046,161 @@ public final class AdminConsoleProto {
     long getDisconnectedSince();
 
     /**
-     * <code>optional bool recorded = 14;</code>
+     * <code>optional .commonProto.RecordingStatusEnumProto recordingStatus = 14;</code>
      */
-    boolean hasRecorded();
+    boolean hasRecordingStatus();
     /**
-     * <code>optional bool recorded = 14;</code>
+     * <code>optional .commonProto.RecordingStatusEnumProto recordingStatus = 14;</code>
      */
-    boolean getRecorded();
+    org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto getRecordingStatus();
 
     /**
-     * <code>optional string recordingFile = 15;</code>
+     * <code>optional .commonProto.MirroringStatusEnumProto mirroringStatus = 15;</code>
+     */
+    boolean hasMirroringStatus();
+    /**
+     * <code>optional .commonProto.MirroringStatusEnumProto mirroringStatus = 15;</code>
+     */
+    org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto getMirroringStatus();
+
+    /**
+     * <code>optional string recordingFile = 16;</code>
      */
     boolean hasRecordingFile();
     /**
-     * <code>optional string recordingFile = 15;</code>
+     * <code>optional string recordingFile = 16;</code>
      */
     java.lang.String getRecordingFile();
     /**
-     * <code>optional string recordingFile = 15;</code>
+     * <code>optional string recordingFile = 16;</code>
      */
     com.google.protobuf.ByteString
         getRecordingFileBytes();
 
     /**
-     * <code>optional bool loggingEnabled = 16;</code>
+     * <code>optional bool loggingEnabled = 17;</code>
      */
     boolean hasLoggingEnabled();
     /**
-     * <code>optional bool loggingEnabled = 16;</code>
+     * <code>optional bool loggingEnabled = 17;</code>
      */
     boolean getLoggingEnabled();
 
     /**
-     * <code>optional bool statisticsLoggingEnabled = 17;</code>
+     * <code>optional bool statisticsLoggingEnabled = 18;</code>
      */
     boolean hasStatisticsLoggingEnabled();
     /**
-     * <code>optional bool statisticsLoggingEnabled = 17;</code>
+     * <code>optional bool statisticsLoggingEnabled = 18;</code>
      */
     boolean getStatisticsLoggingEnabled();
 
     /**
-     * <code>repeated string warnings = 18;</code>
+     * <code>repeated string warnings = 19;</code>
      */
     java.util.List<java.lang.String>
         getWarningsList();
     /**
-     * <code>repeated string warnings = 18;</code>
+     * <code>repeated string warnings = 19;</code>
      */
     int getWarningsCount();
     /**
-     * <code>repeated string warnings = 18;</code>
+     * <code>repeated string warnings = 19;</code>
      */
     java.lang.String getWarnings(int index);
     /**
-     * <code>repeated string warnings = 18;</code>
+     * <code>repeated string warnings = 19;</code>
      */
     com.google.protobuf.ByteString
         getWarningsBytes(int index);
 
     /**
-     * <code>repeated string warningHistory = 19;</code>
+     * <code>repeated string warningHistory = 20;</code>
      */
     java.util.List<java.lang.String>
         getWarningHistoryList();
     /**
-     * <code>repeated string warningHistory = 19;</code>
+     * <code>repeated string warningHistory = 20;</code>
      */
     int getWarningHistoryCount();
     /**
-     * <code>repeated string warningHistory = 19;</code>
+     * <code>repeated string warningHistory = 20;</code>
      */
     java.lang.String getWarningHistory(int index);
     /**
-     * <code>repeated string warningHistory = 19;</code>
+     * <code>repeated string warningHistory = 20;</code>
      */
     com.google.protobuf.ByteString
         getWarningHistoryBytes(int index);
 
     /**
-     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
      */
     java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto> 
         getThreadDumpsList();
     /**
-     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto getThreadDumps(int index);
     /**
-     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
      */
     int getThreadDumpsCount();
     /**
-     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
      */
     java.util.List<? extends org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProtoOrBuilder> 
         getThreadDumpsOrBuilderList();
     /**
-     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProtoOrBuilder getThreadDumpsOrBuilder(
         int index);
 
     /**
-     * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+     * <code>repeated .MetricMsgOutProto metrics = 22;</code>
      */
     java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto> 
         getMetricsList();
     /**
-     * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+     * <code>repeated .MetricMsgOutProto metrics = 22;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto getMetrics(int index);
     /**
-     * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+     * <code>repeated .MetricMsgOutProto metrics = 22;</code>
      */
     int getMetricsCount();
     /**
-     * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+     * <code>repeated .MetricMsgOutProto metrics = 22;</code>
      */
     java.util.List<? extends org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProtoOrBuilder> 
         getMetricsOrBuilderList();
     /**
-     * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+     * <code>repeated .MetricMsgOutProto metrics = 22;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProtoOrBuilder getMetricsOrBuilder(
         int index);
 
     /**
-     * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+     * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
      */
     java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto> 
         getStatsList();
     /**
-     * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+     * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto getStats(int index);
     /**
-     * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+     * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
      */
     int getStatsCount();
     /**
-     * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+     * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
      */
     java.util.List<? extends org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProtoOrBuilder> 
         getStatsOrBuilderList();
     /**
-     * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+     * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProtoOrBuilder getStatsOrBuilder(
         int index);
@@ -30042,7 +31231,8 @@ public final class AdminConsoleProto {
       connected_ = false;
       applet_ = false;
       disconnectedSince_ = 0L;
-      recorded_ = false;
+      recordingStatus_ = 1;
+      mirroringStatus_ = 1;
       recordingFile_ = "";
       loggingEnabled_ = false;
       statisticsLoggingEnabled_ = false;
@@ -30157,66 +31347,85 @@ public final class AdminConsoleProto {
               break;
             }
             case 112: {
-              bitField0_ |= 0x00002000;
-              recorded_ = input.readBool();
+              int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
+              org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto value = org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(14, rawValue);
+              } else {
+                bitField0_ |= 0x00002000;
+                recordingStatus_ = rawValue;
+              }
               break;
             }
-            case 122: {
+            case 120: {
+              int rawValue = input.readEnum();
+                @SuppressWarnings("deprecation")
+              org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto value = org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(15, rawValue);
+              } else {
+                bitField0_ |= 0x00004000;
+                mirroringStatus_ = rawValue;
+              }
+              break;
+            }
+            case 130: {
               com.google.protobuf.ByteString bs = input.readBytes();
-              bitField0_ |= 0x00004000;
-              recordingFile_ = bs;
-              break;
-            }
-            case 128: {
               bitField0_ |= 0x00008000;
-              loggingEnabled_ = input.readBool();
+              recordingFile_ = bs;
               break;
             }
             case 136: {
               bitField0_ |= 0x00010000;
-              statisticsLoggingEnabled_ = input.readBool();
+              loggingEnabled_ = input.readBool();
               break;
             }
-            case 146: {
-              com.google.protobuf.ByteString bs = input.readBytes();
-              if (!((mutable_bitField0_ & 0x00020000) == 0x00020000)) {
-                warnings_ = new com.google.protobuf.LazyStringArrayList();
-                mutable_bitField0_ |= 0x00020000;
-              }
-              warnings_.add(bs);
+            case 144: {
+              bitField0_ |= 0x00020000;
+              statisticsLoggingEnabled_ = input.readBool();
               break;
             }
             case 154: {
               com.google.protobuf.ByteString bs = input.readBytes();
               if (!((mutable_bitField0_ & 0x00040000) == 0x00040000)) {
-                warningHistory_ = new com.google.protobuf.LazyStringArrayList();
+                warnings_ = new com.google.protobuf.LazyStringArrayList();
                 mutable_bitField0_ |= 0x00040000;
+              }
+              warnings_.add(bs);
+              break;
+            }
+            case 162: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              if (!((mutable_bitField0_ & 0x00080000) == 0x00080000)) {
+                warningHistory_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00080000;
               }
               warningHistory_.add(bs);
               break;
             }
-            case 162: {
-              if (!((mutable_bitField0_ & 0x00080000) == 0x00080000)) {
+            case 170: {
+              if (!((mutable_bitField0_ & 0x00100000) == 0x00100000)) {
                 threadDumps_ = new java.util.ArrayList<org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto>();
-                mutable_bitField0_ |= 0x00080000;
+                mutable_bitField0_ |= 0x00100000;
               }
               threadDumps_.add(
                   input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto.PARSER, extensionRegistry));
               break;
             }
-            case 170: {
-              if (!((mutable_bitField0_ & 0x00100000) == 0x00100000)) {
+            case 178: {
+              if (!((mutable_bitField0_ & 0x00200000) == 0x00200000)) {
                 metrics_ = new java.util.ArrayList<org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto>();
-                mutable_bitField0_ |= 0x00100000;
+                mutable_bitField0_ |= 0x00200000;
               }
               metrics_.add(
                   input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto.PARSER, extensionRegistry));
               break;
             }
-            case 178: {
-              if (!((mutable_bitField0_ & 0x00200000) == 0x00200000)) {
+            case 186: {
+              if (!((mutable_bitField0_ & 0x00400000) == 0x00400000)) {
                 stats_ = new java.util.ArrayList<org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto>();
-                mutable_bitField0_ |= 0x00200000;
+                mutable_bitField0_ |= 0x00400000;
               }
               stats_.add(
                   input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto.PARSER, extensionRegistry));
@@ -30237,19 +31446,19 @@ public final class AdminConsoleProto {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00020000) == 0x00020000)) {
+        if (((mutable_bitField0_ & 0x00040000) == 0x00040000)) {
           warnings_ = warnings_.getUnmodifiableView();
         }
-        if (((mutable_bitField0_ & 0x00040000) == 0x00040000)) {
+        if (((mutable_bitField0_ & 0x00080000) == 0x00080000)) {
           warningHistory_ = warningHistory_.getUnmodifiableView();
         }
-        if (((mutable_bitField0_ & 0x00080000) == 0x00080000)) {
+        if (((mutable_bitField0_ & 0x00100000) == 0x00100000)) {
           threadDumps_ = java.util.Collections.unmodifiableList(threadDumps_);
         }
-        if (((mutable_bitField0_ & 0x00100000) == 0x00100000)) {
+        if (((mutable_bitField0_ & 0x00200000) == 0x00200000)) {
           metrics_ = java.util.Collections.unmodifiableList(metrics_);
         }
-        if (((mutable_bitField0_ & 0x00200000) == 0x00200000)) {
+        if (((mutable_bitField0_ & 0x00400000) == 0x00400000)) {
           stats_ = java.util.Collections.unmodifiableList(stats_);
         }
         this.unknownFields = unknownFields.build();
@@ -30773,31 +31982,50 @@ public final class AdminConsoleProto {
       return disconnectedSince_;
     }
 
-    public static final int RECORDED_FIELD_NUMBER = 14;
-    private boolean recorded_;
+    public static final int RECORDINGSTATUS_FIELD_NUMBER = 14;
+    private int recordingStatus_;
     /**
-     * <code>optional bool recorded = 14;</code>
+     * <code>optional .commonProto.RecordingStatusEnumProto recordingStatus = 14;</code>
      */
-    public boolean hasRecorded() {
+    public boolean hasRecordingStatus() {
       return ((bitField0_ & 0x00002000) == 0x00002000);
     }
     /**
-     * <code>optional bool recorded = 14;</code>
+     * <code>optional .commonProto.RecordingStatusEnumProto recordingStatus = 14;</code>
      */
-    public boolean getRecorded() {
-      return recorded_;
+    public org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto getRecordingStatus() {
+      @SuppressWarnings("deprecation")
+      org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto result = org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto.valueOf(recordingStatus_);
+      return result == null ? org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto.NOT_RECORDING : result;
     }
 
-    public static final int RECORDINGFILE_FIELD_NUMBER = 15;
-    private volatile java.lang.Object recordingFile_;
+    public static final int MIRRORINGSTATUS_FIELD_NUMBER = 15;
+    private int mirroringStatus_;
     /**
-     * <code>optional string recordingFile = 15;</code>
+     * <code>optional .commonProto.MirroringStatusEnumProto mirroringStatus = 15;</code>
      */
-    public boolean hasRecordingFile() {
+    public boolean hasMirroringStatus() {
       return ((bitField0_ & 0x00004000) == 0x00004000);
     }
     /**
-     * <code>optional string recordingFile = 15;</code>
+     * <code>optional .commonProto.MirroringStatusEnumProto mirroringStatus = 15;</code>
+     */
+    public org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto getMirroringStatus() {
+      @SuppressWarnings("deprecation")
+      org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto result = org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto.valueOf(mirroringStatus_);
+      return result == null ? org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto.NOT_MIRRORING : result;
+    }
+
+    public static final int RECORDINGFILE_FIELD_NUMBER = 16;
+    private volatile java.lang.Object recordingFile_;
+    /**
+     * <code>optional string recordingFile = 16;</code>
+     */
+    public boolean hasRecordingFile() {
+      return ((bitField0_ & 0x00008000) == 0x00008000);
+    }
+    /**
+     * <code>optional string recordingFile = 16;</code>
      */
     public java.lang.String getRecordingFile() {
       java.lang.Object ref = recordingFile_;
@@ -30814,7 +32042,7 @@ public final class AdminConsoleProto {
       }
     }
     /**
-     * <code>optional string recordingFile = 15;</code>
+     * <code>optional string recordingFile = 16;</code>
      */
     public com.google.protobuf.ByteString
         getRecordingFileBytes() {
@@ -30830,193 +32058,193 @@ public final class AdminConsoleProto {
       }
     }
 
-    public static final int LOGGINGENABLED_FIELD_NUMBER = 16;
+    public static final int LOGGINGENABLED_FIELD_NUMBER = 17;
     private boolean loggingEnabled_;
     /**
-     * <code>optional bool loggingEnabled = 16;</code>
+     * <code>optional bool loggingEnabled = 17;</code>
      */
     public boolean hasLoggingEnabled() {
-      return ((bitField0_ & 0x00008000) == 0x00008000);
+      return ((bitField0_ & 0x00010000) == 0x00010000);
     }
     /**
-     * <code>optional bool loggingEnabled = 16;</code>
+     * <code>optional bool loggingEnabled = 17;</code>
      */
     public boolean getLoggingEnabled() {
       return loggingEnabled_;
     }
 
-    public static final int STATISTICSLOGGINGENABLED_FIELD_NUMBER = 17;
+    public static final int STATISTICSLOGGINGENABLED_FIELD_NUMBER = 18;
     private boolean statisticsLoggingEnabled_;
     /**
-     * <code>optional bool statisticsLoggingEnabled = 17;</code>
+     * <code>optional bool statisticsLoggingEnabled = 18;</code>
      */
     public boolean hasStatisticsLoggingEnabled() {
-      return ((bitField0_ & 0x00010000) == 0x00010000);
+      return ((bitField0_ & 0x00020000) == 0x00020000);
     }
     /**
-     * <code>optional bool statisticsLoggingEnabled = 17;</code>
+     * <code>optional bool statisticsLoggingEnabled = 18;</code>
      */
     public boolean getStatisticsLoggingEnabled() {
       return statisticsLoggingEnabled_;
     }
 
-    public static final int WARNINGS_FIELD_NUMBER = 18;
+    public static final int WARNINGS_FIELD_NUMBER = 19;
     private com.google.protobuf.LazyStringList warnings_;
     /**
-     * <code>repeated string warnings = 18;</code>
+     * <code>repeated string warnings = 19;</code>
      */
     public com.google.protobuf.ProtocolStringList
         getWarningsList() {
       return warnings_;
     }
     /**
-     * <code>repeated string warnings = 18;</code>
+     * <code>repeated string warnings = 19;</code>
      */
     public int getWarningsCount() {
       return warnings_.size();
     }
     /**
-     * <code>repeated string warnings = 18;</code>
+     * <code>repeated string warnings = 19;</code>
      */
     public java.lang.String getWarnings(int index) {
       return warnings_.get(index);
     }
     /**
-     * <code>repeated string warnings = 18;</code>
+     * <code>repeated string warnings = 19;</code>
      */
     public com.google.protobuf.ByteString
         getWarningsBytes(int index) {
       return warnings_.getByteString(index);
     }
 
-    public static final int WARNINGHISTORY_FIELD_NUMBER = 19;
+    public static final int WARNINGHISTORY_FIELD_NUMBER = 20;
     private com.google.protobuf.LazyStringList warningHistory_;
     /**
-     * <code>repeated string warningHistory = 19;</code>
+     * <code>repeated string warningHistory = 20;</code>
      */
     public com.google.protobuf.ProtocolStringList
         getWarningHistoryList() {
       return warningHistory_;
     }
     /**
-     * <code>repeated string warningHistory = 19;</code>
+     * <code>repeated string warningHistory = 20;</code>
      */
     public int getWarningHistoryCount() {
       return warningHistory_.size();
     }
     /**
-     * <code>repeated string warningHistory = 19;</code>
+     * <code>repeated string warningHistory = 20;</code>
      */
     public java.lang.String getWarningHistory(int index) {
       return warningHistory_.get(index);
     }
     /**
-     * <code>repeated string warningHistory = 19;</code>
+     * <code>repeated string warningHistory = 20;</code>
      */
     public com.google.protobuf.ByteString
         getWarningHistoryBytes(int index) {
       return warningHistory_.getByteString(index);
     }
 
-    public static final int THREADDUMPS_FIELD_NUMBER = 20;
+    public static final int THREADDUMPS_FIELD_NUMBER = 21;
     private java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto> threadDumps_;
     /**
-     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
      */
     public java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto> getThreadDumpsList() {
       return threadDumps_;
     }
     /**
-     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
      */
     public java.util.List<? extends org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProtoOrBuilder> 
         getThreadDumpsOrBuilderList() {
       return threadDumps_;
     }
     /**
-     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
      */
     public int getThreadDumpsCount() {
       return threadDumps_.size();
     }
     /**
-     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto getThreadDumps(int index) {
       return threadDumps_.get(index);
     }
     /**
-     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+     * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProtoOrBuilder getThreadDumpsOrBuilder(
         int index) {
       return threadDumps_.get(index);
     }
 
-    public static final int METRICS_FIELD_NUMBER = 21;
+    public static final int METRICS_FIELD_NUMBER = 22;
     private java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto> metrics_;
     /**
-     * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+     * <code>repeated .MetricMsgOutProto metrics = 22;</code>
      */
     public java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto> getMetricsList() {
       return metrics_;
     }
     /**
-     * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+     * <code>repeated .MetricMsgOutProto metrics = 22;</code>
      */
     public java.util.List<? extends org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProtoOrBuilder> 
         getMetricsOrBuilderList() {
       return metrics_;
     }
     /**
-     * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+     * <code>repeated .MetricMsgOutProto metrics = 22;</code>
      */
     public int getMetricsCount() {
       return metrics_.size();
     }
     /**
-     * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+     * <code>repeated .MetricMsgOutProto metrics = 22;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto getMetrics(int index) {
       return metrics_.get(index);
     }
     /**
-     * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+     * <code>repeated .MetricMsgOutProto metrics = 22;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProtoOrBuilder getMetricsOrBuilder(
         int index) {
       return metrics_.get(index);
     }
 
-    public static final int STATS_FIELD_NUMBER = 22;
+    public static final int STATS_FIELD_NUMBER = 23;
     private java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto> stats_;
     /**
-     * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+     * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
      */
     public java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto> getStatsList() {
       return stats_;
     }
     /**
-     * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+     * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
      */
     public java.util.List<? extends org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProtoOrBuilder> 
         getStatsOrBuilderList() {
       return stats_;
     }
     /**
-     * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+     * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
      */
     public int getStatsCount() {
       return stats_.size();
     }
     /**
-     * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+     * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto getStats(int index) {
       return stats_.get(index);
     }
     /**
-     * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+     * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProtoOrBuilder getStatsOrBuilder(
         int index) {
@@ -31077,31 +32305,34 @@ public final class AdminConsoleProto {
         output.writeSInt64(13, disconnectedSince_);
       }
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
-        output.writeBool(14, recorded_);
+        output.writeEnum(14, recordingStatus_);
       }
       if (((bitField0_ & 0x00004000) == 0x00004000)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 15, recordingFile_);
+        output.writeEnum(15, mirroringStatus_);
       }
       if (((bitField0_ & 0x00008000) == 0x00008000)) {
-        output.writeBool(16, loggingEnabled_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 16, recordingFile_);
       }
       if (((bitField0_ & 0x00010000) == 0x00010000)) {
-        output.writeBool(17, statisticsLoggingEnabled_);
+        output.writeBool(17, loggingEnabled_);
+      }
+      if (((bitField0_ & 0x00020000) == 0x00020000)) {
+        output.writeBool(18, statisticsLoggingEnabled_);
       }
       for (int i = 0; i < warnings_.size(); i++) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 18, warnings_.getRaw(i));
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 19, warnings_.getRaw(i));
       }
       for (int i = 0; i < warningHistory_.size(); i++) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 19, warningHistory_.getRaw(i));
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 20, warningHistory_.getRaw(i));
       }
       for (int i = 0; i < threadDumps_.size(); i++) {
-        output.writeMessage(20, threadDumps_.get(i));
+        output.writeMessage(21, threadDumps_.get(i));
       }
       for (int i = 0; i < metrics_.size(); i++) {
-        output.writeMessage(21, metrics_.get(i));
+        output.writeMessage(22, metrics_.get(i));
       }
       for (int i = 0; i < stats_.size(); i++) {
-        output.writeMessage(22, stats_.get(i));
+        output.writeMessage(23, stats_.get(i));
       }
       unknownFields.writeTo(output);
     }
@@ -31159,18 +32390,22 @@ public final class AdminConsoleProto {
       }
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(14, recorded_);
+          .computeEnumSize(14, recordingStatus_);
       }
       if (((bitField0_ & 0x00004000) == 0x00004000)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(15, recordingFile_);
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(15, mirroringStatus_);
       }
       if (((bitField0_ & 0x00008000) == 0x00008000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(16, loggingEnabled_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(16, recordingFile_);
       }
       if (((bitField0_ & 0x00010000) == 0x00010000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(17, statisticsLoggingEnabled_);
+          .computeBoolSize(17, loggingEnabled_);
+      }
+      if (((bitField0_ & 0x00020000) == 0x00020000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(18, statisticsLoggingEnabled_);
       }
       {
         int dataSize = 0;
@@ -31190,15 +32425,15 @@ public final class AdminConsoleProto {
       }
       for (int i = 0; i < threadDumps_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(20, threadDumps_.get(i));
+          .computeMessageSize(21, threadDumps_.get(i));
       }
       for (int i = 0; i < metrics_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(21, metrics_.get(i));
+          .computeMessageSize(22, metrics_.get(i));
       }
       for (int i = 0; i < stats_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(22, stats_.get(i));
+          .computeMessageSize(23, stats_.get(i));
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -31280,10 +32515,13 @@ public final class AdminConsoleProto {
         result = result && (getDisconnectedSince()
             == other.getDisconnectedSince());
       }
-      result = result && (hasRecorded() == other.hasRecorded());
-      if (hasRecorded()) {
-        result = result && (getRecorded()
-            == other.getRecorded());
+      result = result && (hasRecordingStatus() == other.hasRecordingStatus());
+      if (hasRecordingStatus()) {
+        result = result && recordingStatus_ == other.recordingStatus_;
+      }
+      result = result && (hasMirroringStatus() == other.hasMirroringStatus());
+      if (hasMirroringStatus()) {
+        result = result && mirroringStatus_ == other.mirroringStatus_;
       }
       result = result && (hasRecordingFile() == other.hasRecordingFile());
       if (hasRecordingFile()) {
@@ -31378,10 +32616,13 @@ public final class AdminConsoleProto {
         hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
             getDisconnectedSince());
       }
-      if (hasRecorded()) {
-        hash = (37 * hash) + RECORDED_FIELD_NUMBER;
-        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-            getRecorded());
+      if (hasRecordingStatus()) {
+        hash = (37 * hash) + RECORDINGSTATUS_FIELD_NUMBER;
+        hash = (53 * hash) + recordingStatus_;
+      }
+      if (hasMirroringStatus()) {
+        hash = (37 * hash) + MIRRORINGSTATUS_FIELD_NUMBER;
+        hash = (53 * hash) + mirroringStatus_;
       }
       if (hasRecordingFile()) {
         hash = (37 * hash) + RECORDINGFILE_FIELD_NUMBER;
@@ -31579,33 +32820,35 @@ public final class AdminConsoleProto {
         bitField0_ = (bitField0_ & ~0x00000800);
         disconnectedSince_ = 0L;
         bitField0_ = (bitField0_ & ~0x00001000);
-        recorded_ = false;
+        recordingStatus_ = 1;
         bitField0_ = (bitField0_ & ~0x00002000);
-        recordingFile_ = "";
+        mirroringStatus_ = 1;
         bitField0_ = (bitField0_ & ~0x00004000);
-        loggingEnabled_ = false;
+        recordingFile_ = "";
         bitField0_ = (bitField0_ & ~0x00008000);
-        statisticsLoggingEnabled_ = false;
+        loggingEnabled_ = false;
         bitField0_ = (bitField0_ & ~0x00010000);
-        warnings_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        statisticsLoggingEnabled_ = false;
         bitField0_ = (bitField0_ & ~0x00020000);
-        warningHistory_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        warnings_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00040000);
+        warningHistory_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00080000);
         if (threadDumpsBuilder_ == null) {
           threadDumps_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00080000);
+          bitField0_ = (bitField0_ & ~0x00100000);
         } else {
           threadDumpsBuilder_.clear();
         }
         if (metricsBuilder_ == null) {
           metrics_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00100000);
+          bitField0_ = (bitField0_ & ~0x00200000);
         } else {
           metricsBuilder_.clear();
         }
         if (statsBuilder_ == null) {
           stats_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00200000);
+          bitField0_ = (bitField0_ & ~0x00400000);
         } else {
           statsBuilder_.clear();
         }
@@ -31692,51 +32935,55 @@ public final class AdminConsoleProto {
         if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
           to_bitField0_ |= 0x00002000;
         }
-        result.recorded_ = recorded_;
+        result.recordingStatus_ = recordingStatus_;
         if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
           to_bitField0_ |= 0x00004000;
         }
-        result.recordingFile_ = recordingFile_;
+        result.mirroringStatus_ = mirroringStatus_;
         if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
           to_bitField0_ |= 0x00008000;
         }
-        result.loggingEnabled_ = loggingEnabled_;
+        result.recordingFile_ = recordingFile_;
         if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
           to_bitField0_ |= 0x00010000;
         }
+        result.loggingEnabled_ = loggingEnabled_;
+        if (((from_bitField0_ & 0x00020000) == 0x00020000)) {
+          to_bitField0_ |= 0x00020000;
+        }
         result.statisticsLoggingEnabled_ = statisticsLoggingEnabled_;
-        if (((bitField0_ & 0x00020000) == 0x00020000)) {
+        if (((bitField0_ & 0x00040000) == 0x00040000)) {
           warnings_ = warnings_.getUnmodifiableView();
-          bitField0_ = (bitField0_ & ~0x00020000);
+          bitField0_ = (bitField0_ & ~0x00040000);
         }
         result.warnings_ = warnings_;
-        if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        if (((bitField0_ & 0x00080000) == 0x00080000)) {
           warningHistory_ = warningHistory_.getUnmodifiableView();
-          bitField0_ = (bitField0_ & ~0x00040000);
+          bitField0_ = (bitField0_ & ~0x00080000);
         }
         result.warningHistory_ = warningHistory_;
         if (threadDumpsBuilder_ == null) {
-          if (((bitField0_ & 0x00080000) == 0x00080000)) {
+          if (((bitField0_ & 0x00100000) == 0x00100000)) {
             threadDumps_ = java.util.Collections.unmodifiableList(threadDumps_);
-            bitField0_ = (bitField0_ & ~0x00080000);
+            bitField0_ = (bitField0_ & ~0x00100000);
           }
           result.threadDumps_ = threadDumps_;
         } else {
           result.threadDumps_ = threadDumpsBuilder_.build();
         }
         if (metricsBuilder_ == null) {
-          if (((bitField0_ & 0x00100000) == 0x00100000)) {
+          if (((bitField0_ & 0x00200000) == 0x00200000)) {
             metrics_ = java.util.Collections.unmodifiableList(metrics_);
-            bitField0_ = (bitField0_ & ~0x00100000);
+            bitField0_ = (bitField0_ & ~0x00200000);
           }
           result.metrics_ = metrics_;
         } else {
           result.metrics_ = metricsBuilder_.build();
         }
         if (statsBuilder_ == null) {
-          if (((bitField0_ & 0x00200000) == 0x00200000)) {
+          if (((bitField0_ & 0x00400000) == 0x00400000)) {
             stats_ = java.util.Collections.unmodifiableList(stats_);
-            bitField0_ = (bitField0_ & ~0x00200000);
+            bitField0_ = (bitField0_ & ~0x00400000);
           }
           result.stats_ = stats_;
         } else {
@@ -31844,11 +33091,14 @@ public final class AdminConsoleProto {
         if (other.hasDisconnectedSince()) {
           setDisconnectedSince(other.getDisconnectedSince());
         }
-        if (other.hasRecorded()) {
-          setRecorded(other.getRecorded());
+        if (other.hasRecordingStatus()) {
+          setRecordingStatus(other.getRecordingStatus());
+        }
+        if (other.hasMirroringStatus()) {
+          setMirroringStatus(other.getMirroringStatus());
         }
         if (other.hasRecordingFile()) {
-          bitField0_ |= 0x00004000;
+          bitField0_ |= 0x00008000;
           recordingFile_ = other.recordingFile_;
           onChanged();
         }
@@ -31861,7 +33111,7 @@ public final class AdminConsoleProto {
         if (!other.warnings_.isEmpty()) {
           if (warnings_.isEmpty()) {
             warnings_ = other.warnings_;
-            bitField0_ = (bitField0_ & ~0x00020000);
+            bitField0_ = (bitField0_ & ~0x00040000);
           } else {
             ensureWarningsIsMutable();
             warnings_.addAll(other.warnings_);
@@ -31871,7 +33121,7 @@ public final class AdminConsoleProto {
         if (!other.warningHistory_.isEmpty()) {
           if (warningHistory_.isEmpty()) {
             warningHistory_ = other.warningHistory_;
-            bitField0_ = (bitField0_ & ~0x00040000);
+            bitField0_ = (bitField0_ & ~0x00080000);
           } else {
             ensureWarningHistoryIsMutable();
             warningHistory_.addAll(other.warningHistory_);
@@ -31882,7 +33132,7 @@ public final class AdminConsoleProto {
           if (!other.threadDumps_.isEmpty()) {
             if (threadDumps_.isEmpty()) {
               threadDumps_ = other.threadDumps_;
-              bitField0_ = (bitField0_ & ~0x00080000);
+              bitField0_ = (bitField0_ & ~0x00100000);
             } else {
               ensureThreadDumpsIsMutable();
               threadDumps_.addAll(other.threadDumps_);
@@ -31895,7 +33145,7 @@ public final class AdminConsoleProto {
               threadDumpsBuilder_.dispose();
               threadDumpsBuilder_ = null;
               threadDumps_ = other.threadDumps_;
-              bitField0_ = (bitField0_ & ~0x00080000);
+              bitField0_ = (bitField0_ & ~0x00100000);
               threadDumpsBuilder_ = 
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getThreadDumpsFieldBuilder() : null;
@@ -31908,7 +33158,7 @@ public final class AdminConsoleProto {
           if (!other.metrics_.isEmpty()) {
             if (metrics_.isEmpty()) {
               metrics_ = other.metrics_;
-              bitField0_ = (bitField0_ & ~0x00100000);
+              bitField0_ = (bitField0_ & ~0x00200000);
             } else {
               ensureMetricsIsMutable();
               metrics_.addAll(other.metrics_);
@@ -31921,7 +33171,7 @@ public final class AdminConsoleProto {
               metricsBuilder_.dispose();
               metricsBuilder_ = null;
               metrics_ = other.metrics_;
-              bitField0_ = (bitField0_ & ~0x00100000);
+              bitField0_ = (bitField0_ & ~0x00200000);
               metricsBuilder_ = 
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getMetricsFieldBuilder() : null;
@@ -31934,7 +33184,7 @@ public final class AdminConsoleProto {
           if (!other.stats_.isEmpty()) {
             if (stats_.isEmpty()) {
               stats_ = other.stats_;
-              bitField0_ = (bitField0_ & ~0x00200000);
+              bitField0_ = (bitField0_ & ~0x00400000);
             } else {
               ensureStatsIsMutable();
               stats_.addAll(other.stats_);
@@ -31947,7 +33197,7 @@ public final class AdminConsoleProto {
               statsBuilder_.dispose();
               statsBuilder_ = null;
               stats_ = other.stats_;
-              bitField0_ = (bitField0_ & ~0x00200000);
+              bitField0_ = (bitField0_ & ~0x00400000);
               statsBuilder_ = 
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getStatsFieldBuilder() : null;
@@ -32715,47 +33965,89 @@ public final class AdminConsoleProto {
         return this;
       }
 
-      private boolean recorded_ ;
+      private int recordingStatus_ = 1;
       /**
-       * <code>optional bool recorded = 14;</code>
+       * <code>optional .commonProto.RecordingStatusEnumProto recordingStatus = 14;</code>
        */
-      public boolean hasRecorded() {
+      public boolean hasRecordingStatus() {
         return ((bitField0_ & 0x00002000) == 0x00002000);
       }
       /**
-       * <code>optional bool recorded = 14;</code>
+       * <code>optional .commonProto.RecordingStatusEnumProto recordingStatus = 14;</code>
        */
-      public boolean getRecorded() {
-        return recorded_;
+      public org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto getRecordingStatus() {
+        @SuppressWarnings("deprecation")
+        org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto result = org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto.valueOf(recordingStatus_);
+        return result == null ? org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto.NOT_RECORDING : result;
       }
       /**
-       * <code>optional bool recorded = 14;</code>
+       * <code>optional .commonProto.RecordingStatusEnumProto recordingStatus = 14;</code>
        */
-      public Builder setRecorded(boolean value) {
+      public Builder setRecordingStatus(org.webswing.model.common.proto.CommonProto.RecordingStatusEnumProto value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
         bitField0_ |= 0x00002000;
-        recorded_ = value;
+        recordingStatus_ = value.getNumber();
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool recorded = 14;</code>
+       * <code>optional .commonProto.RecordingStatusEnumProto recordingStatus = 14;</code>
        */
-      public Builder clearRecorded() {
+      public Builder clearRecordingStatus() {
         bitField0_ = (bitField0_ & ~0x00002000);
-        recorded_ = false;
+        recordingStatus_ = 1;
+        onChanged();
+        return this;
+      }
+
+      private int mirroringStatus_ = 1;
+      /**
+       * <code>optional .commonProto.MirroringStatusEnumProto mirroringStatus = 15;</code>
+       */
+      public boolean hasMirroringStatus() {
+        return ((bitField0_ & 0x00004000) == 0x00004000);
+      }
+      /**
+       * <code>optional .commonProto.MirroringStatusEnumProto mirroringStatus = 15;</code>
+       */
+      public org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto getMirroringStatus() {
+        @SuppressWarnings("deprecation")
+        org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto result = org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto.valueOf(mirroringStatus_);
+        return result == null ? org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto.NOT_MIRRORING : result;
+      }
+      /**
+       * <code>optional .commonProto.MirroringStatusEnumProto mirroringStatus = 15;</code>
+       */
+      public Builder setMirroringStatus(org.webswing.model.common.proto.CommonProto.MirroringStatusEnumProto value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00004000;
+        mirroringStatus_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .commonProto.MirroringStatusEnumProto mirroringStatus = 15;</code>
+       */
+      public Builder clearMirroringStatus() {
+        bitField0_ = (bitField0_ & ~0x00004000);
+        mirroringStatus_ = 1;
         onChanged();
         return this;
       }
 
       private java.lang.Object recordingFile_ = "";
       /**
-       * <code>optional string recordingFile = 15;</code>
+       * <code>optional string recordingFile = 16;</code>
        */
       public boolean hasRecordingFile() {
-        return ((bitField0_ & 0x00004000) == 0x00004000);
+        return ((bitField0_ & 0x00008000) == 0x00008000);
       }
       /**
-       * <code>optional string recordingFile = 15;</code>
+       * <code>optional string recordingFile = 16;</code>
        */
       public java.lang.String getRecordingFile() {
         java.lang.Object ref = recordingFile_;
@@ -32772,7 +34064,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional string recordingFile = 15;</code>
+       * <code>optional string recordingFile = 16;</code>
        */
       public com.google.protobuf.ByteString
           getRecordingFileBytes() {
@@ -32788,36 +34080,36 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>optional string recordingFile = 15;</code>
+       * <code>optional string recordingFile = 16;</code>
        */
       public Builder setRecordingFile(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00004000;
+  bitField0_ |= 0x00008000;
         recordingFile_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string recordingFile = 15;</code>
+       * <code>optional string recordingFile = 16;</code>
        */
       public Builder clearRecordingFile() {
-        bitField0_ = (bitField0_ & ~0x00004000);
+        bitField0_ = (bitField0_ & ~0x00008000);
         recordingFile_ = getDefaultInstance().getRecordingFile();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string recordingFile = 15;</code>
+       * <code>optional string recordingFile = 16;</code>
        */
       public Builder setRecordingFileBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00004000;
+  bitField0_ |= 0x00008000;
         recordingFile_ = value;
         onChanged();
         return this;
@@ -32825,31 +34117,31 @@ public final class AdminConsoleProto {
 
       private boolean loggingEnabled_ ;
       /**
-       * <code>optional bool loggingEnabled = 16;</code>
+       * <code>optional bool loggingEnabled = 17;</code>
        */
       public boolean hasLoggingEnabled() {
-        return ((bitField0_ & 0x00008000) == 0x00008000);
+        return ((bitField0_ & 0x00010000) == 0x00010000);
       }
       /**
-       * <code>optional bool loggingEnabled = 16;</code>
+       * <code>optional bool loggingEnabled = 17;</code>
        */
       public boolean getLoggingEnabled() {
         return loggingEnabled_;
       }
       /**
-       * <code>optional bool loggingEnabled = 16;</code>
+       * <code>optional bool loggingEnabled = 17;</code>
        */
       public Builder setLoggingEnabled(boolean value) {
-        bitField0_ |= 0x00008000;
+        bitField0_ |= 0x00010000;
         loggingEnabled_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool loggingEnabled = 16;</code>
+       * <code>optional bool loggingEnabled = 17;</code>
        */
       public Builder clearLoggingEnabled() {
-        bitField0_ = (bitField0_ & ~0x00008000);
+        bitField0_ = (bitField0_ & ~0x00010000);
         loggingEnabled_ = false;
         onChanged();
         return this;
@@ -32857,31 +34149,31 @@ public final class AdminConsoleProto {
 
       private boolean statisticsLoggingEnabled_ ;
       /**
-       * <code>optional bool statisticsLoggingEnabled = 17;</code>
+       * <code>optional bool statisticsLoggingEnabled = 18;</code>
        */
       public boolean hasStatisticsLoggingEnabled() {
-        return ((bitField0_ & 0x00010000) == 0x00010000);
+        return ((bitField0_ & 0x00020000) == 0x00020000);
       }
       /**
-       * <code>optional bool statisticsLoggingEnabled = 17;</code>
+       * <code>optional bool statisticsLoggingEnabled = 18;</code>
        */
       public boolean getStatisticsLoggingEnabled() {
         return statisticsLoggingEnabled_;
       }
       /**
-       * <code>optional bool statisticsLoggingEnabled = 17;</code>
+       * <code>optional bool statisticsLoggingEnabled = 18;</code>
        */
       public Builder setStatisticsLoggingEnabled(boolean value) {
-        bitField0_ |= 0x00010000;
+        bitField0_ |= 0x00020000;
         statisticsLoggingEnabled_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool statisticsLoggingEnabled = 17;</code>
+       * <code>optional bool statisticsLoggingEnabled = 18;</code>
        */
       public Builder clearStatisticsLoggingEnabled() {
-        bitField0_ = (bitField0_ & ~0x00010000);
+        bitField0_ = (bitField0_ & ~0x00020000);
         statisticsLoggingEnabled_ = false;
         onChanged();
         return this;
@@ -32889,39 +34181,39 @@ public final class AdminConsoleProto {
 
       private com.google.protobuf.LazyStringList warnings_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       private void ensureWarningsIsMutable() {
-        if (!((bitField0_ & 0x00020000) == 0x00020000)) {
+        if (!((bitField0_ & 0x00040000) == 0x00040000)) {
           warnings_ = new com.google.protobuf.LazyStringArrayList(warnings_);
-          bitField0_ |= 0x00020000;
+          bitField0_ |= 0x00040000;
          }
       }
       /**
-       * <code>repeated string warnings = 18;</code>
+       * <code>repeated string warnings = 19;</code>
        */
       public com.google.protobuf.ProtocolStringList
           getWarningsList() {
         return warnings_.getUnmodifiableView();
       }
       /**
-       * <code>repeated string warnings = 18;</code>
+       * <code>repeated string warnings = 19;</code>
        */
       public int getWarningsCount() {
         return warnings_.size();
       }
       /**
-       * <code>repeated string warnings = 18;</code>
+       * <code>repeated string warnings = 19;</code>
        */
       public java.lang.String getWarnings(int index) {
         return warnings_.get(index);
       }
       /**
-       * <code>repeated string warnings = 18;</code>
+       * <code>repeated string warnings = 19;</code>
        */
       public com.google.protobuf.ByteString
           getWarningsBytes(int index) {
         return warnings_.getByteString(index);
       }
       /**
-       * <code>repeated string warnings = 18;</code>
+       * <code>repeated string warnings = 19;</code>
        */
       public Builder setWarnings(
           int index, java.lang.String value) {
@@ -32934,7 +34226,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated string warnings = 18;</code>
+       * <code>repeated string warnings = 19;</code>
        */
       public Builder addWarnings(
           java.lang.String value) {
@@ -32947,7 +34239,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated string warnings = 18;</code>
+       * <code>repeated string warnings = 19;</code>
        */
       public Builder addAllWarnings(
           java.lang.Iterable<java.lang.String> values) {
@@ -32958,16 +34250,16 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated string warnings = 18;</code>
+       * <code>repeated string warnings = 19;</code>
        */
       public Builder clearWarnings() {
         warnings_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00020000);
+        bitField0_ = (bitField0_ & ~0x00040000);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated string warnings = 18;</code>
+       * <code>repeated string warnings = 19;</code>
        */
       public Builder addWarningsBytes(
           com.google.protobuf.ByteString value) {
@@ -32982,39 +34274,39 @@ public final class AdminConsoleProto {
 
       private com.google.protobuf.LazyStringList warningHistory_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       private void ensureWarningHistoryIsMutable() {
-        if (!((bitField0_ & 0x00040000) == 0x00040000)) {
+        if (!((bitField0_ & 0x00080000) == 0x00080000)) {
           warningHistory_ = new com.google.protobuf.LazyStringArrayList(warningHistory_);
-          bitField0_ |= 0x00040000;
+          bitField0_ |= 0x00080000;
          }
       }
       /**
-       * <code>repeated string warningHistory = 19;</code>
+       * <code>repeated string warningHistory = 20;</code>
        */
       public com.google.protobuf.ProtocolStringList
           getWarningHistoryList() {
         return warningHistory_.getUnmodifiableView();
       }
       /**
-       * <code>repeated string warningHistory = 19;</code>
+       * <code>repeated string warningHistory = 20;</code>
        */
       public int getWarningHistoryCount() {
         return warningHistory_.size();
       }
       /**
-       * <code>repeated string warningHistory = 19;</code>
+       * <code>repeated string warningHistory = 20;</code>
        */
       public java.lang.String getWarningHistory(int index) {
         return warningHistory_.get(index);
       }
       /**
-       * <code>repeated string warningHistory = 19;</code>
+       * <code>repeated string warningHistory = 20;</code>
        */
       public com.google.protobuf.ByteString
           getWarningHistoryBytes(int index) {
         return warningHistory_.getByteString(index);
       }
       /**
-       * <code>repeated string warningHistory = 19;</code>
+       * <code>repeated string warningHistory = 20;</code>
        */
       public Builder setWarningHistory(
           int index, java.lang.String value) {
@@ -33027,7 +34319,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated string warningHistory = 19;</code>
+       * <code>repeated string warningHistory = 20;</code>
        */
       public Builder addWarningHistory(
           java.lang.String value) {
@@ -33040,7 +34332,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated string warningHistory = 19;</code>
+       * <code>repeated string warningHistory = 20;</code>
        */
       public Builder addAllWarningHistory(
           java.lang.Iterable<java.lang.String> values) {
@@ -33051,16 +34343,16 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated string warningHistory = 19;</code>
+       * <code>repeated string warningHistory = 20;</code>
        */
       public Builder clearWarningHistory() {
         warningHistory_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00040000);
+        bitField0_ = (bitField0_ & ~0x00080000);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated string warningHistory = 19;</code>
+       * <code>repeated string warningHistory = 20;</code>
        */
       public Builder addWarningHistoryBytes(
           com.google.protobuf.ByteString value) {
@@ -33076,9 +34368,9 @@ public final class AdminConsoleProto {
       private java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto> threadDumps_ =
         java.util.Collections.emptyList();
       private void ensureThreadDumpsIsMutable() {
-        if (!((bitField0_ & 0x00080000) == 0x00080000)) {
+        if (!((bitField0_ & 0x00100000) == 0x00100000)) {
           threadDumps_ = new java.util.ArrayList<org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto>(threadDumps_);
-          bitField0_ |= 0x00080000;
+          bitField0_ |= 0x00100000;
          }
       }
 
@@ -33086,7 +34378,7 @@ public final class AdminConsoleProto {
           org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProtoOrBuilder> threadDumpsBuilder_;
 
       /**
-       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
        */
       public java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto> getThreadDumpsList() {
         if (threadDumpsBuilder_ == null) {
@@ -33096,7 +34388,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
        */
       public int getThreadDumpsCount() {
         if (threadDumpsBuilder_ == null) {
@@ -33106,7 +34398,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto getThreadDumps(int index) {
         if (threadDumpsBuilder_ == null) {
@@ -33116,7 +34408,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
        */
       public Builder setThreadDumps(
           int index, org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto value) {
@@ -33133,7 +34425,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
        */
       public Builder setThreadDumps(
           int index, org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto.Builder builderForValue) {
@@ -33147,7 +34439,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
        */
       public Builder addThreadDumps(org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto value) {
         if (threadDumpsBuilder_ == null) {
@@ -33163,7 +34455,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
        */
       public Builder addThreadDumps(
           int index, org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto value) {
@@ -33180,7 +34472,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
        */
       public Builder addThreadDumps(
           org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto.Builder builderForValue) {
@@ -33194,7 +34486,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
        */
       public Builder addThreadDumps(
           int index, org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto.Builder builderForValue) {
@@ -33208,7 +34500,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
        */
       public Builder addAllThreadDumps(
           java.lang.Iterable<? extends org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto> values) {
@@ -33223,12 +34515,12 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
        */
       public Builder clearThreadDumps() {
         if (threadDumpsBuilder_ == null) {
           threadDumps_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00080000);
+          bitField0_ = (bitField0_ & ~0x00100000);
           onChanged();
         } else {
           threadDumpsBuilder_.clear();
@@ -33236,7 +34528,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
        */
       public Builder removeThreadDumps(int index) {
         if (threadDumpsBuilder_ == null) {
@@ -33249,14 +34541,14 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto.Builder getThreadDumpsBuilder(
           int index) {
         return getThreadDumpsFieldBuilder().getBuilder(index);
       }
       /**
-       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProtoOrBuilder getThreadDumpsOrBuilder(
           int index) {
@@ -33266,7 +34558,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
        */
       public java.util.List<? extends org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProtoOrBuilder> 
            getThreadDumpsOrBuilderList() {
@@ -33277,14 +34569,14 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto.Builder addThreadDumpsBuilder() {
         return getThreadDumpsFieldBuilder().addBuilder(
             org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto.getDefaultInstance());
       }
       /**
-       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto.Builder addThreadDumpsBuilder(
           int index) {
@@ -33292,7 +34584,7 @@ public final class AdminConsoleProto {
             index, org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto.getDefaultInstance());
       }
       /**
-       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 20;</code>
+       * <code>repeated .ThreadDumpMsgOutProto threadDumps = 21;</code>
        */
       public java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto.Builder> 
            getThreadDumpsBuilderList() {
@@ -33305,7 +34597,7 @@ public final class AdminConsoleProto {
           threadDumpsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.ThreadDumpMsgOutProtoOrBuilder>(
                   threadDumps_,
-                  ((bitField0_ & 0x00080000) == 0x00080000),
+                  ((bitField0_ & 0x00100000) == 0x00100000),
                   getParentForChildren(),
                   isClean());
           threadDumps_ = null;
@@ -33316,9 +34608,9 @@ public final class AdminConsoleProto {
       private java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto> metrics_ =
         java.util.Collections.emptyList();
       private void ensureMetricsIsMutable() {
-        if (!((bitField0_ & 0x00100000) == 0x00100000)) {
+        if (!((bitField0_ & 0x00200000) == 0x00200000)) {
           metrics_ = new java.util.ArrayList<org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto>(metrics_);
-          bitField0_ |= 0x00100000;
+          bitField0_ |= 0x00200000;
          }
       }
 
@@ -33326,7 +34618,7 @@ public final class AdminConsoleProto {
           org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProtoOrBuilder> metricsBuilder_;
 
       /**
-       * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+       * <code>repeated .MetricMsgOutProto metrics = 22;</code>
        */
       public java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto> getMetricsList() {
         if (metricsBuilder_ == null) {
@@ -33336,7 +34628,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+       * <code>repeated .MetricMsgOutProto metrics = 22;</code>
        */
       public int getMetricsCount() {
         if (metricsBuilder_ == null) {
@@ -33346,7 +34638,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+       * <code>repeated .MetricMsgOutProto metrics = 22;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto getMetrics(int index) {
         if (metricsBuilder_ == null) {
@@ -33356,7 +34648,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+       * <code>repeated .MetricMsgOutProto metrics = 22;</code>
        */
       public Builder setMetrics(
           int index, org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto value) {
@@ -33373,7 +34665,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+       * <code>repeated .MetricMsgOutProto metrics = 22;</code>
        */
       public Builder setMetrics(
           int index, org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto.Builder builderForValue) {
@@ -33387,7 +34679,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+       * <code>repeated .MetricMsgOutProto metrics = 22;</code>
        */
       public Builder addMetrics(org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto value) {
         if (metricsBuilder_ == null) {
@@ -33403,7 +34695,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+       * <code>repeated .MetricMsgOutProto metrics = 22;</code>
        */
       public Builder addMetrics(
           int index, org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto value) {
@@ -33420,7 +34712,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+       * <code>repeated .MetricMsgOutProto metrics = 22;</code>
        */
       public Builder addMetrics(
           org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto.Builder builderForValue) {
@@ -33434,7 +34726,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+       * <code>repeated .MetricMsgOutProto metrics = 22;</code>
        */
       public Builder addMetrics(
           int index, org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto.Builder builderForValue) {
@@ -33448,7 +34740,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+       * <code>repeated .MetricMsgOutProto metrics = 22;</code>
        */
       public Builder addAllMetrics(
           java.lang.Iterable<? extends org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto> values) {
@@ -33463,12 +34755,12 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+       * <code>repeated .MetricMsgOutProto metrics = 22;</code>
        */
       public Builder clearMetrics() {
         if (metricsBuilder_ == null) {
           metrics_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00100000);
+          bitField0_ = (bitField0_ & ~0x00200000);
           onChanged();
         } else {
           metricsBuilder_.clear();
@@ -33476,7 +34768,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+       * <code>repeated .MetricMsgOutProto metrics = 22;</code>
        */
       public Builder removeMetrics(int index) {
         if (metricsBuilder_ == null) {
@@ -33489,14 +34781,14 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+       * <code>repeated .MetricMsgOutProto metrics = 22;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto.Builder getMetricsBuilder(
           int index) {
         return getMetricsFieldBuilder().getBuilder(index);
       }
       /**
-       * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+       * <code>repeated .MetricMsgOutProto metrics = 22;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProtoOrBuilder getMetricsOrBuilder(
           int index) {
@@ -33506,7 +34798,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+       * <code>repeated .MetricMsgOutProto metrics = 22;</code>
        */
       public java.util.List<? extends org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProtoOrBuilder> 
            getMetricsOrBuilderList() {
@@ -33517,14 +34809,14 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+       * <code>repeated .MetricMsgOutProto metrics = 22;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto.Builder addMetricsBuilder() {
         return getMetricsFieldBuilder().addBuilder(
             org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto.getDefaultInstance());
       }
       /**
-       * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+       * <code>repeated .MetricMsgOutProto metrics = 22;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto.Builder addMetricsBuilder(
           int index) {
@@ -33532,7 +34824,7 @@ public final class AdminConsoleProto {
             index, org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto.getDefaultInstance());
       }
       /**
-       * <code>repeated .MetricMsgOutProto metrics = 21;</code>
+       * <code>repeated .MetricMsgOutProto metrics = 22;</code>
        */
       public java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto.Builder> 
            getMetricsBuilderList() {
@@ -33545,7 +34837,7 @@ public final class AdminConsoleProto {
           metricsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.MetricMsgOutProtoOrBuilder>(
                   metrics_,
-                  ((bitField0_ & 0x00100000) == 0x00100000),
+                  ((bitField0_ & 0x00200000) == 0x00200000),
                   getParentForChildren(),
                   isClean());
           metrics_ = null;
@@ -33556,9 +34848,9 @@ public final class AdminConsoleProto {
       private java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto> stats_ =
         java.util.Collections.emptyList();
       private void ensureStatsIsMutable() {
-        if (!((bitField0_ & 0x00200000) == 0x00200000)) {
+        if (!((bitField0_ & 0x00400000) == 0x00400000)) {
           stats_ = new java.util.ArrayList<org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto>(stats_);
-          bitField0_ |= 0x00200000;
+          bitField0_ |= 0x00400000;
          }
       }
 
@@ -33566,7 +34858,7 @@ public final class AdminConsoleProto {
           org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProtoOrBuilder> statsBuilder_;
 
       /**
-       * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+       * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
        */
       public java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto> getStatsList() {
         if (statsBuilder_ == null) {
@@ -33576,7 +34868,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+       * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
        */
       public int getStatsCount() {
         if (statsBuilder_ == null) {
@@ -33586,7 +34878,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+       * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto getStats(int index) {
         if (statsBuilder_ == null) {
@@ -33596,7 +34888,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+       * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
        */
       public Builder setStats(
           int index, org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto value) {
@@ -33613,7 +34905,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+       * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
        */
       public Builder setStats(
           int index, org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto.Builder builderForValue) {
@@ -33627,7 +34919,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+       * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
        */
       public Builder addStats(org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto value) {
         if (statsBuilder_ == null) {
@@ -33643,7 +34935,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+       * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
        */
       public Builder addStats(
           int index, org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto value) {
@@ -33660,7 +34952,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+       * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
        */
       public Builder addStats(
           org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto.Builder builderForValue) {
@@ -33674,7 +34966,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+       * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
        */
       public Builder addStats(
           int index, org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto.Builder builderForValue) {
@@ -33688,7 +34980,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+       * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
        */
       public Builder addAllStats(
           java.lang.Iterable<? extends org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto> values) {
@@ -33703,12 +34995,12 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+       * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
        */
       public Builder clearStats() {
         if (statsBuilder_ == null) {
           stats_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00200000);
+          bitField0_ = (bitField0_ & ~0x00400000);
           onChanged();
         } else {
           statsBuilder_.clear();
@@ -33716,7 +35008,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+       * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
        */
       public Builder removeStats(int index) {
         if (statsBuilder_ == null) {
@@ -33729,14 +35021,14 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+       * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto.Builder getStatsBuilder(
           int index) {
         return getStatsFieldBuilder().getBuilder(index);
       }
       /**
-       * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+       * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProtoOrBuilder getStatsOrBuilder(
           int index) {
@@ -33746,7 +35038,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+       * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
        */
       public java.util.List<? extends org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProtoOrBuilder> 
            getStatsOrBuilderList() {
@@ -33757,14 +35049,14 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+       * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto.Builder addStatsBuilder() {
         return getStatsFieldBuilder().addBuilder(
             org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto.getDefaultInstance());
       }
       /**
-       * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+       * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto.Builder addStatsBuilder(
           int index) {
@@ -33772,7 +35064,7 @@ public final class AdminConsoleProto {
             index, org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto.getDefaultInstance());
       }
       /**
-       * <code>repeated .StatEntryMsgOutProto stats = 22;</code>
+       * <code>repeated .StatEntryMsgOutProto stats = 23;</code>
        */
       public java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto.Builder> 
            getStatsBuilderList() {
@@ -33785,7 +35077,7 @@ public final class AdminConsoleProto {
           statsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.StatEntryMsgOutProtoOrBuilder>(
                   stats_,
-                  ((bitField0_ & 0x00200000) == 0x00200000),
+                  ((bitField0_ & 0x00400000) == 0x00400000),
                   getParentForChildren(),
                   isClean());
           stats_ = null;
@@ -38675,44 +39967,53 @@ public final class AdminConsoleProto {
     int getPriority();
 
     /**
-     * <code>repeated string connectedServers = 4;</code>
+     * <code>optional bool drainMode = 4;</code>
+     */
+    boolean hasDrainMode();
+    /**
+     * <code>optional bool drainMode = 4;</code>
+     */
+    boolean getDrainMode();
+
+    /**
+     * <code>repeated string connectedServers = 5;</code>
      */
     java.util.List<java.lang.String>
         getConnectedServersList();
     /**
-     * <code>repeated string connectedServers = 4;</code>
+     * <code>repeated string connectedServers = 5;</code>
      */
     int getConnectedServersCount();
     /**
-     * <code>repeated string connectedServers = 4;</code>
+     * <code>repeated string connectedServers = 5;</code>
      */
     java.lang.String getConnectedServers(int index);
     /**
-     * <code>repeated string connectedServers = 4;</code>
+     * <code>repeated string connectedServers = 5;</code>
      */
     com.google.protobuf.ByteString
         getConnectedServersBytes(int index);
 
     /**
-     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
      */
     java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto> 
         getAppInstancesList();
     /**
-     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto getAppInstances(int index);
     /**
-     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
      */
     int getAppInstancesCount();
     /**
-     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
      */
     java.util.List<? extends org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProtoOrBuilder> 
         getAppInstancesOrBuilderList();
     /**
-     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
      */
     org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProtoOrBuilder getAppInstancesOrBuilder(
         int index);
@@ -38733,6 +40034,7 @@ public final class AdminConsoleProto {
       id_ = "";
       maxInstances_ = 0;
       priority_ = 0;
+      drainMode_ = false;
       connectedServers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       appInstances_ = java.util.Collections.emptyList();
     }
@@ -38777,19 +40079,24 @@ public final class AdminConsoleProto {
               priority_ = input.readSInt32();
               break;
             }
-            case 34: {
+            case 32: {
+              bitField0_ |= 0x00000008;
+              drainMode_ = input.readBool();
+              break;
+            }
+            case 42: {
               com.google.protobuf.ByteString bs = input.readBytes();
-              if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
                 connectedServers_ = new com.google.protobuf.LazyStringArrayList();
-                mutable_bitField0_ |= 0x00000008;
+                mutable_bitField0_ |= 0x00000010;
               }
               connectedServers_.add(bs);
               break;
             }
-            case 42: {
-              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+            case 50: {
+              if (!((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
                 appInstances_ = new java.util.ArrayList<org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto>();
-                mutable_bitField0_ |= 0x00000010;
+                mutable_bitField0_ |= 0x00000020;
               }
               appInstances_.add(
                   input.readMessage(org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto.PARSER, extensionRegistry));
@@ -38810,10 +40117,10 @@ public final class AdminConsoleProto {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+        if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
           connectedServers_ = connectedServers_.getUnmodifiableView();
         }
-        if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+        if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
           appInstances_ = java.util.Collections.unmodifiableList(appInstances_);
         }
         this.unknownFields = unknownFields.build();
@@ -38906,64 +40213,79 @@ public final class AdminConsoleProto {
       return priority_;
     }
 
-    public static final int CONNECTEDSERVERS_FIELD_NUMBER = 4;
+    public static final int DRAINMODE_FIELD_NUMBER = 4;
+    private boolean drainMode_;
+    /**
+     * <code>optional bool drainMode = 4;</code>
+     */
+    public boolean hasDrainMode() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional bool drainMode = 4;</code>
+     */
+    public boolean getDrainMode() {
+      return drainMode_;
+    }
+
+    public static final int CONNECTEDSERVERS_FIELD_NUMBER = 5;
     private com.google.protobuf.LazyStringList connectedServers_;
     /**
-     * <code>repeated string connectedServers = 4;</code>
+     * <code>repeated string connectedServers = 5;</code>
      */
     public com.google.protobuf.ProtocolStringList
         getConnectedServersList() {
       return connectedServers_;
     }
     /**
-     * <code>repeated string connectedServers = 4;</code>
+     * <code>repeated string connectedServers = 5;</code>
      */
     public int getConnectedServersCount() {
       return connectedServers_.size();
     }
     /**
-     * <code>repeated string connectedServers = 4;</code>
+     * <code>repeated string connectedServers = 5;</code>
      */
     public java.lang.String getConnectedServers(int index) {
       return connectedServers_.get(index);
     }
     /**
-     * <code>repeated string connectedServers = 4;</code>
+     * <code>repeated string connectedServers = 5;</code>
      */
     public com.google.protobuf.ByteString
         getConnectedServersBytes(int index) {
       return connectedServers_.getByteString(index);
     }
 
-    public static final int APPINSTANCES_FIELD_NUMBER = 5;
+    public static final int APPINSTANCES_FIELD_NUMBER = 6;
     private java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto> appInstances_;
     /**
-     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
      */
     public java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto> getAppInstancesList() {
       return appInstances_;
     }
     /**
-     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
      */
     public java.util.List<? extends org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProtoOrBuilder> 
         getAppInstancesOrBuilderList() {
       return appInstances_;
     }
     /**
-     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
      */
     public int getAppInstancesCount() {
       return appInstances_.size();
     }
     /**
-     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto getAppInstances(int index) {
       return appInstances_.get(index);
     }
     /**
-     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+     * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
      */
     public org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProtoOrBuilder getAppInstancesOrBuilder(
         int index) {
@@ -38993,11 +40315,14 @@ public final class AdminConsoleProto {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeSInt32(3, priority_);
       }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeBool(4, drainMode_);
+      }
       for (int i = 0; i < connectedServers_.size(); i++) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, connectedServers_.getRaw(i));
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, connectedServers_.getRaw(i));
       }
       for (int i = 0; i < appInstances_.size(); i++) {
-        output.writeMessage(5, appInstances_.get(i));
+        output.writeMessage(6, appInstances_.get(i));
       }
       unknownFields.writeTo(output);
     }
@@ -39019,6 +40344,10 @@ public final class AdminConsoleProto {
         size += com.google.protobuf.CodedOutputStream
           .computeSInt32Size(3, priority_);
       }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(4, drainMode_);
+      }
       {
         int dataSize = 0;
         for (int i = 0; i < connectedServers_.size(); i++) {
@@ -39029,7 +40358,7 @@ public final class AdminConsoleProto {
       }
       for (int i = 0; i < appInstances_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, appInstances_.get(i));
+          .computeMessageSize(6, appInstances_.get(i));
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -39062,6 +40391,11 @@ public final class AdminConsoleProto {
         result = result && (getPriority()
             == other.getPriority());
       }
+      result = result && (hasDrainMode() == other.hasDrainMode());
+      if (hasDrainMode()) {
+        result = result && (getDrainMode()
+            == other.getDrainMode());
+      }
       result = result && getConnectedServersList()
           .equals(other.getConnectedServersList());
       result = result && getAppInstancesList()
@@ -39088,6 +40422,11 @@ public final class AdminConsoleProto {
       if (hasPriority()) {
         hash = (37 * hash) + PRIORITY_FIELD_NUMBER;
         hash = (53 * hash) + getPriority();
+      }
+      if (hasDrainMode()) {
+        hash = (37 * hash) + DRAINMODE_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getDrainMode());
       }
       if (getConnectedServersCount() > 0) {
         hash = (37 * hash) + CONNECTEDSERVERS_FIELD_NUMBER;
@@ -39237,11 +40576,13 @@ public final class AdminConsoleProto {
         bitField0_ = (bitField0_ & ~0x00000002);
         priority_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
-        connectedServers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        drainMode_ = false;
         bitField0_ = (bitField0_ & ~0x00000008);
+        connectedServers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000010);
         if (appInstancesBuilder_ == null) {
           appInstances_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000010);
+          bitField0_ = (bitField0_ & ~0x00000020);
         } else {
           appInstancesBuilder_.clear();
         }
@@ -39285,15 +40626,19 @@ public final class AdminConsoleProto {
           to_bitField0_ |= 0x00000004;
         }
         result.priority_ = priority_;
-        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.drainMode_ = drainMode_;
+        if (((bitField0_ & 0x00000010) == 0x00000010)) {
           connectedServers_ = connectedServers_.getUnmodifiableView();
-          bitField0_ = (bitField0_ & ~0x00000008);
+          bitField0_ = (bitField0_ & ~0x00000010);
         }
         result.connectedServers_ = connectedServers_;
         if (appInstancesBuilder_ == null) {
-          if (((bitField0_ & 0x00000010) == 0x00000010)) {
+          if (((bitField0_ & 0x00000020) == 0x00000020)) {
             appInstances_ = java.util.Collections.unmodifiableList(appInstances_);
-            bitField0_ = (bitField0_ & ~0x00000010);
+            bitField0_ = (bitField0_ & ~0x00000020);
           }
           result.appInstances_ = appInstances_;
         } else {
@@ -39359,10 +40704,13 @@ public final class AdminConsoleProto {
         if (other.hasPriority()) {
           setPriority(other.getPriority());
         }
+        if (other.hasDrainMode()) {
+          setDrainMode(other.getDrainMode());
+        }
         if (!other.connectedServers_.isEmpty()) {
           if (connectedServers_.isEmpty()) {
             connectedServers_ = other.connectedServers_;
-            bitField0_ = (bitField0_ & ~0x00000008);
+            bitField0_ = (bitField0_ & ~0x00000010);
           } else {
             ensureConnectedServersIsMutable();
             connectedServers_.addAll(other.connectedServers_);
@@ -39373,7 +40721,7 @@ public final class AdminConsoleProto {
           if (!other.appInstances_.isEmpty()) {
             if (appInstances_.isEmpty()) {
               appInstances_ = other.appInstances_;
-              bitField0_ = (bitField0_ & ~0x00000010);
+              bitField0_ = (bitField0_ & ~0x00000020);
             } else {
               ensureAppInstancesIsMutable();
               appInstances_.addAll(other.appInstances_);
@@ -39386,7 +40734,7 @@ public final class AdminConsoleProto {
               appInstancesBuilder_.dispose();
               appInstancesBuilder_ = null;
               appInstances_ = other.appInstances_;
-              bitField0_ = (bitField0_ & ~0x00000010);
+              bitField0_ = (bitField0_ & ~0x00000020);
               appInstancesBuilder_ = 
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getAppInstancesFieldBuilder() : null;
@@ -39565,41 +40913,73 @@ public final class AdminConsoleProto {
         return this;
       }
 
+      private boolean drainMode_ ;
+      /**
+       * <code>optional bool drainMode = 4;</code>
+       */
+      public boolean hasDrainMode() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional bool drainMode = 4;</code>
+       */
+      public boolean getDrainMode() {
+        return drainMode_;
+      }
+      /**
+       * <code>optional bool drainMode = 4;</code>
+       */
+      public Builder setDrainMode(boolean value) {
+        bitField0_ |= 0x00000008;
+        drainMode_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool drainMode = 4;</code>
+       */
+      public Builder clearDrainMode() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        drainMode_ = false;
+        onChanged();
+        return this;
+      }
+
       private com.google.protobuf.LazyStringList connectedServers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       private void ensureConnectedServersIsMutable() {
-        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
           connectedServers_ = new com.google.protobuf.LazyStringArrayList(connectedServers_);
-          bitField0_ |= 0x00000008;
+          bitField0_ |= 0x00000010;
          }
       }
       /**
-       * <code>repeated string connectedServers = 4;</code>
+       * <code>repeated string connectedServers = 5;</code>
        */
       public com.google.protobuf.ProtocolStringList
           getConnectedServersList() {
         return connectedServers_.getUnmodifiableView();
       }
       /**
-       * <code>repeated string connectedServers = 4;</code>
+       * <code>repeated string connectedServers = 5;</code>
        */
       public int getConnectedServersCount() {
         return connectedServers_.size();
       }
       /**
-       * <code>repeated string connectedServers = 4;</code>
+       * <code>repeated string connectedServers = 5;</code>
        */
       public java.lang.String getConnectedServers(int index) {
         return connectedServers_.get(index);
       }
       /**
-       * <code>repeated string connectedServers = 4;</code>
+       * <code>repeated string connectedServers = 5;</code>
        */
       public com.google.protobuf.ByteString
           getConnectedServersBytes(int index) {
         return connectedServers_.getByteString(index);
       }
       /**
-       * <code>repeated string connectedServers = 4;</code>
+       * <code>repeated string connectedServers = 5;</code>
        */
       public Builder setConnectedServers(
           int index, java.lang.String value) {
@@ -39612,7 +40992,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated string connectedServers = 4;</code>
+       * <code>repeated string connectedServers = 5;</code>
        */
       public Builder addConnectedServers(
           java.lang.String value) {
@@ -39625,7 +41005,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated string connectedServers = 4;</code>
+       * <code>repeated string connectedServers = 5;</code>
        */
       public Builder addAllConnectedServers(
           java.lang.Iterable<java.lang.String> values) {
@@ -39636,16 +41016,16 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated string connectedServers = 4;</code>
+       * <code>repeated string connectedServers = 5;</code>
        */
       public Builder clearConnectedServers() {
         connectedServers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated string connectedServers = 4;</code>
+       * <code>repeated string connectedServers = 5;</code>
        */
       public Builder addConnectedServersBytes(
           com.google.protobuf.ByteString value) {
@@ -39661,9 +41041,9 @@ public final class AdminConsoleProto {
       private java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto> appInstances_ =
         java.util.Collections.emptyList();
       private void ensureAppInstancesIsMutable() {
-        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
+        if (!((bitField0_ & 0x00000020) == 0x00000020)) {
           appInstances_ = new java.util.ArrayList<org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto>(appInstances_);
-          bitField0_ |= 0x00000010;
+          bitField0_ |= 0x00000020;
          }
       }
 
@@ -39671,7 +41051,7 @@ public final class AdminConsoleProto {
           org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProtoOrBuilder> appInstancesBuilder_;
 
       /**
-       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
        */
       public java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto> getAppInstancesList() {
         if (appInstancesBuilder_ == null) {
@@ -39681,7 +41061,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
        */
       public int getAppInstancesCount() {
         if (appInstancesBuilder_ == null) {
@@ -39691,7 +41071,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto getAppInstances(int index) {
         if (appInstancesBuilder_ == null) {
@@ -39701,7 +41081,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
        */
       public Builder setAppInstances(
           int index, org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto value) {
@@ -39718,7 +41098,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
        */
       public Builder setAppInstances(
           int index, org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto.Builder builderForValue) {
@@ -39732,7 +41112,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
        */
       public Builder addAppInstances(org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto value) {
         if (appInstancesBuilder_ == null) {
@@ -39748,7 +41128,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
        */
       public Builder addAppInstances(
           int index, org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto value) {
@@ -39765,7 +41145,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
        */
       public Builder addAppInstances(
           org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto.Builder builderForValue) {
@@ -39779,7 +41159,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
        */
       public Builder addAppInstances(
           int index, org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto.Builder builderForValue) {
@@ -39793,7 +41173,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
        */
       public Builder addAllAppInstances(
           java.lang.Iterable<? extends org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto> values) {
@@ -39808,12 +41188,12 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
        */
       public Builder clearAppInstances() {
         if (appInstancesBuilder_ == null) {
           appInstances_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000010);
+          bitField0_ = (bitField0_ & ~0x00000020);
           onChanged();
         } else {
           appInstancesBuilder_.clear();
@@ -39821,7 +41201,7 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
        */
       public Builder removeAppInstances(int index) {
         if (appInstancesBuilder_ == null) {
@@ -39834,14 +41214,14 @@ public final class AdminConsoleProto {
         return this;
       }
       /**
-       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto.Builder getAppInstancesBuilder(
           int index) {
         return getAppInstancesFieldBuilder().getBuilder(index);
       }
       /**
-       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProtoOrBuilder getAppInstancesOrBuilder(
           int index) {
@@ -39851,7 +41231,7 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
        */
       public java.util.List<? extends org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProtoOrBuilder> 
            getAppInstancesOrBuilderList() {
@@ -39862,14 +41242,14 @@ public final class AdminConsoleProto {
         }
       }
       /**
-       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto.Builder addAppInstancesBuilder() {
         return getAppInstancesFieldBuilder().addBuilder(
             org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto.getDefaultInstance());
       }
       /**
-       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
        */
       public org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto.Builder addAppInstancesBuilder(
           int index) {
@@ -39877,7 +41257,7 @@ public final class AdminConsoleProto {
             index, org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto.getDefaultInstance());
       }
       /**
-       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 5;</code>
+       * <code>repeated .SessionPoolAppMsgOutProto appInstances = 6;</code>
        */
       public java.util.List<org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto.Builder> 
            getAppInstancesBuilderList() {
@@ -39890,7 +41270,7 @@ public final class AdminConsoleProto {
           appInstancesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto, org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProto.Builder, org.webswing.model.adminconsole.proto.AdminConsoleProto.SessionPoolAppMsgOutProtoOrBuilder>(
                   appInstances_,
-                  ((bitField0_ & 0x00000010) == 0x00000010),
+                  ((bitField0_ & 0x00000020) == 0x00000020),
                   getParentForChildren(),
                   isClean());
           appInstances_ = null;
@@ -51241,10 +52621,15 @@ public final class AdminConsoleProto {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_AdminConsoleHandshakeMsgInProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_ToggleRecordingMsgInProto_descriptor;
+    internal_static_RecordingRequestMsgInProto_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_ToggleRecordingMsgInProto_fieldAccessorTable;
+      internal_static_RecordingRequestMsgInProto_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_ManageSessionPoolMsgInProto_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_ManageSessionPoolMsgInProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_ToggleStatisticsLoggingMsgInProto_descriptor;
   private static final 
@@ -51464,166 +52849,180 @@ public final class AdminConsoleProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\027AdminConsoleProto.proto\"\302\007\n\033AdminConso" +
-      "leFrameMsgInProto\0223\n\017toggleRecording\030\001 \001" +
-      "(\0132\032.ToggleRecordingMsgInProto\022%\n\010shutdo" +
-      "wn\030\002 \001(\0132\023.ShutdownMsgInProto\0227\n\021request" +
-      "ThreadDump\030\004 \001(\0132\034.RequestThreadDumpMsgI" +
-      "nProto\022/\n\rgetThreadDump\030\005 \001(\0132\030.GetThrea" +
-      "dDumpMsgInProto\022Q\n\036getInstanceCountsStat" +
-      "sWarnings\030\006 \001(\0132).GetInstanceCountsStats" +
-      "WarningsMsgInProto\0225\n\020getSwingSessions\030\007" +
-      " \001(\0132\033.GetSwingSessionsMsgInProto\022/\n\rget" +
-      "ServerInfo\030\010 \001(\0132\030.GetServerInfoMsgInPro" +
-      "to\022C\n\027toggleStatisticsLogging\030\t \001(\0132\".To" +
-      "ggleStatisticsLoggingMsgInProto\0223\n\thands" +
-      "hake\030\n \001(\0132 .AdminConsoleHandshakeMsgInP" +
-      "roto\022\'\n\tgetConfig\030\013 \001(\0132\024.GetConfigMsgIn" +
-      "Proto\022#\n\007getMeta\030\014 \001(\0132\022.GetMetaMsgInPro" +
-      "to\022/\n\rresolveConfig\030\r \001(\0132\030.ResolveConfi" +
-      "gMsgInProto\022)\n\nsaveConfig\030\016 \001(\0132\025.SaveCo" +
-      "nfigMsgInProto\0223\n\017searchVariables\030\017 \001(\0132" +
-      "\032.SearchVariablesMsgInProto\022%\n\010startApp\030" +
-      "\020 \001(\0132\023.StartAppMsgInProto\022#\n\007stopApp\030\021 " +
-      "\001(\0132\022.StopAppMsgInProto\022\'\n\tcreateApp\030\022 \001" +
-      "(\0132\024.CreateAppMsgInProto\022\'\n\tremoveApp\030\023 " +
-      "\001(\0132\024.RemoveAppMsgInProto\022+\n\013mirrorFrame" +
-      "\030\024 \001(\0132\026.MirrorFrameMsgInProto\"8\n\037AdminC" +
-      "onsoleHandshakeMsgInProto\022\025\n\rsecretMessa" +
-      "ge\030\001 \001(\t\"=\n\031ToggleRecordingMsgInProto\022\014\n" +
-      "\004path\030\001 \001(\t\022\022\n\ninstanceId\030\002 \001(\t\"V\n!Toggl" +
-      "eStatisticsLoggingMsgInProto\022\014\n\004path\030\001 \001" +
-      "(\t\022\022\n\ninstanceId\030\002 \001(\t\022\017\n\007enabled\030\003 \001(\010\"" +
-      "E\n\022ShutdownMsgInProto\022\014\n\004path\030\001 \001(\t\022\022\n\ni" +
-      "nstanceId\030\002 \001(\t\022\r\n\005force\030\003 \001(\010\"?\n\033Reques" +
-      "tThreadDumpMsgInProto\022\014\n\004path\030\001 \001(\t\022\022\n\ni" +
-      "nstanceId\030\002 \001(\t\"e\n\027GetThreadDumpMsgInPro" +
-      "to\022\014\n\004path\030\001 \001(\t\022\022\n\ninstanceId\030\002 \001(\t\022\021\n\t" +
-      "timestamp\030\003 \001(\t\022\025\n\rcorrelationId\030\004 \001(\t\"O" +
-      "\n(GetInstanceCountsStatsWarningsMsgInPro" +
-      "to\022\014\n\004path\030\001 \001(\t\022\025\n\rcorrelationId\030\002 \001(\t\"" +
-      "A\n\032GetSwingSessionsMsgInProto\022\014\n\004path\030\001 " +
-      "\001(\t\022\025\n\rcorrelationId\030\002 \001(\t\"\031\n\027GetServerI" +
-      "nfoMsgInProto\":\n\023GetConfigMsgInProto\022\014\n\004" +
-      "path\030\001 \001(\t\022\025\n\rcorrelationId\030\002 \001(\t\"x\n\021Get" +
-      "MetaMsgInProto\022\014\n\004path\030\001 \001(\t\022\024\n\014serverCo" +
-      "nfig\030\002 \001(\014\022(\n\nappConfigs\030\003 \003(\0132\024.AppConf" +
-      "igMsgInProto\022\025\n\rcorrelationId\030\004 \001(\t\"?\n\023A" +
-      "ppConfigMsgInProto\022\021\n\tappConfig\030\001 \001(\014\022\025\n" +
-      "\rsessionPoolId\030\002 \001(\t\"\202\001\n\027ResolveConfigMs" +
-      "gInProto\022\014\n\004path\030\001 \001(\t\022\014\n\004type\030\002 \001(\t\022\017\n\007" +
-      "resolve\030\003 \001(\t\022\014\n\004user\030\004 \001(\t\022\025\n\rsessionPo" +
-      "olId\030\005 \001(\t\022\025\n\rcorrelationId\030\006 \001(\t\"\223\001\n\024Sa" +
-      "veConfigMsgInProto\022\014\n\004path\030\001 \001(\t\022\024\n\014serv" +
-      "erConfig\030\002 \001(\014\022\026\n\016saveAppConfigs\030\003 \001(\010\022(" +
-      "\n\nappConfigs\030\004 \003(\0132\024.AppConfigMsgInProto" +
-      "\022\025\n\rcorrelationId\030\005 \001(\t\"\203\001\n\031SearchVariab" +
-      "lesMsgInProto\022\014\n\004path\030\001 \001(\t\022\014\n\004type\030\002 \001(" +
-      "\t\022\016\n\006search\030\003 \001(\t\022\014\n\004user\030\004 \001(\t\022\025\n\rsessi" +
-      "onPoolId\030\005 \001(\t\022\025\n\rcorrelationId\030\006 \001(\t\"\"\n" +
-      "\022StartAppMsgInProto\022\014\n\004path\030\001 \001(\t\"!\n\021Sto" +
-      "pAppMsgInProto\022\014\n\004path\030\001 \001(\t\"#\n\023CreateAp" +
-      "pMsgInProto\022\014\n\004path\030\001 \001(\t\"#\n\023RemoveAppMs" +
-      "gInProto\022\014\n\004path\030\001 \001(\t\"\201\001\n\025MirrorFrameMs" +
-      "gInProto\022\r\n\005frame\030\001 \001(\014\022\022\n\ninstanceId\030\002 " +
-      "\001(\t\022\021\n\tsessionId\030\003 \001(\t\022\r\n\005token\030\004 \001(\t\022\017\n" +
-      "\007connect\030\005 \001(\010\022\022\n\ndisconnect\030\006 \001(\010\"\213\005\n\034A" +
-      "dminConsoleFrameMsgOutProto\022\014\n\004path\030\001 \001(" +
-      "\t\022*\n\nthreadDump\030\002 \001(\0132\026.ThreadDumpMsgOut" +
-      "Proto\022L\n\033instanceCountsStatsWarnings\030\003 \001" +
-      "(\0132\'.InstanceCountsStatsWarningsMsgOutPr" +
-      "oto\0220\n\rswingSessions\030\004 \001(\0132\031.SwingSessio" +
-      "nsMsgOutProto\0227\n\021registerInstances\030\005 \003(\013" +
-      "2\034.RegisterInstanceMsgOutProto\022*\n\nserver" +
-      "Info\030\006 \001(\0132\026.ServerInfoMsgOutProto\022\"\n\006co" +
-      "nfig\030\007 \001(\0132\022.ConfigMsgOutProto\022\036\n\004meta\030\010" +
-      " \001(\0132\020.MetaMsgOutProto\0220\n\rresolveConfig\030" +
-      "\t \001(\0132\031.ResolveConfigMsgOutProto\0224\n\017sear" +
-      "chVariables\030\n \001(\0132\033.SearchVariablesMsgOu" +
-      "tProto\0226\n\020saveConfigResult\030\013 \001(\0132\034.SaveC" +
-      "onfigResultMsgOutProto\022:\n\022accessTokenCre" +
-      "ated\030\014 \001(\0132\036.AccessTokenCreatedMsgOutPro" +
-      "to\022,\n\013mirrorFrame\030\r \001(\0132\027.MirrorFrameMsg" +
-      "OutProto\"\344\001\n&InstanceCountsStatsWarnings" +
-      "MsgOutProto\022\024\n\014runningCount\030\001 \001(\021\022\026\n\016con" +
-      "nectedCount\030\002 \001(\021\022\023\n\013closedCount\030\003 \001(\021\022+" +
-      "\n\014summaryStats\030\004 \003(\0132\025.StatEntryMsgOutPr" +
-      "oto\0223\n\017summaryWarnings\030\005 \003(\0132\032.SummaryWa" +
-      "rningMsgOutProto\022\025\n\rcorrelationId\030\006 \001(\t\"" +
-      "I\n\024StatEntryMsgOutProto\022\016\n\006metric\030\001 \001(\t\022" +
-      "!\n\005stats\030\002 \003(\0132\022.MetricMsgOutProto\"H\n\021Me" +
-      "tricMsgOutProto\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 " +
-      "\001(\022\022\027\n\017aggregatedCount\030\003 \001(\021\"A\n\031SummaryW" +
-      "arningMsgOutProto\022\022\n\ninstanceId\030\001 \001(\t\022\020\n" +
-      "\010warnings\030\002 \003(\t\"\226\001\n\030SwingSessionsMsgOutP" +
-      "roto\0221\n\017runningSessions\030\001 \003(\0132\030.SwingSes" +
-      "sionMsgOutProto\0220\n\016closedSessions\030\002 \003(\0132" +
-      "\030.SwingSessionMsgOutProto\022\025\n\rcorrelation" +
-      "Id\030\003 \001(\t\"\235\005\n\027SwingSessionMsgOutProto\0228\n\006" +
-      "status\030\001 \001(\0162(.SwingSessionMsgOutProto.S" +
-      "tatusEnumProto\022\022\n\ninstanceId\030\002 \001(\t\022\014\n\004us" +
-      "er\030\003 \001(\t\022\016\n\006userIp\030\004 \001(\t\022\016\n\006userOs\030\005 \001(\t" +
-      "\022\023\n\013userBrowser\030\006 \001(\t\022\023\n\013application\030\007 \001" +
-      "(\t\022\027\n\017applicationPath\030\010 \001(\t\022\021\n\tstartedAt" +
-      "\030\t \001(\022\022\017\n\007endedAt\030\n \001(\022\022\021\n\tconnected\030\013 \001" +
-      "(\010\022\016\n\006applet\030\014 \001(\010\022\031\n\021disconnectedSince\030" +
-      "\r \001(\022\022\020\n\010recorded\030\016 \001(\010\022\025\n\rrecordingFile" +
-      "\030\017 \001(\t\022\026\n\016loggingEnabled\030\020 \001(\010\022 \n\030statis" +
-      "ticsLoggingEnabled\030\021 \001(\010\022\020\n\010warnings\030\022 \003" +
-      "(\t\022\026\n\016warningHistory\030\023 \003(\t\022+\n\013threadDump" +
-      "s\030\024 \003(\0132\026.ThreadDumpMsgOutProto\022#\n\007metri" +
-      "cs\030\025 \003(\0132\022.MetricMsgOutProto\022$\n\005stats\030\026 " +
-      "\003(\0132\025.StatEntryMsgOutProto\"\\\n\017StatusEnum" +
-      "Proto\022\017\n\013NOT_STARTED\020\001\022\013\n\007EXITING\020\002\022\013\n\007R" +
-      "UNNING\020\003\022\020\n\014FORCE_KILLED\020\004\022\014\n\010FINISHED\020\005" +
-      "\"v\n\025ThreadDumpMsgOutProto\022\021\n\ttimestamp\030\001" +
-      " \001(\022\022\017\n\007content\030\002 \001(\t\022\016\n\006reason\030\003 \001(\t\022\022\n" +
-      "\ninstanceId\030\004 \001(\t\022\025\n\rcorrelationId\030\005 \001(\t" +
-      "\"Q\n\033RegisterInstanceMsgOutProto\022\022\n\ninsta" +
-      "nceId\030\001 \001(\t\022\020\n\010register\030\002 \001(\010\022\014\n\004path\030\003 " +
-      "\001(\t\"\263\001\n\025ServerInfoMsgOutProto\022-\n\010appInfo" +
-      "s\030\001 \003(\0132\033.ApplicationInfoMsgOutProto\022,\n\007" +
-      "spInfos\030\002 \003(\0132\033.SessionPoolInfoMsgOutPro" +
-      "to\022\021\n\tinstances\030\003 \001(\021\022\r\n\005users\030\004 \001(\021\022\n\n\002" +
-      "id\030\005 \001(\t\022\017\n\007cluster\030\006 \001(\010\"\261\001\n\032Applicatio" +
-      "nInfoMsgOutProto\022\014\n\004path\030\001 \001(\t\022\020\n\010byteIc" +
-      "on\030\002 \001(\014\022\014\n\004name\030\003 \001(\t\022\017\n\007enabled\030\004 \001(\010\022" +
-      "\022\n\nmaxClients\030\005 \001(\021\022@\n\025instanceManagerSt" +
-      "atus\030\006 \001(\0132!.InstanceManagerStatusMsgOut" +
-      "Proto\"\234\001\n\032SessionPoolInfoMsgOutProto\022\n\n\002" +
-      "id\030\001 \001(\t\022\024\n\014maxInstances\030\002 \001(\021\022\020\n\010priori" +
-      "ty\030\003 \001(\021\022\030\n\020connectedServers\030\004 \003(\t\0220\n\014ap" +
-      "pInstances\030\005 \003(\0132\032.SessionPoolAppMsgOutP" +
-      "roto\"@\n\031SessionPoolAppMsgOutProto\022\014\n\004pat" +
-      "h\030\001 \001(\t\022\025\n\rinstanceCount\030\002 \001(\021\"\200\001\n\021Confi" +
-      "gMsgOutProto\022\024\n\014serverConfig\030\001 \001(\014\022\023\n\013se" +
-      "rverError\030\002 \001(\t\022)\n\nappConfigs\030\003 \003(\0132\025.Ap" +
-      "pConfigMsgOutProto\022\025\n\rcorrelationId\030\004 \001(" +
-      "\t\"~\n\017MetaMsgOutProto\022\024\n\014serverConfig\030\001 \001" +
-      "(\014\022\023\n\013serverError\030\002 \001(\t\022)\n\nappConfigs\030\003 " +
-      "\003(\0132\025.AppConfigMsgOutProto\022\025\n\rcorrelatio" +
-      "nId\030\004 \001(\t\"O\n\024AppConfigMsgOutProto\022\021\n\tapp" +
-      "Config\030\001 \001(\014\022\r\n\005error\030\002 \001(\t\022\025\n\rsessionPo" +
-      "olId\030\003 \001(\t\"T\n\030ResolveConfigMsgOutProto\022!" +
-      "\n\010resolved\030\001 \003(\0132\017.MapMsgOutProto\022\025\n\rcor" +
-      "relationId\030\002 \001(\t\"W\n\032SearchVariablesMsgOu" +
-      "tProto\022\"\n\tvariables\030\001 \003(\0132\017.MapMsgOutPro" +
-      "to\022\025\n\rcorrelationId\030\002 \001(\t\",\n\016MapMsgOutPr" +
-      "oto\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"W\n Insta" +
-      "nceManagerStatusMsgOutProto\022\016\n\006status\030\001 " +
-      "\001(\t\022\r\n\005error\030\002 \001(\t\022\024\n\014errorDetails\030\003 \001(\t" +
-      "\"\224\001\n\033SaveConfigResultMsgOutProto\022\024\n\014serv" +
-      "erResult\030\001 \001(\010\022\023\n\013serverError\030\002 \001(\t\0223\n\na" +
-      "ppResults\030\003 \003(\0132\037.SaveConfigAppResultMsg" +
-      "OutProto\022\025\n\rcorrelationId\030\004 \001(\t\"V\n\036SaveC" +
-      "onfigAppResultMsgOutProto\022\016\n\006result\030\001 \001(" +
-      "\010\022\025\n\rsessionPoolId\030\002 \001(\t\022\r\n\005error\030\003 \001(\t\"" +
-      "[\n\035AccessTokenCreatedMsgOutProto\022\024\n\014refr" +
-      "eshToken\030\001 \001(\t\022\020\n\010accessId\030\002 \001(\t\022\022\n\nexpi" +
-      "ration\030\003 \001(\022\"b\n\026MirrorFrameMsgOutProto\022\r" +
-      "\n\005frame\030\001 \001(\014\022\022\n\ninstanceId\030\002 \001(\t\022\021\n\tses" +
-      "sionId\030\003 \001(\t\022\022\n\ndisconnect\030\004 \001(\010B\'\n%org." +
-      "webswing.model.adminconsole.proto"
+      "\n\027AdminConsoleProto.proto\032\021CommonProto.p" +
+      "roto\"\375\007\n\033AdminConsoleFrameMsgInProto\0223\n\t" +
+      "handshake\030\001 \001(\0132 .AdminConsoleHandshakeM" +
+      "sgInProto\0225\n\020recordingRequest\030\002 \001(\0132\033.Re" +
+      "cordingRequestMsgInProto\022%\n\010shutdown\030\003 \001" +
+      "(\0132\023.ShutdownMsgInProto\0227\n\021requestThread" +
+      "Dump\030\004 \001(\0132\034.RequestThreadDumpMsgInProto" +
+      "\022/\n\rgetThreadDump\030\005 \001(\0132\030.GetThreadDumpM" +
+      "sgInProto\022Q\n\036getInstanceCountsStatsWarni" +
+      "ngs\030\006 \001(\0132).GetInstanceCountsStatsWarnin" +
+      "gsMsgInProto\0225\n\020getSwingSessions\030\007 \001(\0132\033" +
+      ".GetSwingSessionsMsgInProto\022/\n\rgetServer" +
+      "Info\030\010 \001(\0132\030.GetServerInfoMsgInProto\022C\n\027" +
+      "toggleStatisticsLogging\030\t \001(\0132\".ToggleSt" +
+      "atisticsLoggingMsgInProto\022\'\n\tgetConfig\030\n" +
+      " \001(\0132\024.GetConfigMsgInProto\022#\n\007getMeta\030\013 " +
+      "\001(\0132\022.GetMetaMsgInProto\022/\n\rresolveConfig" +
+      "\030\014 \001(\0132\030.ResolveConfigMsgInProto\022)\n\nsave" +
+      "Config\030\r \001(\0132\025.SaveConfigMsgInProto\0223\n\017s" +
+      "earchVariables\030\016 \001(\0132\032.SearchVariablesMs" +
+      "gInProto\022%\n\010startApp\030\017 \001(\0132\023.StartAppMsg" +
+      "InProto\022#\n\007stopApp\030\020 \001(\0132\022.StopAppMsgInP" +
+      "roto\022\'\n\tcreateApp\030\021 \001(\0132\024.CreateAppMsgIn" +
+      "Proto\022\'\n\tremoveApp\030\022 \001(\0132\024.RemoveAppMsgI" +
+      "nProto\022+\n\013mirrorFrame\030\023 \001(\0132\026.MirrorFram" +
+      "eMsgInProto\0227\n\021manageSessionPool\030\024 \001(\0132\034" +
+      ".ManageSessionPoolMsgInProto\"8\n\037AdminCon" +
+      "soleHandshakeMsgInProto\022\025\n\rsecretMessage" +
+      "\030\001 \001(\t\"\307\001\n\032RecordingRequestMsgInProto\022C\n" +
+      "\004type\030\001 \001(\01625.RecordingRequestMsgInProto" +
+      ".RecordingRequestTypeProto\022\014\n\004path\030\002 \001(\t" +
+      "\022\022\n\ninstanceId\030\003 \001(\t\"B\n\031RecordingRequest" +
+      "TypeProto\022\022\n\016startRecording\020\001\022\021\n\rstopRec" +
+      "ording\020\002\"\321\001\n\033ManageSessionPoolMsgInProto" +
+      "\022\025\n\rsessionPoolId\030\001 \001(\t\022L\n\020powerRequestT" +
+      "ype\030\002 \001(\01622.ManageSessionPoolMsgInProto." +
+      "PowerRequestTypeProto\"M\n\025PowerRequestTyp" +
+      "eProto\022\016\n\nDRAIN_MODE\020\001\022\n\n\006RESUME\020\002\022\010\n\004ST" +
+      "OP\020\003\022\016\n\nFORCE_KILL\020\004\"V\n!ToggleStatistics" +
+      "LoggingMsgInProto\022\014\n\004path\030\001 \001(\t\022\022\n\ninsta" +
+      "nceId\030\002 \001(\t\022\017\n\007enabled\030\003 \001(\010\"E\n\022Shutdown" +
+      "MsgInProto\022\014\n\004path\030\001 \001(\t\022\022\n\ninstanceId\030\002" +
+      " \001(\t\022\r\n\005force\030\003 \001(\010\"?\n\033RequestThreadDump" +
+      "MsgInProto\022\014\n\004path\030\001 \001(\t\022\022\n\ninstanceId\030\002" +
+      " \001(\t\"e\n\027GetThreadDumpMsgInProto\022\014\n\004path\030" +
+      "\001 \001(\t\022\022\n\ninstanceId\030\002 \001(\t\022\021\n\ttimestamp\030\003" +
+      " \001(\t\022\025\n\rcorrelationId\030\004 \001(\t\"O\n(GetInstan" +
+      "ceCountsStatsWarningsMsgInProto\022\014\n\004path\030" +
+      "\001 \001(\t\022\025\n\rcorrelationId\030\002 \001(\t\"A\n\032GetSwing" +
+      "SessionsMsgInProto\022\014\n\004path\030\001 \001(\t\022\025\n\rcorr" +
+      "elationId\030\002 \001(\t\"\031\n\027GetServerInfoMsgInPro" +
+      "to\":\n\023GetConfigMsgInProto\022\014\n\004path\030\001 \001(\t\022" +
+      "\025\n\rcorrelationId\030\002 \001(\t\"x\n\021GetMetaMsgInPr" +
+      "oto\022\014\n\004path\030\001 \001(\t\022\024\n\014serverConfig\030\002 \001(\014\022" +
+      "(\n\nappConfigs\030\003 \003(\0132\024.AppConfigMsgInProt" +
+      "o\022\025\n\rcorrelationId\030\004 \001(\t\"?\n\023AppConfigMsg" +
+      "InProto\022\021\n\tappConfig\030\001 \001(\014\022\025\n\rsessionPoo" +
+      "lId\030\002 \001(\t\"\202\001\n\027ResolveConfigMsgInProto\022\014\n" +
+      "\004path\030\001 \001(\t\022\014\n\004type\030\002 \001(\t\022\017\n\007resolve\030\003 \001" +
+      "(\t\022\014\n\004user\030\004 \001(\t\022\025\n\rsessionPoolId\030\005 \001(\t\022" +
+      "\025\n\rcorrelationId\030\006 \001(\t\"\223\001\n\024SaveConfigMsg" +
+      "InProto\022\014\n\004path\030\001 \001(\t\022\024\n\014serverConfig\030\002 " +
+      "\001(\014\022\026\n\016saveAppConfigs\030\003 \001(\010\022(\n\nappConfig" +
+      "s\030\004 \003(\0132\024.AppConfigMsgInProto\022\025\n\rcorrela" +
+      "tionId\030\005 \001(\t\"\203\001\n\031SearchVariablesMsgInPro" +
+      "to\022\014\n\004path\030\001 \001(\t\022\014\n\004type\030\002 \001(\t\022\016\n\006search" +
+      "\030\003 \001(\t\022\014\n\004user\030\004 \001(\t\022\025\n\rsessionPoolId\030\005 " +
+      "\001(\t\022\025\n\rcorrelationId\030\006 \001(\t\"\"\n\022StartAppMs" +
+      "gInProto\022\014\n\004path\030\001 \001(\t\"!\n\021StopAppMsgInPr" +
+      "oto\022\014\n\004path\030\001 \001(\t\"#\n\023CreateAppMsgInProto" +
+      "\022\014\n\004path\030\001 \001(\t\"#\n\023RemoveAppMsgInProto\022\014\n" +
+      "\004path\030\001 \001(\t\"\201\001\n\025MirrorFrameMsgInProto\022\r\n" +
+      "\005frame\030\001 \001(\014\022\022\n\ninstanceId\030\002 \001(\t\022\021\n\tsess" +
+      "ionId\030\003 \001(\t\022\r\n\005token\030\004 \001(\t\022\017\n\007connect\030\005 " +
+      "\001(\010\022\022\n\ndisconnect\030\006 \001(\010\"\213\005\n\034AdminConsole" +
+      "FrameMsgOutProto\022\014\n\004path\030\001 \001(\t\022*\n\nthread" +
+      "Dump\030\002 \001(\0132\026.ThreadDumpMsgOutProto\022L\n\033in" +
+      "stanceCountsStatsWarnings\030\003 \001(\0132\'.Instan" +
+      "ceCountsStatsWarningsMsgOutProto\0220\n\rswin" +
+      "gSessions\030\004 \001(\0132\031.SwingSessionsMsgOutPro" +
+      "to\0227\n\021registerInstances\030\005 \003(\0132\034.Register" +
+      "InstanceMsgOutProto\022*\n\nserverInfo\030\006 \001(\0132" +
+      "\026.ServerInfoMsgOutProto\022\"\n\006config\030\007 \001(\0132" +
+      "\022.ConfigMsgOutProto\022\036\n\004meta\030\010 \001(\0132\020.Meta" +
+      "MsgOutProto\0220\n\rresolveConfig\030\t \001(\0132\031.Res" +
+      "olveConfigMsgOutProto\0224\n\017searchVariables" +
+      "\030\n \001(\0132\033.SearchVariablesMsgOutProto\0226\n\020s" +
+      "aveConfigResult\030\013 \001(\0132\034.SaveConfigResult" +
+      "MsgOutProto\022:\n\022accessTokenCreated\030\014 \001(\0132" +
+      "\036.AccessTokenCreatedMsgOutProto\022,\n\013mirro" +
+      "rFrame\030\r \001(\0132\027.MirrorFrameMsgOutProto\"\344\001" +
+      "\n&InstanceCountsStatsWarningsMsgOutProto" +
+      "\022\024\n\014runningCount\030\001 \001(\021\022\026\n\016connectedCount" +
+      "\030\002 \001(\021\022\023\n\013closedCount\030\003 \001(\021\022+\n\014summarySt" +
+      "ats\030\004 \003(\0132\025.StatEntryMsgOutProto\0223\n\017summ" +
+      "aryWarnings\030\005 \003(\0132\032.SummaryWarningMsgOut" +
+      "Proto\022\025\n\rcorrelationId\030\006 \001(\t\"I\n\024StatEntr" +
+      "yMsgOutProto\022\016\n\006metric\030\001 \001(\t\022!\n\005stats\030\002 " +
+      "\003(\0132\022.MetricMsgOutProto\"H\n\021MetricMsgOutP" +
+      "roto\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\022\022\027\n\017aggr" +
+      "egatedCount\030\003 \001(\021\"A\n\031SummaryWarningMsgOu" +
+      "tProto\022\022\n\ninstanceId\030\001 \001(\t\022\020\n\010warnings\030\002" +
+      " \003(\t\"\226\001\n\030SwingSessionsMsgOutProto\0221\n\017run" +
+      "ningSessions\030\001 \003(\0132\030.SwingSessionMsgOutP" +
+      "roto\0220\n\016closedSessions\030\002 \003(\0132\030.SwingSess" +
+      "ionMsgOutProto\022\025\n\rcorrelationId\030\003 \001(\t\"\213\006" +
+      "\n\027SwingSessionMsgOutProto\0228\n\006status\030\001 \001(" +
+      "\0162(.SwingSessionMsgOutProto.StatusEnumPr" +
+      "oto\022\022\n\ninstanceId\030\002 \001(\t\022\014\n\004user\030\003 \001(\t\022\016\n" +
+      "\006userIp\030\004 \001(\t\022\016\n\006userOs\030\005 \001(\t\022\023\n\013userBro" +
+      "wser\030\006 \001(\t\022\023\n\013application\030\007 \001(\t\022\027\n\017appli" +
+      "cationPath\030\010 \001(\t\022\021\n\tstartedAt\030\t \001(\022\022\017\n\007e" +
+      "ndedAt\030\n \001(\022\022\021\n\tconnected\030\013 \001(\010\022\016\n\006apple" +
+      "t\030\014 \001(\010\022\031\n\021disconnectedSince\030\r \001(\022\022>\n\017re" +
+      "cordingStatus\030\016 \001(\0162%.commonProto.Record" +
+      "ingStatusEnumProto\022>\n\017mirroringStatus\030\017 " +
+      "\001(\0162%.commonProto.MirroringStatusEnumPro" +
+      "to\022\025\n\rrecordingFile\030\020 \001(\t\022\026\n\016loggingEnab" +
+      "led\030\021 \001(\010\022 \n\030statisticsLoggingEnabled\030\022 " +
+      "\001(\010\022\020\n\010warnings\030\023 \003(\t\022\026\n\016warningHistory\030" +
+      "\024 \003(\t\022+\n\013threadDumps\030\025 \003(\0132\026.ThreadDumpM" +
+      "sgOutProto\022#\n\007metrics\030\026 \003(\0132\022.MetricMsgO" +
+      "utProto\022$\n\005stats\030\027 \003(\0132\025.StatEntryMsgOut" +
+      "Proto\"\\\n\017StatusEnumProto\022\017\n\013NOT_STARTED\020" +
+      "\001\022\013\n\007EXITING\020\002\022\013\n\007RUNNING\020\003\022\020\n\014FORCE_KIL" +
+      "LED\020\004\022\014\n\010FINISHED\020\005\"v\n\025ThreadDumpMsgOutP" +
+      "roto\022\021\n\ttimestamp\030\001 \001(\022\022\017\n\007content\030\002 \001(\t" +
+      "\022\016\n\006reason\030\003 \001(\t\022\022\n\ninstanceId\030\004 \001(\t\022\025\n\r" +
+      "correlationId\030\005 \001(\t\"Q\n\033RegisterInstanceM" +
+      "sgOutProto\022\022\n\ninstanceId\030\001 \001(\t\022\020\n\010regist" +
+      "er\030\002 \001(\010\022\014\n\004path\030\003 \001(\t\"\263\001\n\025ServerInfoMsg" +
+      "OutProto\022-\n\010appInfos\030\001 \003(\0132\033.Application" +
+      "InfoMsgOutProto\022,\n\007spInfos\030\002 \003(\0132\033.Sessi" +
+      "onPoolInfoMsgOutProto\022\021\n\tinstances\030\003 \001(\021" +
+      "\022\r\n\005users\030\004 \001(\021\022\n\n\002id\030\005 \001(\t\022\017\n\007cluster\030\006" +
+      " \001(\010\"\261\001\n\032ApplicationInfoMsgOutProto\022\014\n\004p" +
+      "ath\030\001 \001(\t\022\020\n\010byteIcon\030\002 \001(\014\022\014\n\004name\030\003 \001(" +
+      "\t\022\017\n\007enabled\030\004 \001(\010\022\022\n\nmaxClients\030\005 \001(\021\022@" +
+      "\n\025instanceManagerStatus\030\006 \001(\0132!.Instance" +
+      "ManagerStatusMsgOutProto\"\257\001\n\032SessionPool" +
+      "InfoMsgOutProto\022\n\n\002id\030\001 \001(\t\022\024\n\014maxInstan" +
+      "ces\030\002 \001(\021\022\020\n\010priority\030\003 \001(\021\022\021\n\tdrainMode" +
+      "\030\004 \001(\010\022\030\n\020connectedServers\030\005 \003(\t\0220\n\014appI" +
+      "nstances\030\006 \003(\0132\032.SessionPoolAppMsgOutPro" +
+      "to\"@\n\031SessionPoolAppMsgOutProto\022\014\n\004path\030" +
+      "\001 \001(\t\022\025\n\rinstanceCount\030\002 \001(\021\"\200\001\n\021ConfigM" +
+      "sgOutProto\022\024\n\014serverConfig\030\001 \001(\014\022\023\n\013serv" +
+      "erError\030\002 \001(\t\022)\n\nappConfigs\030\003 \003(\0132\025.AppC" +
+      "onfigMsgOutProto\022\025\n\rcorrelationId\030\004 \001(\t\"" +
+      "~\n\017MetaMsgOutProto\022\024\n\014serverConfig\030\001 \001(\014" +
+      "\022\023\n\013serverError\030\002 \001(\t\022)\n\nappConfigs\030\003 \003(" +
+      "\0132\025.AppConfigMsgOutProto\022\025\n\rcorrelationI" +
+      "d\030\004 \001(\t\"O\n\024AppConfigMsgOutProto\022\021\n\tappCo" +
+      "nfig\030\001 \001(\014\022\r\n\005error\030\002 \001(\t\022\025\n\rsessionPool" +
+      "Id\030\003 \001(\t\"T\n\030ResolveConfigMsgOutProto\022!\n\010" +
+      "resolved\030\001 \003(\0132\017.MapMsgOutProto\022\025\n\rcorre" +
+      "lationId\030\002 \001(\t\"W\n\032SearchVariablesMsgOutP" +
+      "roto\022\"\n\tvariables\030\001 \003(\0132\017.MapMsgOutProto" +
+      "\022\025\n\rcorrelationId\030\002 \001(\t\",\n\016MapMsgOutProt" +
+      "o\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"W\n Instanc" +
+      "eManagerStatusMsgOutProto\022\016\n\006status\030\001 \001(" +
+      "\t\022\r\n\005error\030\002 \001(\t\022\024\n\014errorDetails\030\003 \001(\t\"\224" +
+      "\001\n\033SaveConfigResultMsgOutProto\022\024\n\014server" +
+      "Result\030\001 \001(\010\022\023\n\013serverError\030\002 \001(\t\0223\n\napp" +
+      "Results\030\003 \003(\0132\037.SaveConfigAppResultMsgOu" +
+      "tProto\022\025\n\rcorrelationId\030\004 \001(\t\"V\n\036SaveCon" +
+      "figAppResultMsgOutProto\022\016\n\006result\030\001 \001(\010\022" +
+      "\025\n\rsessionPoolId\030\002 \001(\t\022\r\n\005error\030\003 \001(\t\"[\n" +
+      "\035AccessTokenCreatedMsgOutProto\022\024\n\014refres" +
+      "hToken\030\001 \001(\t\022\020\n\010accessId\030\002 \001(\t\022\022\n\nexpira" +
+      "tion\030\003 \001(\022\"b\n\026MirrorFrameMsgOutProto\022\r\n\005" +
+      "frame\030\001 \001(\014\022\022\n\ninstanceId\030\002 \001(\t\022\021\n\tsessi" +
+      "onId\030\003 \001(\t\022\022\n\ndisconnect\030\004 \001(\010B\'\n%org.we" +
+      "bswing.model.adminconsole.proto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -51636,277 +53035,285 @@ public final class AdminConsoleProto {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          org.webswing.model.common.proto.CommonProto.getDescriptor(),
         }, assigner);
     internal_static_AdminConsoleFrameMsgInProto_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_AdminConsoleFrameMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_AdminConsoleFrameMsgInProto_descriptor,
-        new java.lang.String[] { "ToggleRecording", "Shutdown", "RequestThreadDump", "GetThreadDump", "GetInstanceCountsStatsWarnings", "GetSwingSessions", "GetServerInfo", "ToggleStatisticsLogging", "Handshake", "GetConfig", "GetMeta", "ResolveConfig", "SaveConfig", "SearchVariables", "StartApp", "StopApp", "CreateApp", "RemoveApp", "MirrorFrame", });
+        new java.lang.String[] { "Handshake", "RecordingRequest", "Shutdown", "RequestThreadDump", "GetThreadDump", "GetInstanceCountsStatsWarnings", "GetSwingSessions", "GetServerInfo", "ToggleStatisticsLogging", "GetConfig", "GetMeta", "ResolveConfig", "SaveConfig", "SearchVariables", "StartApp", "StopApp", "CreateApp", "RemoveApp", "MirrorFrame", "ManageSessionPool", });
     internal_static_AdminConsoleHandshakeMsgInProto_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_AdminConsoleHandshakeMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_AdminConsoleHandshakeMsgInProto_descriptor,
         new java.lang.String[] { "SecretMessage", });
-    internal_static_ToggleRecordingMsgInProto_descriptor =
+    internal_static_RecordingRequestMsgInProto_descriptor =
       getDescriptor().getMessageTypes().get(2);
-    internal_static_ToggleRecordingMsgInProto_fieldAccessorTable = new
+    internal_static_RecordingRequestMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_ToggleRecordingMsgInProto_descriptor,
-        new java.lang.String[] { "Path", "InstanceId", });
-    internal_static_ToggleStatisticsLoggingMsgInProto_descriptor =
+        internal_static_RecordingRequestMsgInProto_descriptor,
+        new java.lang.String[] { "Type", "Path", "InstanceId", });
+    internal_static_ManageSessionPoolMsgInProto_descriptor =
       getDescriptor().getMessageTypes().get(3);
+    internal_static_ManageSessionPoolMsgInProto_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_ManageSessionPoolMsgInProto_descriptor,
+        new java.lang.String[] { "SessionPoolId", "PowerRequestType", });
+    internal_static_ToggleStatisticsLoggingMsgInProto_descriptor =
+      getDescriptor().getMessageTypes().get(4);
     internal_static_ToggleStatisticsLoggingMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ToggleStatisticsLoggingMsgInProto_descriptor,
         new java.lang.String[] { "Path", "InstanceId", "Enabled", });
     internal_static_ShutdownMsgInProto_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_ShutdownMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ShutdownMsgInProto_descriptor,
         new java.lang.String[] { "Path", "InstanceId", "Force", });
     internal_static_RequestThreadDumpMsgInProto_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_RequestThreadDumpMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_RequestThreadDumpMsgInProto_descriptor,
         new java.lang.String[] { "Path", "InstanceId", });
     internal_static_GetThreadDumpMsgInProto_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_GetThreadDumpMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_GetThreadDumpMsgInProto_descriptor,
         new java.lang.String[] { "Path", "InstanceId", "Timestamp", "CorrelationId", });
     internal_static_GetInstanceCountsStatsWarningsMsgInProto_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_GetInstanceCountsStatsWarningsMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_GetInstanceCountsStatsWarningsMsgInProto_descriptor,
         new java.lang.String[] { "Path", "CorrelationId", });
     internal_static_GetSwingSessionsMsgInProto_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_GetSwingSessionsMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_GetSwingSessionsMsgInProto_descriptor,
         new java.lang.String[] { "Path", "CorrelationId", });
     internal_static_GetServerInfoMsgInProto_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_GetServerInfoMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_GetServerInfoMsgInProto_descriptor,
         new java.lang.String[] { });
     internal_static_GetConfigMsgInProto_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(11);
     internal_static_GetConfigMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_GetConfigMsgInProto_descriptor,
         new java.lang.String[] { "Path", "CorrelationId", });
     internal_static_GetMetaMsgInProto_descriptor =
-      getDescriptor().getMessageTypes().get(11);
+      getDescriptor().getMessageTypes().get(12);
     internal_static_GetMetaMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_GetMetaMsgInProto_descriptor,
         new java.lang.String[] { "Path", "ServerConfig", "AppConfigs", "CorrelationId", });
     internal_static_AppConfigMsgInProto_descriptor =
-      getDescriptor().getMessageTypes().get(12);
+      getDescriptor().getMessageTypes().get(13);
     internal_static_AppConfigMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_AppConfigMsgInProto_descriptor,
         new java.lang.String[] { "AppConfig", "SessionPoolId", });
     internal_static_ResolveConfigMsgInProto_descriptor =
-      getDescriptor().getMessageTypes().get(13);
+      getDescriptor().getMessageTypes().get(14);
     internal_static_ResolveConfigMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ResolveConfigMsgInProto_descriptor,
         new java.lang.String[] { "Path", "Type", "Resolve", "User", "SessionPoolId", "CorrelationId", });
     internal_static_SaveConfigMsgInProto_descriptor =
-      getDescriptor().getMessageTypes().get(14);
+      getDescriptor().getMessageTypes().get(15);
     internal_static_SaveConfigMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SaveConfigMsgInProto_descriptor,
         new java.lang.String[] { "Path", "ServerConfig", "SaveAppConfigs", "AppConfigs", "CorrelationId", });
     internal_static_SearchVariablesMsgInProto_descriptor =
-      getDescriptor().getMessageTypes().get(15);
+      getDescriptor().getMessageTypes().get(16);
     internal_static_SearchVariablesMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SearchVariablesMsgInProto_descriptor,
         new java.lang.String[] { "Path", "Type", "Search", "User", "SessionPoolId", "CorrelationId", });
     internal_static_StartAppMsgInProto_descriptor =
-      getDescriptor().getMessageTypes().get(16);
+      getDescriptor().getMessageTypes().get(17);
     internal_static_StartAppMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_StartAppMsgInProto_descriptor,
         new java.lang.String[] { "Path", });
     internal_static_StopAppMsgInProto_descriptor =
-      getDescriptor().getMessageTypes().get(17);
+      getDescriptor().getMessageTypes().get(18);
     internal_static_StopAppMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_StopAppMsgInProto_descriptor,
         new java.lang.String[] { "Path", });
     internal_static_CreateAppMsgInProto_descriptor =
-      getDescriptor().getMessageTypes().get(18);
+      getDescriptor().getMessageTypes().get(19);
     internal_static_CreateAppMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_CreateAppMsgInProto_descriptor,
         new java.lang.String[] { "Path", });
     internal_static_RemoveAppMsgInProto_descriptor =
-      getDescriptor().getMessageTypes().get(19);
+      getDescriptor().getMessageTypes().get(20);
     internal_static_RemoveAppMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_RemoveAppMsgInProto_descriptor,
         new java.lang.String[] { "Path", });
     internal_static_MirrorFrameMsgInProto_descriptor =
-      getDescriptor().getMessageTypes().get(20);
+      getDescriptor().getMessageTypes().get(21);
     internal_static_MirrorFrameMsgInProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_MirrorFrameMsgInProto_descriptor,
         new java.lang.String[] { "Frame", "InstanceId", "SessionId", "Token", "Connect", "Disconnect", });
     internal_static_AdminConsoleFrameMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(21);
+      getDescriptor().getMessageTypes().get(22);
     internal_static_AdminConsoleFrameMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_AdminConsoleFrameMsgOutProto_descriptor,
         new java.lang.String[] { "Path", "ThreadDump", "InstanceCountsStatsWarnings", "SwingSessions", "RegisterInstances", "ServerInfo", "Config", "Meta", "ResolveConfig", "SearchVariables", "SaveConfigResult", "AccessTokenCreated", "MirrorFrame", });
     internal_static_InstanceCountsStatsWarningsMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(22);
+      getDescriptor().getMessageTypes().get(23);
     internal_static_InstanceCountsStatsWarningsMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_InstanceCountsStatsWarningsMsgOutProto_descriptor,
         new java.lang.String[] { "RunningCount", "ConnectedCount", "ClosedCount", "SummaryStats", "SummaryWarnings", "CorrelationId", });
     internal_static_StatEntryMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(23);
+      getDescriptor().getMessageTypes().get(24);
     internal_static_StatEntryMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_StatEntryMsgOutProto_descriptor,
         new java.lang.String[] { "Metric", "Stats", });
     internal_static_MetricMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(24);
+      getDescriptor().getMessageTypes().get(25);
     internal_static_MetricMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_MetricMsgOutProto_descriptor,
         new java.lang.String[] { "Key", "Value", "AggregatedCount", });
     internal_static_SummaryWarningMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(25);
+      getDescriptor().getMessageTypes().get(26);
     internal_static_SummaryWarningMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SummaryWarningMsgOutProto_descriptor,
         new java.lang.String[] { "InstanceId", "Warnings", });
     internal_static_SwingSessionsMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(26);
+      getDescriptor().getMessageTypes().get(27);
     internal_static_SwingSessionsMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SwingSessionsMsgOutProto_descriptor,
         new java.lang.String[] { "RunningSessions", "ClosedSessions", "CorrelationId", });
     internal_static_SwingSessionMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(27);
+      getDescriptor().getMessageTypes().get(28);
     internal_static_SwingSessionMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SwingSessionMsgOutProto_descriptor,
-        new java.lang.String[] { "Status", "InstanceId", "User", "UserIp", "UserOs", "UserBrowser", "Application", "ApplicationPath", "StartedAt", "EndedAt", "Connected", "Applet", "DisconnectedSince", "Recorded", "RecordingFile", "LoggingEnabled", "StatisticsLoggingEnabled", "Warnings", "WarningHistory", "ThreadDumps", "Metrics", "Stats", });
+        new java.lang.String[] { "Status", "InstanceId", "User", "UserIp", "UserOs", "UserBrowser", "Application", "ApplicationPath", "StartedAt", "EndedAt", "Connected", "Applet", "DisconnectedSince", "RecordingStatus", "MirroringStatus", "RecordingFile", "LoggingEnabled", "StatisticsLoggingEnabled", "Warnings", "WarningHistory", "ThreadDumps", "Metrics", "Stats", });
     internal_static_ThreadDumpMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(28);
+      getDescriptor().getMessageTypes().get(29);
     internal_static_ThreadDumpMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ThreadDumpMsgOutProto_descriptor,
         new java.lang.String[] { "Timestamp", "Content", "Reason", "InstanceId", "CorrelationId", });
     internal_static_RegisterInstanceMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(29);
+      getDescriptor().getMessageTypes().get(30);
     internal_static_RegisterInstanceMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_RegisterInstanceMsgOutProto_descriptor,
         new java.lang.String[] { "InstanceId", "Register", "Path", });
     internal_static_ServerInfoMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(30);
+      getDescriptor().getMessageTypes().get(31);
     internal_static_ServerInfoMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ServerInfoMsgOutProto_descriptor,
         new java.lang.String[] { "AppInfos", "SpInfos", "Instances", "Users", "Id", "Cluster", });
     internal_static_ApplicationInfoMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(31);
+      getDescriptor().getMessageTypes().get(32);
     internal_static_ApplicationInfoMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ApplicationInfoMsgOutProto_descriptor,
         new java.lang.String[] { "Path", "ByteIcon", "Name", "Enabled", "MaxClients", "InstanceManagerStatus", });
     internal_static_SessionPoolInfoMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(32);
+      getDescriptor().getMessageTypes().get(33);
     internal_static_SessionPoolInfoMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SessionPoolInfoMsgOutProto_descriptor,
-        new java.lang.String[] { "Id", "MaxInstances", "Priority", "ConnectedServers", "AppInstances", });
+        new java.lang.String[] { "Id", "MaxInstances", "Priority", "DrainMode", "ConnectedServers", "AppInstances", });
     internal_static_SessionPoolAppMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(33);
+      getDescriptor().getMessageTypes().get(34);
     internal_static_SessionPoolAppMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SessionPoolAppMsgOutProto_descriptor,
         new java.lang.String[] { "Path", "InstanceCount", });
     internal_static_ConfigMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(34);
+      getDescriptor().getMessageTypes().get(35);
     internal_static_ConfigMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ConfigMsgOutProto_descriptor,
         new java.lang.String[] { "ServerConfig", "ServerError", "AppConfigs", "CorrelationId", });
     internal_static_MetaMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(35);
+      getDescriptor().getMessageTypes().get(36);
     internal_static_MetaMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_MetaMsgOutProto_descriptor,
         new java.lang.String[] { "ServerConfig", "ServerError", "AppConfigs", "CorrelationId", });
     internal_static_AppConfigMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(36);
+      getDescriptor().getMessageTypes().get(37);
     internal_static_AppConfigMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_AppConfigMsgOutProto_descriptor,
         new java.lang.String[] { "AppConfig", "Error", "SessionPoolId", });
     internal_static_ResolveConfigMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(37);
+      getDescriptor().getMessageTypes().get(38);
     internal_static_ResolveConfigMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ResolveConfigMsgOutProto_descriptor,
         new java.lang.String[] { "Resolved", "CorrelationId", });
     internal_static_SearchVariablesMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(38);
+      getDescriptor().getMessageTypes().get(39);
     internal_static_SearchVariablesMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SearchVariablesMsgOutProto_descriptor,
         new java.lang.String[] { "Variables", "CorrelationId", });
     internal_static_MapMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(39);
+      getDescriptor().getMessageTypes().get(40);
     internal_static_MapMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_MapMsgOutProto_descriptor,
         new java.lang.String[] { "Key", "Value", });
     internal_static_InstanceManagerStatusMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(40);
+      getDescriptor().getMessageTypes().get(41);
     internal_static_InstanceManagerStatusMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_InstanceManagerStatusMsgOutProto_descriptor,
         new java.lang.String[] { "Status", "Error", "ErrorDetails", });
     internal_static_SaveConfigResultMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(41);
+      getDescriptor().getMessageTypes().get(42);
     internal_static_SaveConfigResultMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SaveConfigResultMsgOutProto_descriptor,
         new java.lang.String[] { "ServerResult", "ServerError", "AppResults", "CorrelationId", });
     internal_static_SaveConfigAppResultMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(42);
+      getDescriptor().getMessageTypes().get(43);
     internal_static_SaveConfigAppResultMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SaveConfigAppResultMsgOutProto_descriptor,
         new java.lang.String[] { "Result", "SessionPoolId", "Error", });
     internal_static_AccessTokenCreatedMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(43);
+      getDescriptor().getMessageTypes().get(44);
     internal_static_AccessTokenCreatedMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_AccessTokenCreatedMsgOutProto_descriptor,
         new java.lang.String[] { "RefreshToken", "AccessId", "Expiration", });
     internal_static_MirrorFrameMsgOutProto_descriptor =
-      getDescriptor().getMessageTypes().get(44);
+      getDescriptor().getMessageTypes().get(45);
     internal_static_MirrorFrameMsgOutProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_MirrorFrameMsgOutProto_descriptor,
         new java.lang.String[] { "Frame", "InstanceId", "SessionId", "Disconnect", });
+    org.webswing.model.common.proto.CommonProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

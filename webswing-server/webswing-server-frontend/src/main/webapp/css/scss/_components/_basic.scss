@@ -37,16 +37,16 @@
     @include rel('padding', 20px);
     @include border-radius(3px);
     @include dropshadow-5;
-
+    
     position: relative;
     top: -10%;
     z-index: 1020;
-
+    
     width: 100%; // Note: max width is set to 320px
     margin-right: auto;
     margin-left: auto;
     background-color: $white;
-
+    
     text-align: center;
     
     &-content {
@@ -56,11 +56,12 @@
 
 // The frame that holds the rest
 .ws-toolbar {
-    @include rel('width', 480px);
+    @include rel('max-width', 480px);
     @include rel('padding', 15px);
     @include border-radius(3px);
     @include dropshadow-3;
-
+    
+    width: 100%; // Note: max width is set to 480px
     position: absolute;
     right: 0;
     bottom: 0;

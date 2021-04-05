@@ -19,43 +19,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webswing.Constants;
-import org.webswing.model.adminconsole.in.AdminConsoleFrameMsgIn;
-import org.webswing.model.adminconsole.in.AppConfigMsgIn;
-import org.webswing.model.adminconsole.in.GetConfigMsgIn;
-import org.webswing.model.adminconsole.in.GetInstanceCountsStatsWarningsMsgIn;
-import org.webswing.model.adminconsole.in.GetMetaMsgIn;
-import org.webswing.model.adminconsole.in.GetSwingSessionsMsgIn;
-import org.webswing.model.adminconsole.in.GetThreadDumpMsgIn;
-import org.webswing.model.adminconsole.in.MirrorFrameMsgIn;
-import org.webswing.model.adminconsole.in.RequestThreadDumpMsgIn;
-import org.webswing.model.adminconsole.in.ResolveConfigMsgIn;
-import org.webswing.model.adminconsole.in.SaveConfigMsgIn;
-import org.webswing.model.adminconsole.in.SearchVariablesMsgIn;
-import org.webswing.model.adminconsole.in.ShutdownMsgIn;
-import org.webswing.model.adminconsole.in.ToggleRecordingMsgIn;
-import org.webswing.model.adminconsole.in.ToggleStatisticsLoggingMsgIn;
-import org.webswing.model.adminconsole.out.AccessTokenCreatedMsgOut;
-import org.webswing.model.adminconsole.out.AdminConsoleFrameMsgOut;
-import org.webswing.model.adminconsole.out.AppConfigMsgOut;
-import org.webswing.model.adminconsole.out.ApplicationInfoMsgOut;
-import org.webswing.model.adminconsole.out.ConfigMsgOut;
-import org.webswing.model.adminconsole.out.InstanceCountsStatsWarningsMsgOut;
-import org.webswing.model.adminconsole.out.InstanceManagerStatusMsgOut;
-import org.webswing.model.adminconsole.out.MapMsgOut;
-import org.webswing.model.adminconsole.out.MetaMsgOut;
-import org.webswing.model.adminconsole.out.MetricMsgOut;
-import org.webswing.model.adminconsole.out.RegisterInstanceMsgOut;
-import org.webswing.model.adminconsole.out.ResolveConfigMsgOut;
-import org.webswing.model.adminconsole.out.SaveConfigAppResultMsgOut;
-import org.webswing.model.adminconsole.out.SaveConfigResultMsgOut;
-import org.webswing.model.adminconsole.out.SearchVariablesMsgOut;
-import org.webswing.model.adminconsole.out.ServerInfoMsgOut;
-import org.webswing.model.adminconsole.out.SessionPoolInfoMsgOut;
-import org.webswing.model.adminconsole.out.StatEntryMsgOut;
-import org.webswing.model.adminconsole.out.SummaryWarningMsgOut;
-import org.webswing.model.adminconsole.out.SwingSessionMsgOut;
-import org.webswing.model.adminconsole.out.SwingSessionsMsgOut;
-import org.webswing.model.adminconsole.out.ThreadDumpMsgOut;
+import org.webswing.model.adminconsole.in.*;
+import org.webswing.model.adminconsole.out.*;
 import org.webswing.model.appframe.out.SimpleEventMsgOut;
 import org.webswing.model.common.in.ConnectionHandshakeMsgIn;
 import org.webswing.server.api.GlobalUrlHandler;
@@ -179,9 +144,9 @@ public class SessionPoolHolderServiceImpl implements SessionPoolHolderService {
 	@Override
 	public void handleAdminConsoleMessage(AdminConsoleFrameMsgIn frame, AdminConsoleWebSocketConnection connection) {
 		try {
-			if (frame.getToggleRecording() != null) {
-				ToggleRecordingMsgIn toggleRecordingMsg = frame.getToggleRecording();
-				toggleRecordingByInstanceId(toggleRecordingMsg.getPath(), toggleRecordingMsg.getInstanceId());
+			if (frame.getRecordingRequest() != null) {
+				RecordingRequestMsgIn recordingRequestMsg = frame.getRecordingRequest();
+				requestRecordingByInstanceId(recordingRequestMsg.getType(), recordingRequestMsg.getPath(), recordingRequestMsg.getInstanceId());
 			} else if (frame.getToggleStatisticsLogging() != null) {
 				ToggleStatisticsLoggingMsgIn toggleStatisticsLoggingMsg = frame.getToggleStatisticsLogging();
 				toggleStatisticsLoggingByInstanceId(toggleStatisticsLoggingMsg.getPath(), toggleStatisticsLoggingMsg.getInstanceId(), toggleStatisticsLoggingMsg.getEnabled());
@@ -396,6 +361,12 @@ public class SessionPoolHolderServiceImpl implements SessionPoolHolderService {
 					} else {
 						instance.handleBrowserMirrorMessage(mirror.getFrame());
 					}
+				}
+			} else if (frame.getManageSessionPool() != null) {
+				ManageSessionPoolMsgIn manageSessionPool = frame.getManageSessionPool();
+				ServerSessionPoolConnector sp = sessionPools.get(manageSessionPool.getSessionPoolId());
+				if (sp != null) {
+					sp.handleManageSessionPool(manageSessionPool);
 				}
 			}
 		} catch (WsException e) {
@@ -705,6 +676,10 @@ public class SessionPoolHolderServiceImpl implements SessionPoolHolderService {
 		}
 		
 		if (!connectSwingInstance(path, r, handshake, config.getSessionMode(), config.isAllowStealSession())) {
+			if (handshake.getInstanceId() != null) {
+				r.sendMessage(SimpleEventMsgOut.reconnectInstanceNotFound.buildMsgOut());
+				return;
+			}
 			startSwingInstance(path, r, handshake, instanceInfo);
 		}
 	}
@@ -787,14 +762,14 @@ public class SessionPoolHolderServiceImpl implements SessionPoolHolderService {
 		}
 	}
 
-	private void toggleRecordingByInstanceId(String path, String instanceId) throws WsException {
+	private void requestRecordingByInstanceId(RecordingRequestMsgIn.RecordingRequestType recordingRequestType, String path, String instanceId) throws WsException {
 		ServerSessionPoolConnector pool = findSessionPoolByInstanceId(instanceId);
 
 		if (pool == null) {
 			return;
 		}
 
-		pool.toggleRecordingForConnectedInstance(path, instanceId);
+		pool.requestRecordingForConnectedInstance(recordingRequestType, path, instanceId);
 	}
 
 	private void toggleStatisticsLoggingByInstanceId(String path, String instanceId, Boolean enabled) throws WsException {

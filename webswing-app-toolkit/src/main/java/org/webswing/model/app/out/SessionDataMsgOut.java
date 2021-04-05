@@ -1,6 +1,8 @@
 package org.webswing.model.app.out;
 
 import org.webswing.model.MsgOut;
+import org.webswing.model.common.in.MirroringStatusEnum;
+import org.webswing.model.common.in.RecordingStatusEnum;
 
 public class SessionDataMsgOut implements MsgOut {
 
@@ -8,18 +10,19 @@ public class SessionDataMsgOut implements MsgOut {
 
 	private boolean applet;
 	private boolean sessionLoggingEnabled;
-	private boolean recording;
+	private RecordingStatusEnum recordingStatus;
 	private String recordingFile;
+	private MirroringStatusEnum mirroringStatus;
 	private boolean statisticsLoggingEnabled;
 
-	public SessionDataMsgOut() {
-	}
+	public SessionDataMsgOut() {}
 
-	public SessionDataMsgOut(boolean applet, boolean sessionLoggingEnabled, boolean recording, String recordingFile, boolean statisticsLoggingEnabled) {
+	public SessionDataMsgOut(boolean applet, boolean sessionLoggingEnabled, RecordingStatusEnum recordingStatus, String recordingFile, MirroringStatusEnum mirroringStatus, boolean statisticsLoggingEnabled) {
 		super();
 		this.applet = applet;
 		this.sessionLoggingEnabled = sessionLoggingEnabled;
-		this.recording = recording;
+		this.recordingStatus = recordingStatus;
+		this.mirroringStatus = mirroringStatus;
 		this.recordingFile = recordingFile;
 		this.statisticsLoggingEnabled = statisticsLoggingEnabled;
 	}
@@ -40,12 +43,20 @@ public class SessionDataMsgOut implements MsgOut {
 		this.sessionLoggingEnabled = sessionLoggingEnabled;
 	}
 
-	public boolean isRecording() {
-		return recording;
+	public RecordingStatusEnum getRecordingStatus() {
+		return recordingStatus;
 	}
 
-	public void setRecording(boolean recording) {
-		this.recording = recording;
+	public void setRecordingStatus(RecordingStatusEnum recordingStatus) {
+		this.recordingStatus = recordingStatus;
+	}
+
+	public MirroringStatusEnum getMirroringStatus() {
+		return mirroringStatus;
+	}
+
+	public void setMirroringStatus(MirroringStatusEnum mirroringStatus) {
+		this.mirroringStatus = mirroringStatus;
 	}
 
 	public String getRecordingFile() {

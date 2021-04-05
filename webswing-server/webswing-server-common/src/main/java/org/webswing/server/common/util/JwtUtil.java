@@ -129,8 +129,8 @@ public class JwtUtil {
 				.compact();
 	}
 	
-	public static String createAdminConsoleThreadDumpToken(String webswingClaim) {
-		return createTokenBuilder(Long.getLong(Constants.JWT_ADMIN_CONSOLE_THREAD_DUMP_TOKEN_EXPIRATION_MILLIS, Constants.JWT_ADMIN_CONSOLE_THREAD_DUMP_TOKEN_EXPIRATION_MILLIS_DEFAULT), Constants.JWT_SUBJECT_ADMIN_CONSOLE_THREAD_DUMP)
+	public static String createAdminConsoleDownloadToken(String webswingClaim) {
+		return createTokenBuilder(Long.getLong(Constants.JWT_ADMIN_CONSOLE_DOWNLOAD_TOKEN_EXPIRATION_MILLIS, Constants.JWT_ADMIN_CONSOLE_DOWNLOAD_TOKEN_EXPIRATION_MILLIS_DEFAULT), Constants.JWT_SUBJECT_ADMIN_CONSOLE_DOWNLOAD)
 				.claim(Constants.JWT_CLAIM_WEBSWING, webswingClaim)
 				.compact();
 	}
@@ -172,8 +172,8 @@ public class JwtUtil {
 		return parseTokenClaims(token, Constants.JWT_SUBJECT_ADMIN_CONSOLE_REFRESH);
 	}
 	
-	public static Jws<Claims> parseAdminConsoleThreadDumpTokenClaims(String token) {
-		return parseTokenClaims(token, Constants.JWT_SUBJECT_ADMIN_CONSOLE_THREAD_DUMP);
+	public static Jws<Claims> parseAdminConsoleDownloadTokenClaims(String token) {
+		return parseTokenClaims(token, Constants.JWT_SUBJECT_ADMIN_CONSOLE_DOWNLOAD);
 	}
 
 	private static Jws<Claims> parseTokenClaims(String token, String subjectExpected) {

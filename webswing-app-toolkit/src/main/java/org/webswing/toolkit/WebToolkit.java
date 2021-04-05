@@ -124,6 +124,8 @@ import org.webswing.dispatch.WebEventDispatcher;
 import org.webswing.dispatch.WebPaintDispatcher;
 import org.webswing.dispatch.WebSessionWatchdog;
 import org.webswing.model.Msg;
+import org.webswing.model.common.in.MirroringStatusEnum;
+import org.webswing.model.common.in.RecordingStatusEnum;
 import org.webswing.toolkit.api.WebswingApi;
 import org.webswing.toolkit.api.WebswingApiProvider;
 import org.webswing.toolkit.api.lifecycle.ShutdownReason;
@@ -133,6 +135,7 @@ import org.webswing.toolkit.util.EvaluationProperties;
 import org.webswing.toolkit.util.Util;
 import org.webswing.util.AppLogger;
 import org.webswing.util.NamedThreadFactory;
+import org.webswing.util.SessionMirror;
 import org.webswing.util.SessionRecorder;
 
 import sun.awt.SunToolkit;
@@ -156,6 +159,7 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	private WindowManager windowManager = WindowManager.getInstance();
 	private ClassLoader swingClassLoader;
 	private SessionRecorder sessionRecorder;
+	private SessionMirror sessionMirror;
 	private java.util.List<WebToolkitStartupListener> startupListeners = Collections.synchronizedList(new ArrayList<>());
 
 	public void init() {
@@ -229,13 +233,15 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 		}
 		
 		initSessionRecorder();
+		sessionMirror = new SessionMirror();
 		getPaintDispatcher().notifySessionDataChanged();
 	}
 	
 	private void initSessionRecorder() {
 		sessionRecorder = new SessionRecorder(System.getProperty(Constants.SWING_START_SYS_PROP_INSTANCE_ID));
-		
-		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_RECORDING)) {
+
+		// Start recording if recording=true is in app url
+		if (Boolean.getBoolean(Constants.SWING_START_SYS_PROP_RECORDING_FLAGGED)) {
 			try {
 				sessionRecorder.startRecording();
 			} catch (Exception e) {
@@ -284,47 +290,86 @@ public abstract class WebToolkit extends SunToolkit implements WebswingApiProvid
 	public SessionWatchdog getSessionWatchdog() {
 		return sessionWatchdog;
 	}
-	
-	public boolean isRecording() {
-		return sessionRecorder != null && sessionRecorder.isRecording();
+
+	public MirroringStatusEnum getMirroringStatus() {
+		if (sessionMirror == null) {
+			return null;
+		}
+
+		return sessionMirror.getMirroringStatus();
 	}
-	
+
+	public void startMirroring() {
+		try {
+			if (sessionMirror != null && (
+					sessionMirror.getMirroringStatus() == MirroringStatusEnum.NOT_MIRRORING ||
+							sessionMirror.getMirroringStatus() == MirroringStatusEnum.DENIED_MIRRORING_BY_USER
+			)) {
+				sessionMirror.startMirroring();
+				getPaintDispatcher().notifySessionDataChanged();
+			}
+		} catch (Exception e) {
+			AppLogger.error("Failed to start mirroring!", e);
+		}
+	}
+
+	public void stopMirroring() {
+		try {
+			if (sessionMirror != null && (
+					sessionMirror.getMirroringStatus() == MirroringStatusEnum.MIRRORING ||
+							sessionMirror.getMirroringStatus() == MirroringStatusEnum.WAITING_FOR_MIRRORING_APPROVAL
+			)) {
+				sessionMirror.stopMirroring();
+				getPaintDispatcher().notifySessionDataChanged();
+			}
+		} catch (Exception e) {
+			AppLogger.warn("Failed to stop mirroring!", e);
+		}
+	}
+
+	public RecordingStatusEnum getRecordingStatus() {
+		if (sessionRecorder == null) {
+			return null;
+		}
+
+		return sessionRecorder.getRecordingStatus();
+	}
+
 	public void recordFrame(byte[] appFrameMsgOut) {
-		if (sessionRecorder != null && sessionRecorder.isRecording()) {
+		if (sessionRecorder != null && sessionRecorder.getRecordingStatus() == RecordingStatusEnum.RECORDING) {
 			sessionRecorder.saveFrame(appFrameMsgOut);
 		}
 	}
-	
-	public void toggleRecording() {
-		if (sessionRecorder == null) {
-			AppLogger.error("Could not toggle session recording, session recorder not initialized!");
-			return;
-		}
-		
+
+	public void startRecording() {
 		try {
-			if (sessionRecorder.isRecording()) {
-				sessionRecorder.stopRecording();
-			} else {
+			if (sessionRecorder != null && (
+					sessionRecorder.getRecordingStatus() == RecordingStatusEnum.NOT_RECORDING ||
+							sessionRecorder.getRecordingStatus() == RecordingStatusEnum.DENIED_RECORDING_BY_USER
+			)) {
 				sessionRecorder.startRecording();
-				// force repaint
 				getPaintDispatcher().notifyWindowRepaintAll();
+				getPaintDispatcher().notifySessionDataChanged();
 			}
-			getPaintDispatcher().notifySessionDataChanged();
 		} catch (Exception e) {
-			AppLogger.error("Could not toggle session recording!", e);
+			AppLogger.error("Failed to start recording!", e);
 		}
 	}
-	
+
 	public void stopRecording() {
 		try {
-			if (sessionRecorder != null && sessionRecorder.isRecording()) {
+			if (sessionRecorder != null && (
+					sessionRecorder.getRecordingStatus() == RecordingStatusEnum.RECORDING ||
+							sessionRecorder.getRecordingStatus() == RecordingStatusEnum.WAITING_FOR_RECORDING_APPROVAL
+			)) {
 				sessionRecorder.stopRecording();
+				getPaintDispatcher().notifySessionDataChanged();
 			}
 		} catch (Exception e) {
 			AppLogger.error("Failed to stop recording!", e);
 		}
 	}
-	
+
 	public String getRecordingFileName() {
 		if (sessionRecorder == null) {
 			return null;

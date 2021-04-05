@@ -444,7 +444,7 @@ public class Util {
 		List<String> zOrder = getWebToolkit().getWindowManager().getZOrder();
 		Map<Window, List<Container>> webContainers = getWebToolkit().getPaintDispatcher().getRegisteredWebContainersAsMap();
 		Map<Window, List<HtmlPanel>> htmlPanels = getWebToolkit().getPaintDispatcher().getRegisteredHtmlPanelsAsMap();
-		Map<Container, Map<JComponent, WindowMsgOut>> htmlWebComponentsMap = new HashMap<>();
+		Map<Container, Map<JComponent, List<WindowMsgOut>>> htmlWebComponentsMap = new HashMap<>();
 		
 		for (String windowId : zOrder) {
 			WebWindowPeer ww = findWindowPeerById(windowId);
@@ -513,13 +513,20 @@ public class Util {
 		window.setContent(partialContentList);
 	}
 
-	private static void handleHtmlPanels(Map<Window, List<HtmlPanel>> htmlPanels, WebWindowPeer ww, WindowMsgOut window, AppFrameMsgOut frame, Map<Container, Map<JComponent, WindowMsgOut>> htmlWebComponentsMap) {
+	private static void handleHtmlPanels(Map<Window, List<HtmlPanel>> htmlPanels, WebWindowPeer ww, WindowMsgOut window, AppFrameMsgOut frame, Map<Container, Map<JComponent, List<WindowMsgOut>>> htmlWebComponentsMap) {
 		for (HtmlPanel htmlPanel : htmlPanels.get(ww.getTarget())) {
 			if (!htmlPanel.isShowing()) {
 				continue;
 			}
 			
-			WindowMsgOut htmlWin = new WindowMsgOut(System.identityHashCode(htmlPanel) + "", htmlPanel.getName(), htmlPanel.getLocationOnScreen(), htmlPanel.getBounds().width, htmlPanel.getBounds().height, WindowType.html, window.isModalBlocked(), window.getId());
+			Rectangle visibleRect = htmlPanel.getVisibleRect();
+			Dimension size = new Dimension(Math.max(0, htmlPanel.getWidth()), Math.max(0, htmlPanel.getHeight()));
+			if (visibleRect.width == 0 || visibleRect.height == 0) {
+				size.width = 0;
+				size.height = 0;
+			}
+			
+			WindowMsgOut htmlWin = new WindowMsgOut(System.identityHashCode(htmlPanel) + "", htmlPanel.getName(), htmlPanel.getLocationOnScreen(), size.width, size.height, WindowType.html, window.isModalBlocked(), window.getId());
 			if (!isDD()) {
 				htmlWin.setContent(Collections.emptyList());
 			}
@@ -532,7 +539,10 @@ public class Util {
 					if (!htmlWebComponentsMap.containsKey(container)) {
 						htmlWebComponentsMap.put(container, new HashMap<>());
 					}
-					htmlWebComponentsMap.get(container).put(component, htmlWin);
+					if (!htmlWebComponentsMap.get(container).containsKey(component)) {
+						htmlWebComponentsMap.get(container).put(component, new ArrayList<>());
+					}
+					htmlWebComponentsMap.get(container).get(component).add(htmlWin);
 					continue;
 				}
 			}
@@ -541,7 +551,7 @@ public class Util {
 		}
 	}
 	
-	private static void handleWebContainers(List<Container> containers, WindowMsgOut window, AppFrameMsgOut frame, Map<Container, Map<JComponent, WindowMsgOut>> htmlWebComponentsMap) {
+	private static void handleWebContainers(List<Container> containers, WindowMsgOut window, AppFrameMsgOut frame, Map<Container, Map<JComponent, List<WindowMsgOut>>> htmlWebComponentsMap) {
 		// sort according to hierarchy
 		Collections.sort(containers, (o1, o2) -> {
 			return o1.isAncestorOf(o2) ? 1 : (o2.isAncestorOf(o1) ? -1 : 0);
@@ -551,9 +561,21 @@ public class Util {
 			if (!container.isShowing()) {
 				continue;
 			}
-			
+
+			Rectangle containerBounds = new Rectangle(container.getLocationOnScreen(), container.getSize());
+			if (container instanceof JComponent) {
+				Rectangle visibleRect = ((JComponent) container).getVisibleRect();
+				// if container is inside a scrollpane, visibleRect has non-0 x/y
+				// we have to add the visibleRect location to the container.getLocationOnScreen to compensate for the scroll offset
+				containerBounds.x += visibleRect.x;
+				containerBounds.y += visibleRect.y;
+				// restrict the container size by its visible rect size
+				containerBounds.width = Math.min(containerBounds.width, visibleRect.width);
+				containerBounds.height = Math.min(containerBounds.height, visibleRect.height);
+			}
+
 			// handle wrapper
-			WindowMsgOut containerWin = new WindowMsgOut(System.identityHashCode(container) + "", container.getName(), container.getLocationOnScreen(), container.getBounds().width, container.getBounds().height, WindowType.internalWrapper, window.isModalBlocked(), window.getId());
+			WindowMsgOut containerWin = new WindowMsgOut(System.identityHashCode(container) + "", container.getName(), containerBounds.getLocation(), containerBounds.width, containerBounds.height, WindowType.internalWrapper, window.isModalBlocked(), window.getId());
 			if (!isDD()) {
 				containerWin.setContent(Collections.emptyList());
 			}
@@ -564,7 +586,7 @@ public class Util {
 			window.getInternalWindows().add(containerWin);
 			
 			// handle child components
-			Map<JComponent, WindowMsgOut> htmlComponents = htmlWebComponentsMap.get(container);
+			Map<JComponent, List<WindowMsgOut>> htmlComponents = htmlWebComponentsMap.get(container);
 			for (Component c : container.getComponents()) {
 				if (!c.isShowing()) {
 					continue;
@@ -572,10 +594,12 @@ public class Util {
 				
 				if (htmlComponents != null && htmlComponents.containsKey(c)) {
 					// if component contains a registered HtmlPanel
-					WindowMsgOut htmlWin = htmlComponents.get(c);
-					htmlWin.setOwnerId(containerWin.getId());
-					htmlWin.setType(WindowType.internalHtml);
-					window.getInternalWindows().add(htmlWin);
+					List<WindowMsgOut> htmlWins = htmlComponents.get(c);
+					htmlWins.forEach(htmlWin -> {
+						htmlWin.setOwnerId(containerWin.getId());
+						htmlWin.setType(WindowType.internalHtml);
+						window.getInternalWindows().add(htmlWin);
+					});
 				}
 				
 				WindowMsgOut componentWin = new WindowMsgOut(System.identityHashCode(c) + "", c.getName(), c.getLocationOnScreen(), c.getBounds().width, c.getBounds().height, WindowType.internal, containerWin.isModalBlocked(), containerWin.getId());
@@ -1283,5 +1307,10 @@ public class Util {
 	public static EvaluationProperties getEvaluationProps() {
 		return evaluationProps;
 	}
-	
+
+	public static Thread async(Runnable runnable) {
+		Thread thread = new Thread(runnable);
+		thread.start();
+		return thread;
+	}
 }

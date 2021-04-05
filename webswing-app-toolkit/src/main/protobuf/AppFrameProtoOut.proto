@@ -227,6 +227,7 @@ enum SimpleEventMsgOutProto {
     sessionTimeoutWarning = 8;
     sessionTimedOutNotification = 9;
     applicationBusy = 10;
+    reconnectInstanceNotFound = 11;
 }
 
 message JsEvalRequestMsgOutProto {

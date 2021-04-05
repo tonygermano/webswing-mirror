@@ -14,6 +14,222 @@ public final class CommonProto {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
+  /**
+   * Protobuf enum {@code commonProto.RecordingStatusEnumProto}
+   */
+  public enum RecordingStatusEnumProto
+      implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <code>NOT_RECORDING = 1;</code>
+     */
+    NOT_RECORDING(1),
+    /**
+     * <code>WAITING_FOR_RECORDING_APPROVAL = 2;</code>
+     */
+    WAITING_FOR_RECORDING_APPROVAL(2),
+    /**
+     * <code>DENIED_RECORDING_BY_USER = 3;</code>
+     */
+    DENIED_RECORDING_BY_USER(3),
+    /**
+     * <code>RECORDING = 4;</code>
+     */
+    RECORDING(4),
+    ;
+
+    /**
+     * <code>NOT_RECORDING = 1;</code>
+     */
+    public static final int NOT_RECORDING_VALUE = 1;
+    /**
+     * <code>WAITING_FOR_RECORDING_APPROVAL = 2;</code>
+     */
+    public static final int WAITING_FOR_RECORDING_APPROVAL_VALUE = 2;
+    /**
+     * <code>DENIED_RECORDING_BY_USER = 3;</code>
+     */
+    public static final int DENIED_RECORDING_BY_USER_VALUE = 3;
+    /**
+     * <code>RECORDING = 4;</code>
+     */
+    public static final int RECORDING_VALUE = 4;
+
+
+    public final int getNumber() {
+      return value;
+    }
+
+    /**
+     * @deprecated Use {@link #forNumber(int)} instead.
+     */
+    @java.lang.Deprecated
+    public static RecordingStatusEnumProto valueOf(int value) {
+      return forNumber(value);
+    }
+
+    public static RecordingStatusEnumProto forNumber(int value) {
+      switch (value) {
+        case 1: return NOT_RECORDING;
+        case 2: return WAITING_FOR_RECORDING_APPROVAL;
+        case 3: return DENIED_RECORDING_BY_USER;
+        case 4: return RECORDING;
+        default: return null;
+      }
+    }
+
+    public static com.google.protobuf.Internal.EnumLiteMap<RecordingStatusEnumProto>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static final com.google.protobuf.Internal.EnumLiteMap<
+        RecordingStatusEnumProto> internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<RecordingStatusEnumProto>() {
+            public RecordingStatusEnumProto findValueByNumber(int number) {
+              return RecordingStatusEnumProto.forNumber(number);
+            }
+          };
+
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      return getDescriptor().getValues().get(ordinal());
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return org.webswing.model.common.proto.CommonProto.getDescriptor().getEnumTypes().get(0);
+    }
+
+    private static final RecordingStatusEnumProto[] VALUES = values();
+
+    public static RecordingStatusEnumProto valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      return VALUES[desc.getIndex()];
+    }
+
+    private final int value;
+
+    private RecordingStatusEnumProto(int value) {
+      this.value = value;
+    }
+
+    // @@protoc_insertion_point(enum_scope:commonProto.RecordingStatusEnumProto)
+  }
+
+  /**
+   * Protobuf enum {@code commonProto.MirroringStatusEnumProto}
+   */
+  public enum MirroringStatusEnumProto
+      implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <code>NOT_MIRRORING = 1;</code>
+     */
+    NOT_MIRRORING(1),
+    /**
+     * <code>WAITING_FOR_MIRRORING_APPROVAL = 2;</code>
+     */
+    WAITING_FOR_MIRRORING_APPROVAL(2),
+    /**
+     * <code>DENIED_MIRRORING_BY_USER = 3;</code>
+     */
+    DENIED_MIRRORING_BY_USER(3),
+    /**
+     * <code>MIRRORING = 4;</code>
+     */
+    MIRRORING(4),
+    ;
+
+    /**
+     * <code>NOT_MIRRORING = 1;</code>
+     */
+    public static final int NOT_MIRRORING_VALUE = 1;
+    /**
+     * <code>WAITING_FOR_MIRRORING_APPROVAL = 2;</code>
+     */
+    public static final int WAITING_FOR_MIRRORING_APPROVAL_VALUE = 2;
+    /**
+     * <code>DENIED_MIRRORING_BY_USER = 3;</code>
+     */
+    public static final int DENIED_MIRRORING_BY_USER_VALUE = 3;
+    /**
+     * <code>MIRRORING = 4;</code>
+     */
+    public static final int MIRRORING_VALUE = 4;
+
+
+    public final int getNumber() {
+      return value;
+    }
+
+    /**
+     * @deprecated Use {@link #forNumber(int)} instead.
+     */
+    @java.lang.Deprecated
+    public static MirroringStatusEnumProto valueOf(int value) {
+      return forNumber(value);
+    }
+
+    public static MirroringStatusEnumProto forNumber(int value) {
+      switch (value) {
+        case 1: return NOT_MIRRORING;
+        case 2: return WAITING_FOR_MIRRORING_APPROVAL;
+        case 3: return DENIED_MIRRORING_BY_USER;
+        case 4: return MIRRORING;
+        default: return null;
+      }
+    }
+
+    public static com.google.protobuf.Internal.EnumLiteMap<MirroringStatusEnumProto>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static final com.google.protobuf.Internal.EnumLiteMap<
+        MirroringStatusEnumProto> internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<MirroringStatusEnumProto>() {
+            public MirroringStatusEnumProto findValueByNumber(int number) {
+              return MirroringStatusEnumProto.forNumber(number);
+            }
+          };
+
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      return getDescriptor().getValues().get(ordinal());
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return org.webswing.model.common.proto.CommonProto.getDescriptor().getEnumTypes().get(1);
+    }
+
+    private static final MirroringStatusEnumProto[] VALUES = values();
+
+    public static MirroringStatusEnumProto valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      return VALUES[desc.getIndex()];
+    }
+
+    private final int value;
+
+    private MirroringStatusEnumProto(int value) {
+      this.value = value;
+    }
+
+    // @@protoc_insertion_point(enum_scope:commonProto.MirroringStatusEnumProto)
+  }
+
   public interface ParamMsgInProtoOrBuilder extends
       // @@protoc_insertion_point(interface_extends:commonProto.ParamMsgInProto)
       com.google.protobuf.MessageOrBuilder {
@@ -913,9 +1129,21 @@ public final class CommonProto {
        */
       disableStatisticsLogging(11),
       /**
-       * <code>toggleRecording = 12;</code>
+       * <code>startRecording = 12;</code>
        */
-      toggleRecording(12),
+      startRecording(12),
+      /**
+       * <code>stopRecording = 13;</code>
+       */
+      stopRecording(13),
+      /**
+       * <code>startMirroring = 14;</code>
+       */
+      startMirroring(14),
+      /**
+       * <code>stopMirroring = 15;</code>
+       */
+      stopMirroring(15),
       ;
 
       /**
@@ -967,9 +1195,21 @@ public final class CommonProto {
        */
       public static final int disableStatisticsLogging_VALUE = 11;
       /**
-       * <code>toggleRecording = 12;</code>
+       * <code>startRecording = 12;</code>
        */
-      public static final int toggleRecording_VALUE = 12;
+      public static final int startRecording_VALUE = 12;
+      /**
+       * <code>stopRecording = 13;</code>
+       */
+      public static final int stopRecording_VALUE = 13;
+      /**
+       * <code>startMirroring = 14;</code>
+       */
+      public static final int startMirroring_VALUE = 14;
+      /**
+       * <code>stopMirroring = 15;</code>
+       */
+      public static final int stopMirroring_VALUE = 15;
 
 
       public final int getNumber() {
@@ -998,7 +1238,10 @@ public final class CommonProto {
           case 9: return requestWindowSwitchList;
           case 10: return enableStatisticsLogging;
           case 11: return disableStatisticsLogging;
-          case 12: return toggleRecording;
+          case 12: return startRecording;
+          case 13: return stopRecording;
+          case 14: return startMirroring;
+          case 15: return stopMirroring;
           default: return null;
         }
       }
@@ -5384,30 +5627,38 @@ public final class CommonProto {
     java.lang.String[] descriptorData = {
       "\n\021CommonProto.proto\022\013commonProto\".\n\017Para" +
       "mMsgInProto\022\014\n\004name\030\001 \001(\t\022\r\n\005value\030\002 \001(\t" +
-      "\"\203\003\n\025SimpleEventMsgInProto\022E\n\004type\030\001 \001(\016" +
+      "\"\274\003\n\025SimpleEventMsgInProto\022E\n\004type\030\001 \001(\016" +
       "27.commonProto.SimpleEventMsgInProto.Sim" +
-      "pleEventTypeProto\"\242\002\n\024SimpleEventTypePro" +
+      "pleEventTypeProto\"\333\002\n\024SimpleEventTypePro" +
       "to\022\n\n\006unload\020\000\022\r\n\tkillSwing\020\001\022\022\n\016killSwi" +
       "ngAdmin\020\002\022\014\n\010paintAck\020\003\022\013\n\007repaint\020\004\022\020\n\014" +
       "downloadFile\020\005\022\016\n\ndeleteFile\020\006\022\027\n\023cancel" +
       "FileSelection\020\007\022\030\n\024requestComponentTree\020" +
       "\010\022\033\n\027requestWindowSwitchList\020\t\022\033\n\027enable" +
       "StatisticsLogging\020\n\022\034\n\030disableStatistics" +
-      "Logging\020\013\022\023\n\017toggleRecording\020\014\"\227\003\n\035Conne" +
-      "ctionHandshakeMsgInProto\022\022\n\ninstanceId\030\001" +
-      " \001(\t\022\016\n\006viewId\030\002 \001(\t\022\021\n\tbrowserId\030\003 \001(\t\022" +
-      "\024\n\014desktopWidth\030\004 \001(\r\022\025\n\rdesktopHeight\030\005" +
-      " \001(\r\022\027\n\017applicationName\030\006 \001(\t\022\020\n\010mirrore" +
-      "d\030\007 \001(\010\022\033\n\023directDrawSupported\030\010 \001(\010\022\024\n\014" +
-      "documentBase\030\t \001(\t\022,\n\006params\030\n \003(\0132\034.com" +
-      "monProto.ParamMsgInProto\022\016\n\006locale\030\013 \001(\t" +
-      "\022\013\n\003url\030\014 \001(\t\022\020\n\010timeZone\030\r \001(\t\022\030\n\020docki" +
-      "ngSupported\030\016 \001(\010\022\021\n\ttouchMode\030\017 \001(\010\022\033\n\023" +
-      "accessiblityEnabled\030\020 \001(\010\022\r\n\005tabId\030\021 \001(\t" +
-      "\"j\n\024TimestampsMsgInProto\022\026\n\016startTimesta" +
-      "mp\030\001 \001(\t\022\025\n\rsendTimestamp\030\002 \001(\t\022\025\n\rrende" +
-      "ringTime\030\003 \001(\t\022\014\n\004ping\030\004 \001(\rB!\n\037org.webs" +
-      "wing.model.common.proto"
+      "Logging\020\013\022\022\n\016startRecording\020\014\022\021\n\rstopRec" +
+      "ording\020\r\022\022\n\016startMirroring\020\016\022\021\n\rstopMirr" +
+      "oring\020\017\"\227\003\n\035ConnectionHandshakeMsgInProt" +
+      "o\022\022\n\ninstanceId\030\001 \001(\t\022\016\n\006viewId\030\002 \001(\t\022\021\n" +
+      "\tbrowserId\030\003 \001(\t\022\024\n\014desktopWidth\030\004 \001(\r\022\025" +
+      "\n\rdesktopHeight\030\005 \001(\r\022\027\n\017applicationName" +
+      "\030\006 \001(\t\022\020\n\010mirrored\030\007 \001(\010\022\033\n\023directDrawSu" +
+      "pported\030\010 \001(\010\022\024\n\014documentBase\030\t \001(\t\022,\n\006p" +
+      "arams\030\n \003(\0132\034.commonProto.ParamMsgInProt" +
+      "o\022\016\n\006locale\030\013 \001(\t\022\013\n\003url\030\014 \001(\t\022\020\n\010timeZo" +
+      "ne\030\r \001(\t\022\030\n\020dockingSupported\030\016 \001(\010\022\021\n\tto" +
+      "uchMode\030\017 \001(\010\022\033\n\023accessiblityEnabled\030\020 \001" +
+      "(\010\022\r\n\005tabId\030\021 \001(\t\"j\n\024TimestampsMsgInProt" +
+      "o\022\026\n\016startTimestamp\030\001 \001(\t\022\025\n\rsendTimesta" +
+      "mp\030\002 \001(\t\022\025\n\rrenderingTime\030\003 \001(\t\022\014\n\004ping\030" +
+      "\004 \001(\r*~\n\030RecordingStatusEnumProto\022\021\n\rNOT" +
+      "_RECORDING\020\001\022\"\n\036WAITING_FOR_RECORDING_AP" +
+      "PROVAL\020\002\022\034\n\030DENIED_RECORDING_BY_USER\020\003\022\r" +
+      "\n\tRECORDING\020\004*~\n\030MirroringStatusEnumProt" +
+      "o\022\021\n\rNOT_MIRRORING\020\001\022\"\n\036WAITING_FOR_MIRR" +
+      "ORING_APPROVAL\020\002\022\034\n\030DENIED_MIRRORING_BY_" +
+      "USER\020\003\022\r\n\tMIRRORING\020\004B!\n\037org.webswing.mo" +
+      "del.common.proto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

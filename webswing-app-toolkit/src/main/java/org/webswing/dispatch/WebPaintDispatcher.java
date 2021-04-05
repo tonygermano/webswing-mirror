@@ -65,7 +65,6 @@ public class WebPaintDispatcher extends AbstractPaintDispatcher {
 							}
 							
 							fillMoveAction(frame);
-							fillFocusEvent(frame);
 							setClientNotReady();
 						}
 					}

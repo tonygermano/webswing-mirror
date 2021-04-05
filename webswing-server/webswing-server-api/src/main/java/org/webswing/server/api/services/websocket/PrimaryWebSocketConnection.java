@@ -5,13 +5,12 @@ import org.webswing.model.common.in.ConnectionHandshakeMsgIn;
 public interface PrimaryWebSocketConnection extends BrowserWebSocketConnection {
 	
 	String uuid();
-	
-	boolean isRecording();
+
+	boolean isRecordingFlagged();
 	
 	ConnectionHandshakeMsgIn getReconnectHandshake();
 	
 	WebSocketUserInfo getUserInfo();
 	
 	String getPath();
-	
 }

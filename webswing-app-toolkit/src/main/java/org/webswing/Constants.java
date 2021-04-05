@@ -60,11 +60,30 @@ public interface Constants {
 	String SWING_START_SYS_ALLOW_REDIRECT_STD_OUT = "webswing.allowRedirectStdOut";
 	String SWING_START_SYS_PROP_WEBSOCKET_URL = "webswing.websocketUrl";
 	String SWING_START_SYS_PROP_STATISTICS_LOGGING_ENABLED = "webswing.statisticsLoggingEnabled";
-	String SWING_START_SYS_PROP_RECORDING = "webswing.recording";
+	String SWING_START_SYS_PROP_RECORDING_FLAGGED = "webswing.recording.flagged";
+	String SWING_START_SYS_PROP_RECORDING_ASK_NEEDED = "webswing.recording.ask.needed";
+	String SWING_START_SYS_PROP_MIRRORING_ASK_NEEDED = "webswing.mirroring.ask.needed";
+	String SWING_START_SYS_PROP_RECORDING_MESSAGE = "webswing.recording.message";
+	String SWING_START_SYS_PROP_MIRRORING_MESSAGE = "webswing.mirroring.message";
+	String SWING_START_SYS_PROP_RECORDING_MESSAGE_DEFAULT = "Administrator wants to record your session.\nDo you want to allow the recording?";
+	String SWING_START_SYS_PROP_MIRRORING_MESSAGE_DEFAULT = "Administrator wants to mirror and take control of your session.\nDo you want to allow the mirroring?";
+	String SWING_START_SYS_PROP_RECORDING_DIALOG_TITLE = "webswing.recording.title";
+	String SWING_START_SYS_PROP_MIRRORING_DIALOG_TITLE = "webswing.mirroring.title";
+	String SWING_START_SYS_PROP_RECORDING_DIALOG_TITLE_DEFAULT = "Session recording";
+	String SWING_START_SYS_PROP_MIRRORING_DIALOG_TITLE_DEFAULT = "Session mirroring";
+	String SWING_START_SYS_PROP_RECORDING_ALLOW_BUTTON = "webswing.recording.allow";
+	String SWING_START_SYS_PROP_MIRRORING_ALLOW_BUTTON = "webswing.mirroring.allow";
+	String SWING_START_SYS_PROP_RECORDING_ALLOW_BUTTON_DEFAULT = "Allow";
+	String SWING_START_SYS_PROP_MIRRORING_ALLOW_BUTTON_DEFAULT = "Allow";
+	String SWING_START_SYS_PROP_RECORDING_DENY_BUTTON = "webswing.recording.deny";
+	String SWING_START_SYS_PROP_MIRRORING_DENY_BUTTON = "webswing.mirroring.deny";
+	String SWING_START_SYS_PROP_RECORDING_DENY_BUTTON_DEFAULT = "Deny";
+	String SWING_START_SYS_PROP_MIRRORING_DENY_BUTTON_DEFAULT = "Deny";
 	String SWING_START_SYS_PROP_IS_APPLET = "webswing.launcherType.applet";
 	String SWING_START_SYS_PROP_SESSION_LOGGING_ENABLED = "webswing.sessionLoggingEnabled";
 	String SWING_START_SYS_PROP_DATA_STORE_CONFIG = "webswing.dataStoreConfig";
 
+	String SESSION_POOL_DRAIN_MODE = "webswing.sessionPool.drainMode";
 
 	String PRINTER_JOB_CLASS = "webswing.printerJobDelegate";
 
@@ -212,7 +231,7 @@ public interface Constants {
 	String WEBSWING_SESSION_LOGIN_SESSION_TOKEN = "wlst";
 	String WEBSWING_SESSION_ADMIN_CONSOLE_LOGIN_TOKEN = "waclt";
 	String WEBSWING_SESSION_ADMIN_CONSOLE_REFRESH_TOKEN = "wacrt";
-	String WEBSWING_SESSION_ADMIN_CONSOLE_THREAD_DUMP_TOKEN = "wactdt";
+	String WEBSWING_SESSION_ADMIN_CONSOLE_DOWNLOAD_TOKEN = "wacdt";
 	
 	String WEBSWING_CONNECTION_SECRET = "webswing.connection.secret";
 	String WEBSWING_CONNECTION_SECRET_DEFAULT = "change_this_in_production_000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
@@ -225,7 +244,7 @@ public interface Constants {
 	String JWT_SUBJECT_ADMIN_CONSOLE_LOGIN = "adminConsoleLogin";
 	String JWT_SUBJECT_ADMIN_CONSOLE_ACCESS = "adminConsoleAccess";
 	String JWT_SUBJECT_ADMIN_CONSOLE_REFRESH = "adminConsoleRefresh";
-	String JWT_SUBJECT_ADMIN_CONSOLE_THREAD_DUMP = "adminConsoleThreadDump";
+	String JWT_SUBJECT_ADMIN_CONSOLE_DOWNLOAD = "adminConsoleDownload";
 	String JWT_CLAIM_WEBSWING = "webs";
 	String JWT_CLAIM_WEBSWING_LOGIN_SESSION = "wlsc";
 	
@@ -260,8 +279,8 @@ public interface Constants {
 	String JWT_ADMIN_CONSOLE_REFRESH_TOKEN_EXPIRATION_MILLIS = "webswing.jwt.token.adminConsoleRefresh.expiration";
 	long JWT_ADMIN_CONSOLE_REFRESH_TOKEN_EXPIRATION_MILLIS_DEFAULT = TimeUnit.MINUTES.toMillis(30);
 	
-	String JWT_ADMIN_CONSOLE_THREAD_DUMP_TOKEN_EXPIRATION_MILLIS = "webswing.jwt.token.adminConsoleThreadDump.expiration";
-	long JWT_ADMIN_CONSOLE_THREAD_DUMP_TOKEN_EXPIRATION_MILLIS_DEFAULT = TimeUnit.MINUTES.toMillis(30);
+	String JWT_ADMIN_CONSOLE_DOWNLOAD_TOKEN_EXPIRATION_MILLIS = "webswing.jwt.token.adminConsoleThreadDump.expiration";
+	long JWT_ADMIN_CONSOLE_DOWNLOAD_TOKEN_EXPIRATION_MILLIS_DEFAULT = TimeUnit.MINUTES.toMillis(30);
 	
 	String JWT_CLOCK_SKEW_SECONDS = "webswing.jwt.clockskew.seconds";
 	long JWT_CLOCK_SKEW_SECONDS_DEFAULT = TimeUnit.MINUTES.toSeconds(3);

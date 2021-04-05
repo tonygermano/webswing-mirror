@@ -140,7 +140,6 @@ public class CwmPaintDispatcher extends AbstractPaintDispatcher {
 						}
 					}
 
-					fillFocusEvent(frame);
 					setClientNotReady();
 					sendUpdateScheduled.set(false);
 				}

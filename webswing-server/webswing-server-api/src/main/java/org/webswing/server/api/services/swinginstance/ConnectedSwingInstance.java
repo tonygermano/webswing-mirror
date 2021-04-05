@@ -58,7 +58,9 @@ public interface ConnectedSwingInstance extends RemoteSwingInstance {
 
 	void logWarningHistory();
 
-	void toggleRecording();
+	void startRecording();
+
+	void stopRecording();
 	
 	ThreadDumpMsgOut getThreadDump(String timestamp);
 	

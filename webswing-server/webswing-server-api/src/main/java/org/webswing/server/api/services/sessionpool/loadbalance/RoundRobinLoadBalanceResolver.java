@@ -16,6 +16,7 @@ public class RoundRobinLoadBalanceResolver implements LoadBalanceResolver {
 		
 		synchronized (sessionPools) {
 			ServerSessionPoolConnector sp = sessionPools.pollFirst();
+
 			if (sp == null) {
 				return null;
 			}
@@ -29,7 +30,7 @@ public class RoundRobinLoadBalanceResolver implements LoadBalanceResolver {
 					firstPool = sp;
 				}
 				
-				if (sp.accepts(path)) {
+				if (!sp.isDrainMode() && sp.accepts(path)) {
 					return sp;
 				}
 				

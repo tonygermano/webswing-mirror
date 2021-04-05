@@ -13,6 +13,8 @@ public interface SwingProcessService extends SessionPoolService {
 	
 	void killAll(String path);
 
+	void killAll();
+
 	SwingProcess getByInstanceId(String instanceId);
 	
 	List<SwingProcess> getAll();

@@ -179,6 +179,42 @@ $root.commonProto = (function() {
         return ParamMsgInProto;
     })();
 
+    /**
+     * RecordingStatusEnumProto enum.
+     * @name commonProto.RecordingStatusEnumProto
+     * @enum {string}
+     * @property {number} NOT_RECORDING=1 NOT_RECORDING value
+     * @property {number} WAITING_FOR_RECORDING_APPROVAL=2 WAITING_FOR_RECORDING_APPROVAL value
+     * @property {number} DENIED_RECORDING_BY_USER=3 DENIED_RECORDING_BY_USER value
+     * @property {number} RECORDING=4 RECORDING value
+     */
+    commonProto.RecordingStatusEnumProto = (function() {
+        var valuesById = {}, values = Object.create(valuesById);
+        values[valuesById[1] = "NOT_RECORDING"] = 1;
+        values[valuesById[2] = "WAITING_FOR_RECORDING_APPROVAL"] = 2;
+        values[valuesById[3] = "DENIED_RECORDING_BY_USER"] = 3;
+        values[valuesById[4] = "RECORDING"] = 4;
+        return values;
+    })();
+
+    /**
+     * MirroringStatusEnumProto enum.
+     * @name commonProto.MirroringStatusEnumProto
+     * @enum {string}
+     * @property {number} NOT_MIRRORING=1 NOT_MIRRORING value
+     * @property {number} WAITING_FOR_MIRRORING_APPROVAL=2 WAITING_FOR_MIRRORING_APPROVAL value
+     * @property {number} DENIED_MIRRORING_BY_USER=3 DENIED_MIRRORING_BY_USER value
+     * @property {number} MIRRORING=4 MIRRORING value
+     */
+    commonProto.MirroringStatusEnumProto = (function() {
+        var valuesById = {}, values = Object.create(valuesById);
+        values[valuesById[1] = "NOT_MIRRORING"] = 1;
+        values[valuesById[2] = "WAITING_FOR_MIRRORING_APPROVAL"] = 2;
+        values[valuesById[3] = "DENIED_MIRRORING_BY_USER"] = 3;
+        values[valuesById[4] = "MIRRORING"] = 4;
+        return values;
+    })();
+
     commonProto.SimpleEventMsgInProto = (function() {
 
         /**
@@ -330,9 +366,21 @@ $root.commonProto = (function() {
             case 11:
                 message.type = 11;
                 break;
-            case "toggleRecording":
+            case "startRecording":
             case 12:
                 message.type = 12;
+                break;
+            case "stopRecording":
+            case 13:
+                message.type = 13;
+                break;
+            case "startMirroring":
+            case 14:
+                message.type = 14;
+                break;
+            case "stopMirroring":
+            case 15:
+                message.type = 15;
                 break;
             }
             return message;
@@ -385,7 +433,10 @@ $root.commonProto = (function() {
          * @property {number} requestWindowSwitchList=9 requestWindowSwitchList value
          * @property {number} enableStatisticsLogging=10 enableStatisticsLogging value
          * @property {number} disableStatisticsLogging=11 disableStatisticsLogging value
-         * @property {number} toggleRecording=12 toggleRecording value
+         * @property {number} startRecording=12 startRecording value
+         * @property {number} stopRecording=13 stopRecording value
+         * @property {number} startMirroring=14 startMirroring value
+         * @property {number} stopMirroring=15 stopMirroring value
          */
         SimpleEventMsgInProto.SimpleEventTypeProto = (function() {
             var valuesById = {}, values = Object.create(valuesById);
@@ -401,7 +452,10 @@ $root.commonProto = (function() {
             values[valuesById[9] = "requestWindowSwitchList"] = 9;
             values[valuesById[10] = "enableStatisticsLogging"] = 10;
             values[valuesById[11] = "disableStatisticsLogging"] = 11;
-            values[valuesById[12] = "toggleRecording"] = 12;
+            values[valuesById[12] = "startRecording"] = 12;
+            values[valuesById[13] = "stopRecording"] = 13;
+            values[valuesById[14] = "startMirroring"] = 14;
+            values[valuesById[15] = "stopMirroring"] = 15;
             return values;
         })();
 

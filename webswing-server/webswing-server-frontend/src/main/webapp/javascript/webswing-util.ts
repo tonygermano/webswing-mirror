@@ -85,7 +85,7 @@ export function Util(translations: Translations) {
                     if (loginMsg.redirectUrl != null) {
                         window.top.location.href = loginMsg.redirectUrl;
                     } else if (loginMsg.partialHtml != null) {
-                        elementResolved.html(translate(loginMsg.partialHtml));
+                    	updateLoginDialogContent(elementResolved, translate(loginMsg.partialHtml));
                         const form = elementResolved.find('form').first();
                         form.submit((event) => {
                             elementResolved.find('#progress').show();
@@ -107,13 +107,21 @@ export function Util(translations: Translations) {
                         } else {
                             elementResolved = element;
                         }
-
-                		elementResolved.html(translate("<p>${login.serverNotAvailable}</p>"));
+						
+						updateLoginDialogContent(elementResolved, translate("<p>${login.serverNotAvailable}</p>"));
                 	}
                 }
             }
         });
     }
+    
+    function updateLoginDialogContent(elementResolved: JQuery<HTMLElement>, content: string) {
+    	elementResolved.html(content);
+    	const dialogParents = elementResolved.parents('.ws-modal-container[data-id=commonDialog]');
+    	if (dialogParents.length !== 0) {
+        	dialogParents.attr("data-type", "login");
+    	}
+	}
 
     function webswingLogout(baseUrl: string, element: (() => JQuery<HTMLElement>) | JQuery<HTMLElement>, doneCallback: () => void, failedCallback: () => void, tabLogout?: boolean) {
     	const oldToken = token;
@@ -158,7 +166,7 @@ export function Util(translations: Translations) {
                     window.top.location.href = loginMsg.redirectUrl;
                         return;
                 } else if (loginMsg.partialHtml != null) {
-                    elementResolved.html(translate(loginMsg.partialHtml));
+	                updateLoginDialogContent(elementResolved, translate(loginMsg.partialHtml));
                 } else {
                         console.error("WebswingLogin: Unexpected response:"+JSON.stringify(loginMsg));
                     doneCallback();
