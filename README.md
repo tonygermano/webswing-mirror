@@ -1,30 +1,5 @@
-![logo2.png](https://bitbucket.org/repo/ypeqyM/images/2077889959-logo2.png)
+Development of Webswing has been moved to internal repository. No further updates will be published to this repository.
 
-**Webswing** is a web server that allows you to run any Java swing application inside your web browser using only pure HTML5.
+For further information please refer to our website: [webswing.org](https://www.webswing.org)
 
-The best days of swing framework are gone. Desktop applications lost popularity and everything is forced to be online and mobile. But what about existing application? Using applet technology proved to be insecure, and rewriting the application to web is too expensive. This is where Webswing can help you. With Webswing, your application is securely running on a server and a user's browser only displays the application window. All this without changing a single line of source code.
-
-## Attribution
-
-In case you are using Webswing to deliver your product **give a credit and a create link on your page to webswing.org!**
-
-## Contribution
-
-If you want to contribute to Webswing, be sure to review the [contribution guidelines](http://webswing.org/docs/version-2.5/contrib/).
-We use [bitbucket issues](https://bitbucket.org/meszarv/webswing/issues) for tracking requests and bugs.
-
-## Links
-
-[Webswing Website](https://www.webswing.org)
-
-[Documentation](https://webswing.org/docs/)
-
-[Downloads](https://www.webswing.org/downloads)
-
-[Webswing Promo Video - Youtube](https://youtu.be/IpYlyCRZcxc)
-
-[Webswing Quickstart Guide Video - Youtube](https://youtu.be/TKFJEfBBpKI)
-
-## License
-
-[GNU Affero General Public License](https://www.gnu.org/licenses/agpl-3.0.en.html)
+or contact us at support[at]webswing.org
